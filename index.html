@@ -5,43 +5,128 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>大阪・白濱・和歌山 5日遊</title>
   
+  <!-- CSS & Favicon -->
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="site.webmanifest">
   <link rel="apple-touch-icon" href="icon.png">
 
   <style>
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      margin: 0; padding: 0; color: #333; background-color: #f8f9fa; line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      background-color: #f8f9fa;
+      line-height: 1.6;
     }
-    header { background: #0056b3; color: #fff; padding: 2rem 1rem; text-align: center; }
+    header {
+      background: #0056b3;
+      color: #fff;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
     header h1 { margin: 0; font-size: 1.8rem; }
     header p { margin: 0.5rem 0 0; opacity: 0.9; }
+
     nav {
-      position: sticky; top: 0; background: #ffffff; display: flex;
-      justify-content: space-around; padding: 0.75rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      z-index: 100; overflow-x: auto;
+      position: sticky;
+      top: 0;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-around;
+      padding: 0.75rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 100;
+      overflow-x: auto;
     }
-    nav a { color: #0056b3; text-decoration: none; font-weight: bold; padding: 0.25rem 0.5rem; white-space: nowrap; }
-    nav a:hover { text-decoration: underline; }
-    main { max-width: 800px; margin: 1.5rem auto; padding: 0 1rem; }
+    nav a {
+      color: #0056b3;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 0.25rem 0.5rem;
+      white-space: nowrap;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+    }
     section {
-      background: #fff; margin-bottom: 2rem; padding: 1.5rem;
-      border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); scroll-margin-top: 70px;
+      background: #fff;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      scroll-margin-top: 70px;
     }
-    h2 { border-bottom: 2px solid #0056b3; padding-bottom: 0.5rem; color: #0056b3; margin-top: 0; }
-    .item { margin-bottom: 1.2rem; padding-bottom: 1rem; border-bottom: 1px dashed #eee; }
-    .item:last-child { border-bottom: none; }
-    .time { font-weight: bold; color: #d9534f; font-size: 0.9rem; }
-    .title { font-weight: bold; font-size: 1.1rem; margin: 0.2rem 0; }
-    .map-link { display: inline-block; margin-top: 0.3rem; color: #28a745; text-decoration: none; font-size: 0.9rem; }
+    h2 {
+      border-bottom: 2px solid #0056b3;
+      padding-bottom: 0.5rem;
+      color: #0056b3;
+      margin-top: 0;
+    }
+
+    .item {
+      margin-bottom: 1.2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px dashed #eee;
+    }
+    .item:last-child {
+      border-bottom: none;
+    }
+    .time {
+      font-weight: bold;
+      color: #d9534f;
+      font-size: 0.9rem;
+    }
+    .title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin: 0.2rem 0;
+    }
+    .map-link {
+      display: inline-block;
+      margin-top: 0.3rem;
+      color: #28a745;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
     .map-link:hover { text-decoration: underline; }
+
     textarea#memo {
-      width: 100%; height: 120px; padding: 0.75rem; border: 1px solid #ccc;
-      border-radius: 6px; box-sizing: border-box; font-size: 0.95rem; margin-top: 0.5rem; resize: vertical;
+      width: 100%;
+      height: 120px;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 0.95rem;
+      margin-top: 0.5rem;
+      resize: vertical;
     }
-    .status-msg { font-size: 0.8rem; color: #6c757d; margin-top: 0.2rem; }
+    .status-msg {
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin-top: 0.2rem;
+    }
+    .info-box {
+      background-color: #f1f8ff;
+      border-left: 4px solid #0056b3;
+      padding: 0.8rem 1rem;
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .info-box ul {
+      margin: 0.3rem 0 0 1.2rem;
+      padding: 0;
+    }
   </style>
 </head>
 <body>
@@ -73,13 +158,13 @@
         </div>
         <div class="item">
           <div class="time">07:15 - 08:48</div>
-          <div class="title">🛃 入境與周遊券兌換</div>
-          <div>辦理入境與提取行李，至 JR 綠色窗口兌換 JR 關西廣域鐵路周遊券。</div>
+          <div class="title">🛃 入境與周遊券兌換／劃位</div>
+          <div>前往 JR 關西機場站（2F），於綠色自動售票機領取 JR 周遊券並預約 Kuroshio 特急指定席。</div>
         </div>
         <div class="item">
           <div class="time">08:48 - 11:00</div>
           <div class="title">🚆 機場 ➔ 白濱站</div>
-          <div>搭乘 JR 特急 Kuroshio 直達白濱（如換票較久可順延至下一班）。</div>
+          <div>搭乘 JR 特急 Kuroshio 直達白濱（若換票時間延長可順延至下一班）。</div>
         </div>
         <div class="item">
           <div class="time">11:30 - 13:00</div>
@@ -108,7 +193,7 @@
         <div class="item">
           <div class="time">09:20 - 10:40</div>
           <div class="title">🚆 白濱 ➔ 和歌山</div>
-          <div>搭乘 JR 特急 Kuroshio 前往 JR 和歌山站（行李可寄放於和歌山站置物櫃）。</div>
+          <div>搭乘 JR 特急 Kuroshio 前往 JR 和歌山站（建議將大行李寄放於和歌山站置物櫃）。</div>
         </div>
         <div class="item">
           <div class="time">10:55 - 13:00</div>
@@ -222,8 +307,20 @@
         <p><strong>白濱：</strong>浜千鳥の湯 海舟<br>TEL: <a href="tel:+81739822220">+81 739-82-2220</a></p>
       </div>
       <div class="item">
-        <div class="title">🎫 交通票券</div>
-        <p>JR 關西廣域鐵路周遊券 (5日券)</p>
+        <div class="title">🎫 交通票券：JR 關西廣域鐵路周遊券 (5日券)</div>
+        <div class="info-box">
+          <strong>📍 關西機場兌換地點：</strong>JR 關西機場站 2 樓（綠色自動售票機 / 綠色窗口）<br>
+          <strong>📄 兌換必備文件：</strong>
+          <ul>
+            <li>帶有「短期滯在」貼紙的護照正本（須含 IC 晶片以使用售票機）</li>
+            <li>QR Code 電子兌換券 (E-TICKET / MCO)</li>
+          </ul>
+          <strong style="display:inline-block; margin-top:0.3rem;">⚠️ Kuroshio 特急劃位注意事項：</strong>
+          <ul>
+            <li>Kuroshio 已改為<strong>全車指定席</strong>，搭乘前須憑周遊券於售票機免費劃位。</li>
+            <li>建議 Day 1 兌換周遊券時，同步將 Day 1 與 Day 2 的 Kuroshio 車次劃位完成。</li>
+          </ul>
+        </div>
       </div>
       <div class="item">
         <div class="title">📝 隨手記/購物清單 (自動儲存)</div>
