@@ -100,22 +100,6 @@
     }
     .map-link:hover { text-decoration: underline; }
 
-    textarea#memo {
-      width: 100%;
-      height: 120px;
-      padding: 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-sizing: border-box;
-      font-size: 0.95rem;
-      margin-top: 0.5rem;
-      resize: vertical;
-    }
-    .status-msg {
-      font-size: 0.8rem;
-      color: #6c757d;
-      margin-top: 0.2rem;
-    }
     .info-box {
       background-color: #f1f8ff;
       border-left: 4px solid #0056b3;
@@ -126,6 +110,79 @@
     .info-box ul {
       margin: 0.3rem 0 0 1.2rem;
       padding: 0;
+    }
+
+    /* 記帳結算表樣式 */
+    .ledger-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.8rem;
+    }
+    .ledger-form input, .ledger-form select, .ledger-form button {
+      padding: 0.5rem;
+      font-size: 0.9rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .ledger-form input[type="text"] { flex: 2; min-width: 120px; }
+    .ledger-form input[type="number"] { flex: 1; min-width: 80px; }
+    .ledger-form select { flex: 1; min-width: 90px; }
+    .ledger-form button {
+      background-color: #0056b3;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .ledger-form button:hover { background-color: #004085; }
+
+    .ledger-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+    .ledger-table th, .ledger-table td {
+      border: 1px solid #dee2e6;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    .ledger-table th { background-color: #f1f3f5; }
+    .ledger-table td.num { text-align: right; }
+    .delete-btn {
+      color: #d9534f;
+      cursor: pointer;
+      font-weight: bold;
+      border: none;
+      background: none;
+      padding: 0;
+    }
+
+    .summary-box {
+      margin-top: 1rem;
+      background: #e9ecef;
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .clear-btn {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .status-msg {
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin-top: 0.4rem;
     }
   </style>
 </head>
@@ -295,9 +352,9 @@
       </div>
     </section>
 
-    <!-- Info & Notepad Section -->
+    <!-- Info & Ledger Section -->
     <section id="info">
-      <h2>ℹ️ 實用資訊與離線備忘錄</h2>
+      <h2>ℹ️ 實用資訊與行程開支埋數</h2>
       <div class="item">
         <div class="title">✈️ 航班資訊</div>
         <p><strong>去程：</strong>香港航空 HX616 (02:40 - 07:15)<br><strong>回程：</strong>香港航空 HX613 (20:20 - 23:50)</p>
@@ -322,32 +379,126 @@
           </ul>
         </div>
       </div>
+
+      <!-- 記帳埋數模組 -->
       <div class="item">
-        <div class="title">📝 隨手記/購物清單 (自動儲存)</div>
-        <textarea id="memo" placeholder="在此輸入文字，系統會自動儲存到手機/瀏覽器..."></textarea>
-        <div id="status" class="status-msg">內容自動儲存中...</div>
+        <div class="title">📊 旅途記帳與開支埋數 (自動儲存)</div>
+        <div class="ledger-form">
+          <input type="text" id="itemName" placeholder="項目名稱 (例: 藥妝/黑門市場)" />
+          <input type="number" id="itemAmount" placeholder="金額 ¥" />
+          <select id="payMethod">
+            <option value="現金">現金</option>
+            <option value="信用卡">信用卡</option>
+            <option value="西瓜卡/ICOCA">IC卡</option>
+          </select>
+          <button type="button" id="addBtn">新增項目</button>
+        </div>
+
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>方式</th>
+              <th style="text-align:right;">金額 (日圓)</th>
+              <th style="width: 40px; text-align:center;">刪除</th>
+            </tr>
+          </thead>
+          <tbody id="ledgerBody">
+            <!-- 動態加入記帳明細 -->
+          </tbody>
+        </table>
+
+        <div class="summary-box">
+          <div>
+            總計：<span id="totalJPY">¥0</span> JPY 
+            <span style="font-weight:normal; font-size:0.85rem; color:#555;">(約 <span id="totalHKD">$0</span> HKD)</span>
+          </div>
+          <button type="button" class="clear-btn" id="clearBtn">清空紀錄</button>
+        </div>
+        <div id="status" class="status-msg">資料自動儲存中...</div>
       </div>
     </section>
 
   </main>
 
+  <!-- 記帳模組 JavaScript -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const memo = document.getElementById("memo");
+      const itemName = document.getElementById("itemName");
+      const itemAmount = document.getElementById("itemAmount");
+      const payMethod = document.getElementById("payMethod");
+      const addBtn = document.getElementById("addBtn");
+      const ledgerBody = document.getElementById("ledgerBody");
+      const totalJPY = document.getElementById("totalJPY");
+      const totalHKD = document.getElementById("totalHKD");
+      const clearBtn = document.getElementById("clearBtn");
       const status = document.getElementById("status");
 
-      const savedMemo = localStorage.getItem("travel_memo");
-      if (savedMemo !== null) {
-        memo.value = savedMemo;
-        status.textContent = "已載入歷史備忘錄";
-      } else {
-        status.textContent = "";
+      const JPY_TO_HKD_RATE = 0.052; // 預設日圓兌港幣匯率
+
+      let ledgerData = JSON.parse(localStorage.getItem("travel_ledger")) || [];
+
+      function renderLedger() {
+        ledgerBody.innerHTML = "";
+        let sum = 0;
+
+        if (ledgerData.length === 0) {
+          ledgerBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">暫無記帳明細</td></tr>';
+        } else {
+          ledgerData.forEach((item, index) => {
+            sum += item.amount;
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${item.name}</td>
+              <td>${item.method}</td>
+              <td class="num">¥${item.amount.toLocaleString()}</td>
+              <td style="text-align:center;"><button class="delete-btn" onclick="deleteItem(${index})">✕</button></td>
+            `;
+            ledgerBody.appendChild(tr);
+          });
+        }
+
+        totalJPY.textContent = "¥" + sum.toLocaleString();
+        totalHKD.textContent = "$" + Math.round(sum * JPY_TO_HKD_RATE).toLocaleString();
+        localStorage.setItem("travel_ledger", JSON.stringify(ledgerData));
       }
 
-      memo.addEventListener("input", function () {
-        localStorage.setItem("travel_memo", memo.value);
-        status.textContent = "已自動儲存 " + new Date().toLocaleTimeString();
+      addBtn.addEventListener("click", function () {
+        const name = itemName.value.trim();
+        const amount = parseFloat(itemAmount.value);
+
+        if (!name || isNaN(amount) || amount <= 0) {
+          alert("請輸入有效的項目名稱與金額！");
+          return;
+        }
+
+        ledgerData.push({
+          name: name,
+          amount: amount,
+          method: payMethod.value
+        });
+
+        itemName.value = "";
+        itemAmount.value = "";
+        renderLedger();
+        status.textContent = "已更新並自動儲存 " + new Date().toLocaleTimeString();
       });
+
+      window.deleteItem = function (index) {
+        ledgerData.splice(index, 1);
+        renderLedger();
+        status.textContent = "已刪除項目 " + new Date().toLocaleTimeString();
+      };
+
+      clearBtn.addEventListener("click", function () {
+        if (confirm("確定要清空所有開支紀錄嗎？")) {
+          ledgerData = [];
+          renderLedger();
+          status.textContent = "所有紀錄已清空";
+        }
+      });
+
+      renderLedger();
     });
   </script>
 </body>
