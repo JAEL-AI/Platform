@@ -5,117 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>大阪・白濱・和歌山 5日遊</title>
   
-  <!-- CSS & Favicon -->
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="site.webmanifest">
   <link rel="apple-touch-icon" href="icon.png">
 
   <style>
-    html {
-      scroll-behavior: smooth;
-    }
+    html { scroll-behavior: smooth; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      color: #333;
-      background-color: #f8f9fa;
-      line-height: 1.6;
+      margin: 0; padding: 0; color: #333; background-color: #f8f9fa; line-height: 1.6;
     }
-    header {
-      background: #0056b3;
-      color: #fff;
-      padding: 2rem 1rem;
-      text-align: center;
-    }
+    header { background: #0056b3; color: #fff; padding: 2rem 1rem; text-align: center; }
     header h1 { margin: 0; font-size: 1.8rem; }
     header p { margin: 0.5rem 0 0; opacity: 0.9; }
-
     nav {
-      position: sticky;
-      top: 0;
-      background: #ffffff;
-      display: flex;
-      justify-content: space-around;
-      padding: 0.75rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      z-index: 100;
-      overflow-x: auto;
+      position: sticky; top: 0; background: #ffffff; display: flex;
+      justify-content: space-around; padding: 0.75rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 100; overflow-x: auto;
     }
-    nav a {
-      color: #0056b3;
-      text-decoration: none;
-      font-weight: bold;
-      padding: 0.25rem 0.5rem;
-      white-space: nowrap;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
-
-    main {
-      max-width: 800px;
-      margin: 1.5rem auto;
-      padding: 0 1rem;
-    }
+    nav a { color: #0056b3; text-decoration: none; font-weight: bold; padding: 0.25rem 0.5rem; white-space: nowrap; }
+    nav a:hover { text-decoration: underline; }
+    main { max-width: 800px; margin: 1.5rem auto; padding: 0 1rem; }
     section {
-      background: #fff;
-      margin-bottom: 2rem;
-      padding: 1.5rem;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      scroll-margin-top: 70px;
+      background: #fff; margin-bottom: 2rem; padding: 1.5rem;
+      border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); scroll-margin-top: 70px;
     }
-    h2 {
-      border-bottom: 2px solid #0056b3;
-      padding-bottom: 0.5rem;
-      color: #0056b3;
-      margin-top: 0;
-    }
-
-    .item {
-      margin-bottom: 1.2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px dashed #eee;
-    }
-    .item:last-child {
-      border-bottom: none;
-    }
-    .time {
-      font-weight: bold;
-      color: #d9534f;
-      font-size: 0.9rem;
-    }
-    .title {
-      font-weight: bold;
-      font-size: 1.1rem;
-      margin: 0.2rem 0;
-    }
-    .map-link {
-      display: inline-block;
-      margin-top: 0.3rem;
-      color: #28a745;
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
+    h2 { border-bottom: 2px solid #0056b3; padding-bottom: 0.5rem; color: #0056b3; margin-top: 0; }
+    .item { margin-bottom: 1.2rem; padding-bottom: 1rem; border-bottom: 1px dashed #eee; }
+    .item:last-child { border-bottom: none; }
+    .time { font-weight: bold; color: #d9534f; font-size: 0.9rem; }
+    .title { font-weight: bold; font-size: 1.1rem; margin: 0.2rem 0; }
+    .map-link { display: inline-block; margin-top: 0.3rem; color: #28a745; text-decoration: none; font-size: 0.9rem; }
     .map-link:hover { text-decoration: underline; }
-
     textarea#memo {
-      width: 100%;
-      height: 120px;
-      padding: 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-sizing: border-box;
-      font-size: 0.95rem;
-      margin-top: 0.5rem;
-      resize: vertical;
+      width: 100%; height: 120px; padding: 0.75rem; border: 1px solid #ccc;
+      border-radius: 6px; box-sizing: border-box; font-size: 0.95rem; margin-top: 0.5rem; resize: vertical;
     }
-    .status-msg {
-      font-size: 0.8rem;
-      color: #6c757d;
-      margin-top: 0.2rem;
-    }
+    .status-msg { font-size: 0.8rem; color: #6c757d; margin-top: 0.2rem; }
   </style>
 </head>
 <body>
@@ -146,14 +72,14 @@
           <div>搭乘香港航空 HX616，於 07:15 抵達 KIX。</div>
         </div>
         <div class="item">
-          <div class="time">07:15 - 08:30</div>
+          <div class="time">07:15 - 08:48</div>
           <div class="title">🛃 入境與周遊券兌換</div>
-          <div>辦理入境、提取行李、兌換 JR 關西廣域鐵路周遊券。可於黑貓宅急便寄行李至大阪飯店。</div>
+          <div>辦理入境與提取行李，至 JR 綠色窗口兌換 JR 關西廣域鐵路周遊券。</div>
         </div>
         <div class="item">
           <div class="time">08:48 - 11:00</div>
           <div class="title">🚆 機場 ➔ 白濱站</div>
-          <div>搭乘 JR 特急 Kuroshio 直達白濱。</div>
+          <div>搭乘 JR 特急 Kuroshio 直達白濱（如換票較久可順延至下一班）。</div>
         </div>
         <div class="item">
           <div class="time">11:30 - 13:00</div>
@@ -177,34 +103,34 @@
 
     <!-- Day 2 -->
     <section id="day2">
-      <h2>Day 2：和歌山採草莓 ➔ 貓咪站長 ➔ 返回大阪</h2>
+      <h2>Day 2：採草莓 ➔ 拜訪貓咪站長 ➔ 前往大阪</h2>
       <div>
         <div class="item">
-          <div class="time">09:00 - 10:30</div>
+          <div class="time">09:20 - 10:40</div>
           <div class="title">🚆 白濱 ➔ 和歌山</div>
-          <div>搭乘 JR 特急 Kuroshio 返回 JR 和歌山站。</div>
+          <div>搭乘 JR 特急 Kuroshio 前往 JR 和歌山站（行李可寄放於和歌山站置物櫃）。</div>
         </div>
         <div class="item">
-          <div class="time">11:00 - 12:30</div>
+          <div class="time">10:55 - 13:00</div>
           <div class="title">🍓 一般社団法人貴志川いちご狩り園</div>
-          <div>體驗草莓無限採摘吃到飽（需提前預約）。</div>
+          <div>搭乘貴志川線至草莓園，體驗草莓無限採摘吃到飽（需預約）。</div>
           <a class="map-link" href="https://maps.google.com/?q=一般社団法人貴志川いちご狩り園" target="_blank" rel="noopener noreferrer">📍 Google 地圖</a>
         </div>
         <div class="item">
           <div class="time">13:30 - 15:00</div>
           <div class="title">🐱 貴志站拜訪貓咪站長</div>
-          <div>搭乘草莓電車/貓咪電車，造訪貴志站與貓咪咖啡廳。</div>
+          <div>搭乘草莓電車/貓咪電車前往貴志站，造訪貓咪站長與小玉咖啡廳。</div>
           <a class="map-link" href="https://maps.google.com/?q=Kishi+Station+Wakayama" target="_blank" rel="noopener noreferrer">📍 Google 地圖</a>
         </div>
         <div class="item">
-          <div class="time">16:00 - 17:00</div>
-          <div class="title">🏯 和歌山城巡禮</div>
-          <div>登上天守閣俯瞰和歌山市景。</div>
+          <div class="time">15:15 - 16:30</div>
+          <div class="title">🚆 和歌山 ➔ 大阪</div>
+          <div>返回 JR 和歌山站取行李，搭乘 JR 特急 Kuroshio 前往大阪。</div>
         </div>
         <div class="item">
-          <div class="time">18:00+</div>
+          <div class="time">17:30+</div>
           <div class="title">🛍️ 大阪 Check-in & 道頓堀夜遊</div>
-          <div>入住難波/心齋橋飯店，打卡固力果跑跑人並吃章魚燒、串炸。</div>
+          <div>入住難波/心齋橋飯店，打卡固力果跑跑人，享用章魚燒、串炸與拉麵。</div>
           <a class="map-link" href="https://maps.google.com/?q=Dotonbori+Osaka" target="_blank" rel="noopener noreferrer">📍 Google 地圖</a>
         </div>
       </div>
@@ -308,7 +234,6 @@
 
   </main>
 
-  <!-- Script for Auto-Saving Notepad -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const memo = document.getElementById("memo");
