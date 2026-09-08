@@ -11,7 +11,6 @@
   <link rel="apple-touch-icon" href="icon.png">
 
   <style>
-    /* Basic Layout & Navigation Styling */
     html {
       scroll-behavior: smooth;
     }
@@ -101,7 +100,6 @@
     }
     .map-link:hover { text-decoration: underline; }
 
-    /* Auto-saving Memo Section */
     textarea#memo {
       width: 100%;
       height: 120px;
@@ -124,7 +122,7 @@
 
   <header>
     <h1>大阪・白濱・和歌山 5日遊</h1>
-    <p>2027/03/08 - 03/12 | 去程: HX616 | 回程: HX613</p>
+    <p>2027/03/08 - 03/12 | 去程: HX616 (02:40 - 07:15) | 回程: HX613 (20:20 - 23:50)</p>
   </header>
 
   <nav>
@@ -254,23 +252,33 @@
 
     <!-- Day 5 -->
     <section id="day5">
-      <h2>Day 5：黑門市場 ➔ 機場返港</h2>
+      <h2>Day 5：黑門市場 ➔ 市區最後採購 ➔ 機場返港</h2>
       <div>
         <div class="item">
-          <div class="time">09:30 - 12:00</div>
+          <div class="time">09:30 - 12:30</div>
           <div class="title">🥩 黑門市場早午餐</div>
-          <div>享用和牛燒肉、海鮮丼，進行最後補貨。</div>
+          <div>享用和牛燒肉、海鮮丼，體驗大阪廚房的美食魅力。</div>
           <a class="map-link" href="https://maps.google.com/?q=Kuromon+Market" target="_blank" rel="noopener noreferrer">📍 Google 地圖</a>
         </div>
         <div class="item">
-          <div class="time">12:30 - 13:30</div>
-          <div class="title">🚆 南海電鐵直達關西機場</div>
-          <div>搭乘南海電鐵 Rapi:t 直達關西機場（約 40 分鐘）。</div>
+          <div class="time">13:00 - 16:30</div>
+          <div class="title">🛍️ 難波 / 心齋橋最後補貨 & 取行李</div>
+          <div>把握最後時間採購伴手禮與藥妝，隨後返回飯店取行李。</div>
         </div>
         <div class="item">
-          <div class="time">13:30+</div>
-          <div class="title">🛍️ 機場免稅店採購 & 搭乘 HX613 返港</div>
-          <div>辦理登機手續，最後免稅採購，搭乘香港航空 HX613 返回香港。</div>
+          <div class="time">16:30 - 17:30</div>
+          <div class="title">🚆 南海電鐵直達關西機場</div>
+          <div>從難波站搭乘南海電鐵 Rapi:t 特急直達關西機場（約 40 分鐘）。</div>
+        </div>
+        <div class="item">
+          <div class="time">17:30 - 20:20</div>
+          <div class="title">🛃 機場辦理登機 & 免稅店採購</div>
+          <div>辦理報到手續與託行李，於機場免稅店進行最後採購。</div>
+        </div>
+        <div class="item">
+          <div class="time">20:20 - 23:50</div>
+          <div class="title">✈️ 搭乘 HX613 返回香港</div>
+          <div>搭乘香港航空 HX613 (20:20 起飛)，預計 23:50 抵達香港國際機場。</div>
         </div>
       </div>
     </section>
@@ -280,7 +288,7 @@
       <h2>ℹ️ 實用資訊與離線備忘錄</h2>
       <div class="item">
         <div class="title">✈️ 航班資訊</div>
-        <p><strong>去程：</strong>香港航空 HX616 (02:40 - 07:15)<br><strong>回程：</strong>香港航空 HX613</p>
+        <p><strong>去程：</strong>香港航空 HX616 (02:40 - 07:15)<br><strong>回程：</strong>香港航空 HX613 (20:20 - 23:50)</p>
       </div>
       <div class="item">
         <div class="title">🏨 飯店資訊</div>
@@ -305,7 +313,6 @@
       const memo = document.getElementById("memo");
       const status = document.getElementById("status");
 
-      // Load saved notes from LocalStorage
       const savedMemo = localStorage.getItem("travel_memo");
       if (savedMemo !== null) {
         memo.value = savedMemo;
@@ -314,7 +321,6 @@
         status.textContent = "";
       }
 
-      // Auto-save on typing
       memo.addEventListener("input", function () {
         localStorage.setItem("travel_memo", memo.value);
         status.textContent = "已自動儲存 " + new Date().toLocaleTimeString();
