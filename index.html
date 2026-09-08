@@ -281,14 +281,14 @@
         </div>
       </div>
 
-      <!-- 多人分帳埋數模組 -->
+      <!-- 6人分帳埋數模組 -->
       <div class="item">
-        <div class="title">⚖️ 旅途多人分帳／AA 埋數計算機</div>
+        <div class="title">⚖️ 旅途 6 人分帳／AA 埋數計算機</div>
         
         <!-- 成員設定 -->
         <div class="split-config">
           <label style="font-weight:bold; font-size:0.9rem;">成員名單 (用逗號分隔):</label>
-          <input type="text" id="membersInput" value="成員A, 成員B" placeholder="例如: 小明, 小紅, 阿華" />
+          <input type="text" id="membersInput" value="基, 浩琳, 宏志, Winnie, 宇軒, 樂行" placeholder="例如: 基, 浩琳, 宏志" />
           <button type="button" id="saveMembersBtn" style="padding:0.4rem 0.8rem; font-size:0.85rem; cursor:pointer;">更新成員</button>
         </div>
 
@@ -350,7 +350,9 @@
 
       const JPY_TO_HKD_RATE = 0.052;
 
-      let members = JSON.parse(localStorage.getItem("split_members")) || ["成員A", "成員B"];
+      // 預設 6 位成員名單
+      const defaultMembers = ["基", "浩琳", "宏志", "Winnie", "宇軒", "樂行"];
+      let members = JSON.parse(localStorage.getItem("split_members")) || defaultMembers;
       let splitData = JSON.parse(localStorage.getItem("split_data")) || [];
 
       membersInput.value = members.join(", ");
@@ -360,13 +362,13 @@
         sharersCheckboxGroup.innerHTML = "";
 
         members.forEach(m => {
-          // Payer options
+          // 付款人選項
           const opt = document.createElement("option");
           opt.value = m;
           opt.textContent = m + " 先付";
           payerSelect.appendChild(opt);
 
-          // Sharers checkboxes
+          // 平攤人勾選框
           const lbl = document.createElement("label");
           lbl.innerHTML = `<input type="checkbox" value="${m}" checked /> ${m}`;
           sharersCheckboxGroup.appendChild(lbl);
@@ -385,7 +387,6 @@
       function renderSplit() {
         ledgerBody.innerHTML = "";
 
-        // Track balances per person
         let paid = {};
         let owed = {};
         members.forEach(m => { paid[m] = 0; owed[m] = 0; });
