@@ -1,191 +1,182 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>大阪5日遊行程</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大阪・白濱・和歌山 5日遊</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1a365d">
-  <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/japan-map.png">
 </head>
 <body>
 
-  <!-- Header -->
   <header>
     <h1>大阪・白濱・和歌山 5日遊</h1>
-    <p>2027/03/08 - 03/12 | 香港航空 HX616</p>
+    <p>2027/03/08 - 03/12 | 去程: HX616 | 回程: HX613</p>
   </header>
 
-  <!-- Navigation Tabs -->
-  <nav class="nav-tabs">
-    <button class="tab-btn active" onclick="switchDay(1)">D1 3/8</button>
-    <button class="tab-btn" onclick="switchDay(2)">D2 3/9</button>
-    <button class="tab-btn" onclick="switchDay(3)">D3 3/10</button>
-    <button class="tab-btn" onclick="switchDay(4)">D4 3/11</button>
-    <button class="tab-btn" onclick="switchDay(5)">D5 3/12</button>
-    <button class="tab-btn" onclick="switchDay('info')">ℹ️ 資訊</button>
+  <nav>
+    <!-- Navigation links if applicable -->
   </nav>
 
-  <!-- Content Sections -->
-  <main class="container">
+  <main>
 
     <!-- Day 1 -->
-    <section id="day-1" class="day-content active">
+    <section>
       <h2>Day 1：抵達關西機場 ➔ 直奔白濱溫泉</h2>
-      <div class="timeline">
-        <div class="card">
-          <div class="time">02:40 - 07:15</div>
-          <div class="title">✈️ 香港飛往關西機場 (KIX)</div>
-          <div class="desc">搭乘香港航空 HX616，於 07:15 抵達 KIX。</div>
+      <div>
+        <div>
+          <div>02:40 - 07:15</div>
+          <div>✈️ 香港飛往關西機場 (KIX)</div>
+          <div>搭乘香港航空 HX616，於 07:15 抵達 KIX。</div>
         </div>
-        <div class="card">
-          <div class="time">07:15 - 08:30</div>
-          <div class="title">🛃 入境與周遊券兌換</div>
-          <div class="desc">辦理入境、提取行李、兌換 JR 關西廣域鐵路周遊券。可於黑貓宅急便寄寄行李至大阪飯店。</div>
+        <div>
+          <div>07:15 - 08:30</div>
+          <div>🛃 入境與周遊券兌換</div>
+          <div>辦理入境、提取行李、兌換 JR 關西廣域鐵路周遊券。可於黑貓宅急便寄行李至大阪飯店。</div>
         </div>
-        <div class="card">
-          <div class="time">08:48 - 11:00</div>
-          <div class="title">🚆 機場 ➔ 白濱站</div>
-          <div class="desc">搭乘 JR 特急 Kuroshio 直達白濱。</div>
+        <div>
+          <div>08:48 - 11:00</div>
+          <div>🚆 機場 ➔ 白濱站</div>
+          <div>搭乘 JR 特急 Kuroshio 直達白濱。</div>
         </div>
-        <div class="card">
-          <div class="time">11:30 - 13:00</div>
-          <div class="title">🍱 Toretore Market 海鮮市場</div>
-          <div class="desc">品嚐新鮮海鮮丼、生魚片與海鮮燒烤。</div>
-          <a class="map-btn" href="https://maps.google.com/?q=Toretore+Market+Shirahama" target="_blank">📍 Google 地圖</a>
+        <div>
+          <div>11:30 - 13:00</div>
+          <div>🍱 Toretore Market 海鮮市場</div>
+          <div>品嚐新鮮海鮮丼、生魚片與海鮮燒烤。</div>
+          <a href="https://maps.google.com/?q=Toretore+Market+Shirahama" target="_blank">📍 Google 地圖</a>
         </div>
-        <div class="card">
-          <div class="time">13:30 - 16:30</div>
-          <div class="title">🌊 三段壁 & 千疊敷</div>
-          <div class="desc">搭乘電梯深入 36 米地下海蝕洞，並欣賞太平洋廣陸岩層。</div>
-          <a class="map-btn" href="https://maps.google.com/?q=Sandanbeki+Cave" target="_blank">📍 Google 地圖</a>
+        <div>
+          <div>13:30 - 16:30</div>
+          <div>🌊 三段壁 &amp; 千疊敷</div>
+          <div>搭乘電梯深入 36 米地下海蝕洞，並欣賞太平洋廣陸岩層。</div>
+          <a href="https://maps.google.com/?q=Sandanbeki+Cave" target="_blank">📍 Google 地圖</a>
         </div>
-        <div class="card">
-          <div class="time">17:00+</div>
-          <div class="title">♨️ 入住「濱千鳥之湯 海舟」</div>
-          <div class="desc">享用日式會席晚餐，體驗白濱溫泉名湯。</div>
+        <div>
+          <div>17:00+</div>
+          <div>♨️ 入住「濱千鳥之湯 海舟」</div>
+          <div>享用日式會席晚餐，體驗白濱溫泉名湯。</div>
         </div>
       </div>
     </section>
 
     <!-- Day 2 -->
-    <section id="day-2" class="day-content">
+    <section>
       <h2>Day 2：和歌山採草莓 ➔ 貓咪站長 ➔ 返回大阪</h2>
-      <div class="timeline">
-        <div class="card">
-          <div class="time">09:00 - 10:30</div>
-          <div class="title">🚆 白濱 ➔ 和歌山</div>
-          <div class="desc">搭乘 JR 特急 Kuroshio 返回 JR 和歌山站。</div>
+      <div>
+        <div>
+          <div>09:00 - 10:30</div>
+          <div>🚆 白濱 ➔ 和歌山</div>
+          <div>搭乘 JR 特急 Kuroshio 返回 JR 和歌山站。</div>
         </div>
-        <div class="card">
-          <div class="time">11:00 - 12:30</div>
-          <div class="title">🍓 紀之川市草莓園</div>
-          <div class="desc">體驗 30 分鐘草莓無限採摘吃到飽（需要預約）。</div>
+        <div>
+          <div>11:00 - 12:30</div>
+          <div>🍓 紀之川市草莓園</div>
+          <div>體驗 30 分鐘草莓無限採摘吃到飽（需要預約）。</div>
         </div>
-        <div class="card">
-          <div class="time">13:30 - 15:00</div>
-          <div class="title">🐱 貴志站拜訪貓咪站長</div>
-          <div class="desc">搭乘草莓電車/貓咪電車，造訪貴志站與貓咪咖啡廳。</div>
-          <a class="map-btn" href="https://maps.google.com/?q=Kishi+Station+Wakayama" target="_blank">📍 Google 地圖</a>
+        <div>
+          <div>13:30 - 15:00</div>
+          <div>🐱 貴志站拜訪貓咪站長</div>
+          <div>搭乘草莓電車/貓咪電車，造訪貴志站與貓咪咖啡廳。</div>
+          <a href="https://maps.google.com/?q=Kishi+Station+Wakayama" target="_blank">📍 Google 地圖</a>
         </div>
-        <div class="card">
-          <div class="time">16:00 - 17:00</div>
-          <div class="title">🏯 和歌山城巡禮</div>
-          <div class="desc">登上天守閣俯瞰和歌山市景。</div>
+        <div>
+          <div>16:00 - 17:00</div>
+          <div>🏯 和歌山城巡禮</div>
+          <div>登上天守閣俯瞰和歌山市景。</div>
         </div>
-        <div class="card">
-          <div class="time">18:00+</div>
-          <div class="title">🛍️ 大阪 Check-in & 道頓堀夜遊</div>
-          <div class="desc">入住難波/心齋橋飯店，打卡固力果跑跑人並吃章魚燒、串炸。</div>
-          <a class="map-btn" href="https://maps.google.com/?q=Dotonbori+Osaka" target="_blank">📍 Google 地圖</a>
+        <div>
+          <div>18:00+</div>
+          <div>🛍️ 大阪 Check-in &amp; 道頓堀夜遊</div>
+          <div>入住難波/心齋橋飯店，打卡固力果跑跑人並吃章魚燒、串炸。</div>
+          <a href="https://maps.google.com/?q=Dotonbori+Osaka" target="_blank">📍 Google 地圖</a>
         </div>
       </div>
     </section>
 
     <!-- Day 3 -->
-    <section id="day-3" class="day-content">
+    <section>
       <h2>Day 3：大阪地標 ➔ 心齋橋 ➔ 梅田夜景</h2>
-      <div class="timeline">
-        <div class="card">
-          <div class="time">09:30 - 12:00</div>
-          <div class="title">🏯 大阪城天守閣</div>
-          <div class="desc">遊覽大阪城公園與歷史建築。</div>
+      <div>
+        <div>
+          <div>09:30 - 12:00</div>
+          <div>🏯 大阪城天守閣</div>
+          <div>遊覽大阪城公園與歷史建築。</div>
         </div>
-        <div class="card">
-          <div class="time">12:30 - 16:30</div>
-          <div class="title">🛍️ 心齋橋筋 & 難波購物</div>
-          <div class="desc">藥妝、服飾、伴手禮採購。</div>
+        <div>
+          <div>12:30 - 16:30</div>
+          <div>🛍️ 心齋橋筋 &amp; 難波購物</div>
+          <div>藥妝、服飾、伴手禮採購。</div>
         </div>
-        <div class="card">
-          <div class="time">17:30 - 20:00</div>
-          <div class="title">🌃 梅田藍天大廈空中庭園</div>
-          <div class="desc">俯瞰大阪 360 度繁華夜景。</div>
-          <a class="map-btn" href="https://maps.google.com/?q=Umeda+Sky+Building" target="_blank">📍 Google 地圖</a>
+        <div>
+          <div>17:30 - 20:00</div>
+          <div>🌃 梅田藍天大廈空中庭園</div>
+          <div>俯瞰大阪 360 度繁華夜景。</div>
+          <a href="https://maps.google.com/?q=Umeda+Sky+Building" target="_blank">📍 Google 地圖</a>
         </div>
       </div>
     </section>
 
     <!-- Day 4 -->
-    <section id="day-4" class="day-content">
+    <section>
       <h2>Day 4：環球影城全天暢遊 (或市區深遊)</h2>
-      <div class="timeline">
-        <div class="card">
-          <div class="time">全天選項 A</div>
-          <div class="title">🎢 日本環球影城 (USJ)</div>
-          <div class="desc">超級任天堂世界、哈利波特魔法世界暢遊。</div>
-          <a class="map-btn" href="https://maps.google.com/?q=Universal+Studios+Japan" target="_blank">📍 Google 地圖</a>
+      <div>
+        <div>
+          <div>全天選項 A</div>
+          <div>🎢 日本環球影城 (USJ)</div>
+          <div>超級任天堂世界、哈利波特魔法世界暢遊。</div>
+          <a href="https://maps.google.com/?q=Universal+Studios+Japan" target="_blank">📍 Google 地圖</a>
         </div>
-        <div class="card">
-          <div class="time">全天選項 B</div>
-          <div class="title">🗼 通天閣 / 新世界 / 阿倍野 HARUKAS</div>
-          <div class="desc">走訪懷舊商圈，登頂阿倍野 HARUKAS 300 展望台。</div>
+        <div>
+          <div>全天選項 B</div>
+          <div>🗼 通天閣 / 新世界 / 阿倍野 HARUKAS</div>
+          <div>走訪懷舊商圈，登頂阿倍野 HARUKAS 300 展望台。</div>
         </div>
       </div>
     </section>
 
     <!-- Day 5 -->
-    <section id="day-5" class="day-content">
+    <section>
       <h2>Day 5：黑門市場 ➔ 機場返港</h2>
-      <div class="timeline">
-        <div class="card">
-          <div class="time">09:30 - 12:00</div>
-          <div class="title">🥩 黑門市場早午餐</div>
-          <div class="desc">享用和牛燒肉、海鮮丼，進行最後補貨。</div>
-          <a class="map-btn" href="https://maps.google.com/?q=Kuromon+Market" target="_blank">📍 Google 地圖</a>
+      <div>
+        <div>
+          <div>09:30 - 12:00</div>
+          <div>🥩 黑門市場早午餐</div>
+          <div>享用和牛燒肉、海鮮丼，進行最後補貨。</div>
+          <a href="https://maps.google.com/?q=Kuromon+Market" target="_blank">📍 Google 地圖</a>
         </div>
-        <div class="card">
-          <div class="time">12:30 - 13:30</div>
-          <div class="title">🚆 南海電鐵直達關西機場</div>
-          <div class="desc">搭乘南海電鐵 Rapi:t 直達關西機場（約 40 分鐘）。</div>
+        <div>
+          <div>12:30 - 13:30</div>
+          <div>🚆 南海電鐵直達關西機場</div>
+          <div>搭乘南海電鐵 Rapi:t 直達關西機場（約 40 分鐘）。</div>
         </div>
-        <div class="card">
-          <div class="time">13:30+</div>
-          <div class="title">🛍️ 機場免稅店採購 & 返港</div>
-          <div class="desc">辦理登機手續並準備搭機返回香港。</div>
+        <div>
+          <div>13:30+</div>
+          <div>🛍️ 機場免稅店採購 &amp; 搭乘 HX613 返港</div>
+          <div>辦理登機手續，最後免稅採購，搭乘香港航空 HX613 返回香港。</div>
         </div>
       </div>
     </section>
 
-    <!-- Info & Memo Section -->
-    <section id="day-info" class="day-content">
+    <!-- Practical Info -->
+    <section>
       <h2>ℹ️ 實用資訊與離線備忘錄</h2>
-      <div class="card">
-        <div class="title">🏨 飯店資訊</div>
+      <div>
+        <div>✈️ 航班資訊</div>
+        <p><strong>去程：</strong>香港航空 HX616 (02:40 - 07:15)<br><strong>回程：</strong>香港航空 HX613</p>
+      </div>
+      <div>
+        <div>🏨 飯店資訊</div>
         <p><strong>白濱：</strong>浜千鳥の湯 海舟<br>TEL: +81 739-82-2220</p>
       </div>
-      <div class="card">
-        <div class="title">🎫 交通票券</div>
+      <div>
+        <div>🎫 交通票券</div>
         <p>JR 關西廣域鐵路周遊券 (5日券)</p>
       </div>
-      <div class="card">
-        <div class="title">📝 隨手記/購物清單 (自動自動儲存)</div>
-        <textarea id="memo-input" placeholder="在此輸入購物清單或備忘錄..."></textarea>
+      <div>
+        <div>📝 隨手記/購物清單 (自動儲存)</div>
       </div>
     </section>
 
   </main>
 
-  <script src="app.js"></script>
 </body>
 </html>
