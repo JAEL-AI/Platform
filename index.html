@@ -11,179 +11,80 @@
   <link rel="apple-touch-icon" href="icon.png">
 
   <style>
-    html {
-      scroll-behavior: smooth;
-    }
+    html { scroll-behavior: smooth; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      color: #333;
-      background-color: #f8f9fa;
-      line-height: 1.6;
+      margin: 0; padding: 0; color: #333; background-color: #f8f9fa; line-height: 1.6;
     }
-    header {
-      background: #0056b3;
-      color: #fff;
-      padding: 2rem 1rem;
-      text-align: center;
-    }
+    header { background: #0056b3; color: #fff; padding: 2rem 1rem; text-align: center; }
     header h1 { margin: 0; font-size: 1.8rem; }
     header p { margin: 0.5rem 0 0; opacity: 0.9; }
 
     nav {
-      position: sticky;
-      top: 0;
-      background: #ffffff;
-      display: flex;
-      justify-content: space-around;
-      padding: 0.75rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      z-index: 100;
-      overflow-x: auto;
+      position: sticky; top: 0; background: #ffffff; display: flex;
+      justify-content: space-around; padding: 0.75rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 100; overflow-x: auto;
     }
-    nav a {
-      color: #0056b3;
-      text-decoration: none;
-      font-weight: bold;
-      padding: 0.25rem 0.5rem;
-      white-space: nowrap;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
+    nav a { color: #0056b3; text-decoration: none; font-weight: bold; padding: 0.25rem 0.5rem; white-space: nowrap; }
+    nav a:hover { text-decoration: underline; }
 
-    main {
-      max-width: 800px;
-      margin: 1.5rem auto;
-      padding: 0 1rem;
-    }
+    main { max-width: 800px; margin: 1.5rem auto; padding: 0 1rem; }
     section {
-      background: #fff;
-      margin-bottom: 2rem;
-      padding: 1.5rem;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      scroll-margin-top: 70px;
+      background: #fff; margin-bottom: 2rem; padding: 1.5rem;
+      border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); scroll-margin-top: 70px;
     }
-    h2 {
-      border-bottom: 2px solid #0056b3;
-      padding-bottom: 0.5rem;
-      color: #0056b3;
-      margin-top: 0;
-    }
+    h2 { border-bottom: 2px solid #0056b3; padding-bottom: 0.5rem; color: #0056b3; margin-top: 0; }
 
-    .item {
-      margin-bottom: 1.2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px dashed #eee;
-    }
-    .item:last-child {
-      border-bottom: none;
-    }
-    .time {
-      font-weight: bold;
-      color: #d9534f;
-      font-size: 0.9rem;
-    }
-    .title {
-      font-weight: bold;
-      font-size: 1.1rem;
-      margin: 0.2rem 0;
-    }
-    .map-link {
-      display: inline-block;
-      margin-top: 0.3rem;
-      color: #28a745;
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
+    .item { margin-bottom: 1.2rem; padding-bottom: 1rem; border-bottom: 1px dashed #eee; }
+    .item:last-child { border-bottom: none; }
+    .time { font-weight: bold; color: #d9534f; font-size: 0.9rem; }
+    .title { font-weight: bold; font-size: 1.1rem; margin: 0.2rem 0; }
+    .map-link { display: inline-block; margin-top: 0.3rem; color: #28a745; text-decoration: none; font-size: 0.9rem; }
     .map-link:hover { text-decoration: underline; }
 
     .info-box {
-      background-color: #f1f8ff;
-      border-left: 4px solid #0056b3;
-      padding: 0.8rem 1rem;
-      margin-top: 0.5rem;
-      font-size: 0.95rem;
+      background-color: #f1f8ff; border-left: 4px solid #0056b3;
+      padding: 0.8rem 1rem; margin-top: 0.5rem; font-size: 0.95rem;
     }
-    .info-box ul {
-      margin: 0.3rem 0 0 1.2rem;
-      padding: 0;
-    }
+    .info-box ul { margin: 0.3rem 0 0 1.2rem; padding: 0; }
 
-    /* 記帳結算表樣式 */
-    .ledger-form {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.8rem;
+    /* 多人分帳模組樣式 */
+    .split-config {
+      display: flex; gap: 0.5rem; margin-bottom: 1rem; align-items: center; flex-wrap: wrap;
     }
-    .ledger-form input, .ledger-form select, .ledger-form button {
-      padding: 0.5rem;
-      font-size: 0.9rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+    .split-config input { flex: 1; min-width: 200px; padding: 0.4rem; border: 1px solid #ccc; border-radius: 4px; }
+    
+    .split-form {
+      display: flex; flex-direction: column; gap: 0.5rem; background: #f8f9fa; padding: 0.8rem; border-radius: 6px; border: 1px solid #e9ecef;
     }
-    .ledger-form input[type="text"] { flex: 2; min-width: 120px; }
-    .ledger-form input[type="number"] { flex: 1; min-width: 80px; }
-    .ledger-form select { flex: 1; min-width: 90px; }
-    .ledger-form button {
-      background-color: #0056b3;
-      color: white;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
+    .split-form-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .split-form input, .split-form select, .split-form button {
+      padding: 0.5rem; font-size: 0.9rem; border: 1px solid #ccc; border-radius: 4px;
     }
-    .ledger-form button:hover { background-color: #004085; }
+    .split-form input[type="text"] { flex: 2; min-width: 120px; }
+    .split-form input[type="number"] { flex: 1; min-width: 90px; }
+    .split-form select { flex: 1; min-width: 100px; }
+    .split-form button {
+      background-color: #0056b3; color: white; border: none; font-weight: bold; cursor: pointer; padding: 0.5rem 1rem;
+    }
+    .split-form button:hover { background-color: #004085; }
 
-    .ledger-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-    }
-    .ledger-table th, .ledger-table td {
-      border: 1px solid #dee2e6;
-      padding: 0.5rem;
-      text-align: left;
-    }
+    .checkbox-group { display: flex; gap: 0.8rem; align-items: center; font-size: 0.85rem; flex-wrap: wrap; margin-top: 0.2rem; }
+
+    .ledger-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.85rem; }
+    .ledger-table th, .ledger-table td { border: 1px solid #dee2e6; padding: 0.5rem; text-align: left; }
     .ledger-table th { background-color: #f1f3f5; }
-    .ledger-table td.num { text-align: right; }
-    .delete-btn {
-      color: #d9534f;
-      cursor: pointer;
-      font-weight: bold;
-      border: none;
-      background: none;
-      padding: 0;
-    }
+    .delete-btn { color: #d9534f; cursor: pointer; font-weight: bold; border: none; background: none; padding: 0; }
 
-    .summary-box {
-      margin-top: 1rem;
-      background: #e9ecef;
-      padding: 0.8rem 1rem;
-      border-radius: 6px;
-      font-weight: bold;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
+    .settlement-box {
+      margin-top: 1rem; background: #e7f5ff; border: 1px solid #a5d8ff; padding: 0.8rem 1rem; border-radius: 6px;
     }
-    .clear-btn {
-      background-color: #6c757d;
-      color: white;
-      border: none;
-      padding: 0.3rem 0.6rem;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
-    .status-msg {
-      font-size: 0.8rem;
-      color: #6c757d;
-      margin-top: 0.4rem;
-    }
+    .settlement-title { font-weight: bold; color: #1864ab; margin-bottom: 0.4rem; }
+    .settlement-list { margin: 0; padding-left: 1.2rem; font-size: 0.9rem; }
+    .settlement-list li { margin-bottom: 0.2rem; }
+
+    .clear-btn { background-color: #6c757d; color: white; border: none; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.8rem; cursor: pointer; margin-top: 0.5rem; }
+    .status-msg { font-size: 0.8rem; color: #6c757d; margin-top: 0.4rem; }
   </style>
 </head>
 <body>
@@ -352,9 +253,9 @@
       </div>
     </section>
 
-    <!-- Info & Ledger Section -->
+    <!-- Info & Split Expense Section -->
     <section id="info">
-      <h2>ℹ️ 實用資訊與行程開支埋數</h2>
+      <h2>ℹ️ 實用資訊與同行分帳工具</h2>
       <div class="item">
         <div class="title">✈️ 航班資訊</div>
         <p><strong>去程：</strong>香港航空 HX616 (02:40 - 07:15)<br><strong>回程：</strong>香港航空 HX613 (20:20 - 23:50)</p>
@@ -380,125 +281,242 @@
         </div>
       </div>
 
-      <!-- 記帳埋數模組 -->
+      <!-- 多人分帳埋數模組 -->
       <div class="item">
-        <div class="title">📊 旅途記帳與開支埋數 (自動儲存)</div>
-        <div class="ledger-form">
-          <input type="text" id="itemName" placeholder="項目名稱 (例: 藥妝/黑門市場)" />
-          <input type="number" id="itemAmount" placeholder="金額 ¥" />
-          <select id="payMethod">
-            <option value="現金">現金</option>
-            <option value="信用卡">信用卡</option>
-            <option value="西瓜卡/ICOCA">IC卡</option>
-          </select>
-          <button type="button" id="addBtn">新增項目</button>
+        <div class="title">⚖️ 旅途多人分帳／AA 埋數計算機</div>
+        
+        <!-- 成員設定 -->
+        <div class="split-config">
+          <label style="font-weight:bold; font-size:0.9rem;">成員名單 (用逗號分隔):</label>
+          <input type="text" id="membersInput" value="成員A, 成員B" placeholder="例如: 小明, 小紅, 阿華" />
+          <button type="button" id="saveMembersBtn" style="padding:0.4rem 0.8rem; font-size:0.85rem; cursor:pointer;">更新成員</button>
         </div>
 
+        <!-- 輸入開支 -->
+        <div class="split-form">
+          <div class="split-form-row">
+            <input type="text" id="itemName" placeholder="項目 (例: 居酒屋/車票)" />
+            <input type="number" id="itemAmount" placeholder="金額 ¥" />
+            <select id="payerSelect"></select>
+          </div>
+          <div>
+            <span style="font-size:0.85rem; font-weight:bold; color:#555;">誰平攤這筆錢：</span>
+            <div id="sharersCheckboxGroup" class="checkbox-group"></div>
+          </div>
+          <button type="button" id="addBtn">新增開支</button>
+        </div>
+
+        <!-- 明細表格 -->
         <table class="ledger-table">
           <thead>
             <tr>
               <th>項目</th>
-              <th>方式</th>
-              <th style="text-align:right;">金額 (日圓)</th>
-              <th style="width: 40px; text-align:center;">刪除</th>
+              <th>付款人</th>
+              <th>金額 (日圓)</th>
+              <th>平攤人</th>
+              <th style="width: 35px; text-align:center;">刪除</th>
             </tr>
           </thead>
-          <tbody id="ledgerBody">
-            <!-- 動態加入記帳明細 -->
-          </tbody>
+          <tbody id="ledgerBody"></tbody>
         </table>
 
-        <div class="summary-box">
-          <div>
-            總計：<span id="totalJPY">¥0</span> JPY 
-            <span style="font-weight:normal; font-size:0.85rem; color:#555;">(約 <span id="totalHKD">$0</span> HKD)</span>
-          </div>
-          <button type="button" class="clear-btn" id="clearBtn">清空紀錄</button>
+        <!-- 最終埋數結算結果 -->
+        <div class="settlement-box">
+          <div class="settlement-title">💡 最終分帳結算 (誰要給誰多少錢)：</div>
+          <ul id="settlementList" class="settlement-list"></ul>
         </div>
+
+        <button type="button" class="clear-btn" id="clearBtn">清空所有分帳紀錄</button>
         <div id="status" class="status-msg">資料自動儲存中...</div>
       </div>
     </section>
 
   </main>
 
-  <!-- 記帳模組 JavaScript -->
+  <!-- 分帳模組 JavaScript -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
+      const membersInput = document.getElementById("membersInput");
+      const saveMembersBtn = document.getElementById("saveMembersBtn");
+      const payerSelect = document.getElementById("payerSelect");
+      const sharersCheckboxGroup = document.getElementById("sharersCheckboxGroup");
       const itemName = document.getElementById("itemName");
       const itemAmount = document.getElementById("itemAmount");
-      const payMethod = document.getElementById("payMethod");
       const addBtn = document.getElementById("addBtn");
       const ledgerBody = document.getElementById("ledgerBody");
-      const totalJPY = document.getElementById("totalJPY");
-      const totalHKD = document.getElementById("totalHKD");
+      const settlementList = document.getElementById("settlementList");
       const clearBtn = document.getElementById("clearBtn");
       const status = document.getElementById("status");
 
-      const JPY_TO_HKD_RATE = 0.052; // 預設日圓兌港幣匯率
+      const JPY_TO_HKD_RATE = 0.052;
 
-      let ledgerData = JSON.parse(localStorage.getItem("travel_ledger")) || [];
+      let members = JSON.parse(localStorage.getItem("split_members")) || ["成員A", "成員B"];
+      let splitData = JSON.parse(localStorage.getItem("split_data")) || [];
 
-      function renderLedger() {
+      membersInput.value = members.join(", ");
+
+      function updateMemberUI() {
+        payerSelect.innerHTML = "";
+        sharersCheckboxGroup.innerHTML = "";
+
+        members.forEach(m => {
+          // Payer options
+          const opt = document.createElement("option");
+          opt.value = m;
+          opt.textContent = m + " 先付";
+          payerSelect.appendChild(opt);
+
+          // Sharers checkboxes
+          const lbl = document.createElement("label");
+          lbl.innerHTML = `<input type="checkbox" value="${m}" checked /> ${m}`;
+          sharersCheckboxGroup.appendChild(lbl);
+        });
+      }
+
+      saveMembersBtn.addEventListener("click", function() {
+        const raw = membersInput.value.trim();
+        if(!raw) return;
+        members = raw.split(",").map(s => s.trim()).filter(s => s !== "");
+        localStorage.setItem("split_members", JSON.stringify(members));
+        updateMemberUI();
+        renderSplit();
+      });
+
+      function renderSplit() {
         ledgerBody.innerHTML = "";
-        let sum = 0;
 
-        if (ledgerData.length === 0) {
-          ledgerBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">暫無記帳明細</td></tr>';
+        // Track balances per person
+        let paid = {};
+        let owed = {};
+        members.forEach(m => { paid[m] = 0; owed[m] = 0; });
+
+        if (splitData.length === 0) {
+          ledgerBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">暫無分帳開支紀錄</td></tr>';
         } else {
-          ledgerData.forEach((item, index) => {
-            sum += item.amount;
+          splitData.forEach((item, index) => {
+            if(!paid.hasOwnProperty(item.payer)) paid[item.payer] = 0;
+            paid[item.payer] += item.amount;
+
+            const count = item.sharers.length;
+            if (count > 0) {
+              const perPerson = item.amount / count;
+              item.sharers.forEach(s => {
+                if(!owed.hasOwnProperty(s)) owed[s] = 0;
+                owed[s] += perPerson;
+              });
+            }
+
             const tr = document.createElement("tr");
             tr.innerHTML = `
               <td>${item.name}</td>
-              <td>${item.method}</td>
-              <td class="num">¥${item.amount.toLocaleString()}</td>
+              <td>${item.payer}</td>
+              <td>¥${item.amount.toLocaleString()}</td>
+              <td>${item.sharers.join(", ")}</td>
               <td style="text-align:center;"><button class="delete-btn" onclick="deleteItem(${index})">✕</button></td>
             `;
             ledgerBody.appendChild(tr);
           });
         }
 
-        totalJPY.textContent = "¥" + sum.toLocaleString();
-        totalHKD.textContent = "$" + Math.round(sum * JPY_TO_HKD_RATE).toLocaleString();
-        localStorage.setItem("travel_ledger", JSON.stringify(ledgerData));
+        calculateSettlement(paid, owed);
+        localStorage.setItem("split_data", JSON.stringify(splitData));
+      }
+
+      function calculateSettlement(paid, owed) {
+        settlementList.innerHTML = "";
+        let netBalances = {};
+
+        members.forEach(m => {
+          netBalances[m] = (paid[m] || 0) - (owed[m] || 0);
+        });
+
+        let debtors = [];
+        let creditors = [];
+
+        for (let m in netBalances) {
+          if (netBalances[m] < -0.01) {
+            debtors.push({ name: m, amount: -netBalances[m] });
+          } else if (netBalances[m] > 0.01) {
+            creditors.push({ name: m, amount: netBalances[m] });
+          }
+        }
+
+        let transactions = [];
+        let d = 0, c = 0;
+
+        while (d < debtors.length && c < creditors.length) {
+          let payment = Math.min(debtors[d].amount, creditors[c].amount);
+          transactions.push({
+            from: debtors[d].name,
+            to: creditors[c].name,
+            amount: payment
+          });
+
+          debtors[d].amount -= payment;
+          creditors[c].amount -= payment;
+
+          if (debtors[d].amount < 0.01) d++;
+          if (creditors[c].amount < 0.01) c++;
+        }
+
+        if (transactions.length === 0) {
+          settlementList.innerHTML = '<li>目前無人欠款，大家平手！</li>';
+        } else {
+          transactions.forEach(t => {
+            const hkd = Math.round(t.amount * JPY_TO_HKD_RATE);
+            const li = document.createElement("li");
+            li.innerHTML = `<strong>${t.from}</strong> 應給 <strong>${t.to}</strong>：<strong>¥${Math.round(t.amount).toLocaleString()} 日圓</strong> <span style="color:#555; font-size:0.85rem;">(約 $${hkd} HKD)</span>`;
+            settlementList.appendChild(li);
+          });
+        }
       }
 
       addBtn.addEventListener("click", function () {
         const name = itemName.value.trim();
         const amount = parseFloat(itemAmount.value);
+        const payer = payerSelect.value;
+        
+        const checkboxes = sharersCheckboxGroup.querySelectorAll("input[type='checkbox']:checked");
+        const sharers = Array.from(checkboxes).map(cb => cb.value);
 
         if (!name || isNaN(amount) || amount <= 0) {
-          alert("請輸入有效的項目名稱與金額！");
+          alert("請輸入有效的開支項目與金額！");
+          return;
+        }
+        if (sharers.length === 0) {
+          alert("請至少選擇一位平攤開支的人！");
           return;
         }
 
-        ledgerData.push({
+        splitData.push({
           name: name,
           amount: amount,
-          method: payMethod.value
+          payer: payer,
+          sharers: sharers
         });
 
         itemName.value = "";
         itemAmount.value = "";
-        renderLedger();
-        status.textContent = "已更新並自動儲存 " + new Date().toLocaleTimeString();
+        renderSplit();
+        status.textContent = "已新增開支並自動儲存 " + new Date().toLocaleTimeString();
       });
 
       window.deleteItem = function (index) {
-        ledgerData.splice(index, 1);
-        renderLedger();
+        splitData.splice(index, 1);
+        renderSplit();
         status.textContent = "已刪除項目 " + new Date().toLocaleTimeString();
       };
 
       clearBtn.addEventListener("click", function () {
-        if (confirm("確定要清空所有開支紀錄嗎？")) {
-          ledgerData = [];
-          renderLedger();
-          status.textContent = "所有紀錄已清空";
+        if (confirm("確定要清空所有分帳紀錄嗎？")) {
+          splitData = [];
+          renderSplit();
+          status.textContent = "所有分帳紀錄已清空";
         }
       });
 
-      renderLedger();
+      updateMemberUI();
+      renderSplit();
     });
   </script>
 </body>
