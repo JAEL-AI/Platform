@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大阪・白濱・和歌山 2027 | 旅遊 Portal</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af',
+              900: '#0f172a',
+            },
+            sakura: {
+              500: '#f43f5e',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white transition-colors duration-300 relative overflow-x-hidden">
+
+  <!-- Background decorative glows -->
+  <div class="absolute -top-40 -left-40 w-96 h-96 bg-brand-600/30 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-sakura-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+  <header class="w-full max-w-5xl mx-auto px-6 py-6 flex justify-between items-center relative z-10">
+    <div class="flex items-center space-x-2">
+      <span class="text-2xl animate-pulse">🌸</span>
+      <span class="font-black text-lg tracking-tight text-white">Travel Platform</span>
+    </div>
+    <button id="themeToggle" onclick="toggleTheme()" class="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 transition focus:outline-none" title="切換深色/淺色模式">
+      <i class="fa-solid fa-moon text-base dark:hidden"></i>
+      <i class="fa-solid fa-sun text-base hidden dark:block text-amber-400"></i>
+    </button>
+  </header>
+
+  <main class="w-full max-w-3xl mx-auto px-4 py-8 flex-grow flex flex-col justify-center items-center text-center relative z-10">
+    
+    <!-- Title -->
+    <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight mb-8">
+      <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-300 to-rose-400">Travel Platform</span>
+    </h1>
+
+    <!-- Current Time Clock Card -->
+    <div class="w-full glass-card p-6 sm:p-8 rounded-3xl shadow-2xl mb-10 max-w-xl">
+      <div class="text-xs font-bold uppercase tracking-wider text-amber-300 mb-2 flex items-center justify-center gap-2">
+        <i class="fa-regular fa-clock"></i> 當前時間 CURRENT TIME
+      </div>
+      <div class="text-sm font-semibold text-slate-300 mb-4" id="currentDate">----/--/--</div>
+
+      <div class="grid grid-cols-3 gap-3 text-center" id="clockDisplay">
+        <div class="bg-slate-950/60 p-3 sm:p-4 rounded-2xl border border-white/10">
+          <span class="block text-2xl sm:text-4xl font-black text-white" id="clockHours">--</span>
+          <span class="text-[10px] sm:text-xs text-slate-400 font-bold tracking-wider">時 HOURS</span>
+        </div>
+        <div class="bg-slate-950/60 p-3 sm:p-4 rounded-2xl border border-white/10">
+          <span class="block text-2xl sm:text-4xl font-black text-white" id="clockMins">--</span>
+          <span class="text-[10px] sm:text-xs text-slate-400 font-bold tracking-wider">分 MINS</span>
+        </div>
+        <div class="bg-slate-950/60 p-3 sm:p-4 rounded-2xl border border-white/10">
+          <span class="block text-2xl sm:text-4xl font-black text-white" id="clockSecs">--</span>
+          <span class="text-[10px] sm:text-xs text-slate-400 font-bold tracking-wider">秒 SECS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- The Two Primary Action Buttons -->
+    <div class="w-full max-w-md space-y-4">
+      <a href="202703OSAKA.html" class="w-full py-4 px-6 bg-brand-600 hover:bg-brand-500 text-white font-bold text-base sm:text-lg rounded-2xl transition duration-300 shadow-lg shadow-brand-600/40 flex items-center justify-center gap-3 group border border-brand-400/30">
+        <i class="fa-solid fa-map-location-dot text-xl group-hover:scale-110 transition"></i>
+        <span>2027年3月8-12日-日本大阪</span>
+        <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition"></i>
+      </a>
+
+      <a href="AA_Cal.html" class="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base sm:text-lg rounded-2xl transition duration-300 shadow-lg shadow-emerald-600/40 flex items-center justify-center gap-3 group border border-emerald-400/30">
+        <i class="fa-solid fa-calculator text-xl group-hover:scale-110 transition"></i>
+        <span>開啟 AA 埋數計算機</span>
+        <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition"></i>
+      </a>
+    </div>
+
+  </main>
+
+  <footer class="w-full py-6 text-center text-xs text-slate-500 relative z-10">
+    🌸 Travel Platform
+  </footer>
+
+  <script>
+    // Theme Switcher Logic
+    function toggleTheme() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('osaka_theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('osaka_theme', 'dark');
+      }
+    }
+
+    if (localStorage.getItem('osaka_theme') === 'dark' || (!('osaka_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // Live Current Time Display
+    function initClock() {
+      function update() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const date = String(now.getDate()).padStart(2, '0');
+        const days = ['日', '一', '二', '三', '四', '五', '六'];
+        const dayName = days[now.getDay()];
+
+        const hours = String(now.getHours()).padStart(2, '0');
+        const mins = String(now.getMinutes()).padStart(2, '0');
+        const secs = String(now.getSeconds()).padStart(2, '0');
+
+        const dateElem = document.getElementById('currentDate');
+        if (dateElem) {
+          dateElem.innerText = `${year}年${month}月${date}日 星期${dayName}`;
+        }
+
+        const hElem = document.getElementById('clockHours');
+        const mElem = document.getElementById('clockMins');
+        const sElem = document.getElementById('clockSecs');
+
+        if (hElem) hElem.innerText = hours;
+        if (mElem) mElem.innerText = mins;
+        if (sElem) sElem.innerText = secs;
+      }
+
+      update();
+      setInterval(update, 1000);
+    }
+
+    window.onload = function() {
+      initClock();
+    };
+  </script>
+</body>
+</html>
