@@ -3,280 +3,480 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>多人 AA 制埋數計算器</title>
+    <title>多人 AA 制埋數計算器 (QR Code & 連結分享版)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- QR Code Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- HTML5 QR Code Camera Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg: #f3f4f6;
-            --card-bg: #ffffff;
-            --text: #1f2937;
-            --danger: #ef4444;
-        }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 16px;
-            display: flex;
-            justify-content: center;
         }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        .toast {
+            transition: all 0.3s ease;
         }
-
-        h1 {
-            text-align: center;
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            color: var(--primary);
+        .modal-overlay {
+            transition: opacity 0.2s ease, visibility 0.2s ease;
         }
-
-        .card {
-            background: var(--card-bg);
-            padding: 20px;
+        #qr-reader video {
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            font-size: 1.1rem;
-            margin-top: 0;
-            margin-bottom: 12px;
-            border-bottom: 2px solid var(--bg);
-            padding-bottom: 8px;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        input[type="text"], input[type="number"], select {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-            outline: none;
-        }
-
-        input:focus, select:focus {
-            border-color: var(--primary);
-        }
-
-        button {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        button:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-danger {
-            background-color: transparent;
-            color: var(--danger);
-            padding: 4px 8px;
-            font-size: 12px;
-        }
-
-        .btn-danger:hover {
-            background-color: #fee2e2;
-        }
-
-        .tag-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .tag {
-            background: #e0e7ff;
-            color: #3730a3;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 10px 0;
-            background: #f9fafb;
-            padding: 10px;
-            border-radius: 6px;
-        }
-
-        .checkbox-group label {
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-        }
-
-        .item-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .item-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .item-details {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 2px;
-        }
-
-        .result-box {
-            background: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 10px;
-        }
-
-        .result-item {
-            font-size: 15px;
-            font-weight: bold;
-            color: #065f46;
-            margin: 6px 0;
+            object-fit: cover;
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-800 min-h-screen p-4 flex justify-center items-start">
 
-<div class="container">
-    <h1>👥 多人 AA 制埋數計算器</h1>
+<div class="w-full max-w-xl space-y-4 my-2">
 
-    <!-- 1. 人數設定 -->
-    <div class="card">
-        <h2>1. 參與成員</h2>
-        <div class="input-group">
-            <input type="text" id="personName" placeholder="輸入成員名字（例如：阿明）">
-            <button onclick="addPerson()">新增成員</button>
+    <!-- Header & Passcode Section -->
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <div>
+                <h1 class="text-xl font-bold text-indigo-600 flex items-center gap-2">
+                    <span>👥</span> 多人 AA 制埋數計算器
+                </h1>
+                <p class="text-xs text-slate-500 mt-0.5">無雲端依賴 · 支持 QR Code / 連結 離線跨裝置同步</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="switchPasscodeModal()" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-lg transition">
+                    🔑 切換本機群組
+                </button>
+            </div>
         </div>
-        <div class="tag-list" id="peopleList"></div>
+
+        <!-- Sharing Toolbar -->
+        <div class="mt-4 pt-1 grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button onclick="showQRCodeModal()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                <span>📱</span> 顯示 QR Code
+            </button>
+            <button onclick="openScannerModal()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                <span>📷</span> 掃描 QR Code
+            </button>
+            <button onclick="copyShareableLink()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                <span>🔗</span> 複製分享連結
+            </button>
+            <button onclick="openExportImportModal()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                <span>📋</span> 匯出/匯入代碼
+            </button>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between text-xs text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+            <span>目前本機帳號: <b id="currentPasscodeTag" class="text-indigo-600 font-bold">預設帳號</b></span>
+            <button onclick="confirmResetData()" class="text-rose-500 hover:underline">清空此帳號資料</button>
+        </div>
     </div>
 
-    <!-- 2. 新增消費 -->
-    <div class="card">
-        <h2>2. 新增消費項目</h2>
-        <div class="input-group">
-            <input type="text" id="itemName" placeholder="項目名稱（例如：晚飯/車費）">
-            <input type="number" id="itemAmount" placeholder="金額 ($)">
+    <!-- 1. Members Section -->
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <h2 class="text-base font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">1. 參與成員</h2>
+        <div class="flex gap-2 mb-3">
+            <input type="text" id="personName" placeholder="輸入成員名字（例如：阿明、小紅）" 
+                   onkeypress="handlePersonKeyPress(event)"
+                   class="flex-1 px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <button onclick="addPerson()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition">
+                新增
+            </button>
         </div>
-        <div style="margin-bottom: 8px;">
-            <label style="font-size: 14px;"><b>付款人：</b></label>
-            <select id="payerSelect"></select>
-        </div>
-        <div>
-            <label style="font-size: 14px;"><b>參與平分的人：</b></label>
-            <div class="checkbox-group" id="sharerCheckboxes"></div>
-        </div>
-        <button style="width: 100%; margin-top: 10px;" onclick="addItem()">新增消費</button>
+        <div class="flex flex-wrap gap-2 min-h-[32px]" id="peopleList"></div>
     </div>
 
-    <!-- 3. 消費清單 -->
-    <div class="card">
-        <h2>3. 消費明細</h2>
-        <ul class="item-list" id="itemList"></ul>
+    <!-- 2. Add Expense Section -->
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <h2 class="text-base font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">2. 新增消費項目</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+            <input type="text" id="itemName" placeholder="項目名稱（例：晚餐 / 計程車）" 
+                   class="px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <input type="number" id="itemAmount" placeholder="金額 ($)" step="0.1" min="0" 
+                   class="px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div class="mb-3">
+            <label class="text-xs font-bold text-slate-600 block mb-1">付款人：</label>
+            <select id="payerSelect" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"></select>
+        </div>
+
+        <div class="mb-3">
+            <div class="flex justify-between items-center mb-1">
+                <label class="text-xs font-bold text-slate-600">參與平分的人：</label>
+                <div class="space-x-1">
+                    <button onclick="selectAllSharers(true)" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-0.5 rounded">全選</button>
+                    <button onclick="selectAllSharers(false)" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-0.5 rounded">全不選</button>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl" id="sharerCheckboxes"></div>
+        </div>
+
+        <button onclick="addItem()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition shadow-sm">
+            ➕ 新增消費項目
+        </button>
     </div>
 
-    <!-- 4. 結算結果 -->
-    <div class="card">
-        <h2>4. 結算方案（最簡轉賬）</h2>
-        <button style="width: 100%; background-color: #10b981;" onclick="calculate()">計算埋數</button>
-        <div id="resultContainer" style="display:none; margin-top: 15px;">
-            <p id="totalExpense" style="font-weight: bold; color: var(--text);"></p>
-            <div class="result-box" id="settlementList"></div>
+    <!-- 3. Expense List -->
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <h2 class="text-base font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">3. 消費明細</h2>
+        <ul id="itemList" class="divide-y divide-slate-100"></ul>
+    </div>
+
+    <!-- 4. Settlement Calculation -->
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <h2 class="text-base font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">4. 結算方案（最簡轉賬）</h2>
+        <button onclick="calculate()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition shadow-sm">
+            🧮 計算埋數
+        </button>
+
+        <div id="resultContainer" class="hidden mt-4 pt-3 border-t border-slate-100">
+            <p id="totalExpense" class="font-bold text-slate-800 text-sm mb-2"></p>
+            <div id="settlementList" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 space-y-1.5 mb-3 text-sm"></div>
+            <button onclick="copyResultsText()" class="w-full py-2 bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition">
+                📋 複製文字結算報告
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toastContainer" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+<!-- Modal 1: QR Code Modal -->
+<div id="qrModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-xl">
+        <h3 class="text-lg font-bold text-slate-800 mb-1">📱 掃描 QR Code 載入帳目</h3>
+        <p class="text-xs text-slate-500 mb-4">使用另一部手機掃描此 QR Code，即可直接同步載入目前的成員與消費金額。</p>
+        
+        <div class="flex justify-center p-3 bg-slate-50 border border-slate-200 rounded-2xl mb-4">
+            <div id="qrcodeCanvas"></div>
+        </div>
+
+        <div class="flex gap-2">
+            <button onclick="copyShareableLink()" class="flex-1 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl">
+                複製連結
+            </button>
+            <button onclick="closeModal('qrModal')" class="flex-1 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl">
+                關閉
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 2: Camera Scanner Modal -->
+<div id="scannerModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-xl">
+        <h3 class="text-lg font-bold text-slate-800 mb-1">📷 掃描對方的 QR Code</h3>
+        <p class="text-xs text-slate-500 mb-3">對準另一部手機螢幕顯示的 AA 制 QR Code：</p>
+        
+        <div id="qr-reader" class="w-full bg-slate-900 rounded-xl overflow-hidden mb-4 min-h-[220px]"></div>
+
+        <button onclick="closeScannerModal()" class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl">
+            取消 / 關閉相機
+        </button>
+    </div>
+</div>
+
+<!-- Modal 3: Export / Import Text Modal -->
+<div id="exportImportModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+        <h3 class="text-lg font-bold text-slate-800 mb-1">📋 匯出 / 匯入文字代碼</h3>
+        <p class="text-xs text-slate-500 mb-3">您可以複製這段數據代碼傳送給朋友，或在此貼上代碼匯入：</p>
+        
+        <textarea id="dataCodeArea" rows="4" class="w-full p-2.5 text-xs font-mono border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 mb-3"></textarea>
+
+        <div class="grid grid-cols-2 gap-2">
+            <button onclick="copyDataCodeText()" class="py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl">
+                複製代碼
+            </button>
+            <button onclick="importDataFromCode()" class="py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl">
+                匯入貼上的代碼
+            </button>
+        </div>
+
+        <button onclick="closeModal('exportImportModal')" class="w-full mt-2 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl">
+            關閉
+        </button>
+    </div>
+</div>
+
+<!-- Modal 4: Switch Local Group Passcode Modal -->
+<div id="switchPasscodeModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+        <h3 class="text-lg font-bold text-slate-800 mb-1">🔑 本機切換 / 建立群組帳號</h3>
+        <p class="text-xs text-slate-500 mb-3">輸入代碼以切換至不同的本地賬單（例如：`JAPAN_2026` 或 `DINNER`）：</p>
+        
+        <input type="text" id="newPasscodeInput" placeholder="例如：1234 / 日本旅行" 
+               class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-3">
+
+        <div class="flex gap-2">
+            <button onclick="applyNewPasscode()" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl">
+                切換帳號
+            </button>
+            <button onclick="closeModal('switchPasscodeModal')" class="flex-1 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl">
+                取消
+            </button>
         </div>
     </div>
 </div>
 
 <script>
+    // State Variables
+    let currentPasscode = localStorage.getItem('aa_offline_passcode') || '預設帳號';
     let people = [];
     let items = [];
+    let latestTransactions = [];
+    let latestTotalExpense = 0;
+    let html5QrScanner = null;
 
-    // 新增成員
+    // Local Storage Utilities
+    function getStorageKey(type) {
+        return `aa_offline_${currentPasscode}_${type}`;
+    }
+
+    function saveData() {
+        try {
+            localStorage.setItem(getStorageKey('people'), JSON.stringify(people));
+            localStorage.setItem(getStorageKey('items'), JSON.stringify(items));
+            localStorage.setItem('aa_offline_passcode', currentPasscode);
+        } catch(e) {
+            console.error("Failed to save to local storage", e);
+        }
+    }
+
+    function loadData() {
+        try {
+            const savedPeople = localStorage.getItem(getStorageKey('people'));
+            const savedItems = localStorage.getItem(getStorageKey('items'));
+            people = savedPeople ? JSON.parse(savedPeople) : [];
+            items = savedItems ? JSON.parse(savedItems) : [];
+        } catch(e) {
+            people = [];
+            items = [];
+        }
+    }
+
+    // Encoding & Compression for Sharing
+    function generateCompressedDataPayload() {
+        const payload = { p: people, i: items };
+        const jsonStr = JSON.stringify(payload);
+        // Base64 encode for clean URL hash / QR code embedding
+        return btoa(encodeURIComponent(jsonStr));
+    }
+
+    function parseDataPayload(encodedStr) {
+        try {
+            const jsonStr = decodeURIComponent(atob(encodedStr.trim()));
+            const parsed = JSON.parse(jsonStr);
+            if (Array.isArray(parsed.p) && Array.isArray(parsed.i)) {
+                return { people: parsed.p, items: parsed.i };
+            }
+        } catch(e) {
+            console.error("Failed to parse data payload", e);
+        }
+        return null;
+    }
+
+    function showQRCodeModal() {
+        if (people.length === 0 && items.length === 0) {
+            return showToast('目前沒有任何成員或消費資料可分享', 'warning');
+        }
+
+        const encodedData = generateCompressedDataPayload();
+        const shareUrl = window.location.origin + window.location.pathname + '#data=' + encodedData;
+
+        const container = document.getElementById('qrcodeCanvas');
+        container.innerHTML = '';
+        
+        new QRCode(container, {
+            text: shareUrl,
+            width: 210,
+            height: 210,
+            colorDark: "#1e293b",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.L
+        });
+
+        openModal('qrModal');
+    }
+
+    function copyShareableLink() {
+        if (people.length === 0 && items.length === 0) {
+            return showToast('目前沒有任何成員或消費資料可分享', 'warning');
+        }
+
+        const encodedData = generateCompressedDataPayload();
+        const shareUrl = window.location.origin + window.location.pathname + '#data=' + encodedData;
+
+        const tempInput = document.createElement('input');
+        tempInput.value = shareUrl;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        try {
+            document.execCommand('copy');
+            showToast('已成功複製分享連結！可直接發送至聊天群組', 'success');
+        } catch(e) {
+            showToast('複製失敗，請手動複製', 'warning');
+        }
+        document.body.removeChild(tempInput);
+    }
+
+    // Camera Scanning Logic
+    function openScannerModal() {
+        openModal('scannerModal');
+
+        setTimeout(() => {
+            if (!html5QrScanner) {
+                html5QrScanner = new Html5Qrcode("qr-reader");
+            }
+            
+            const config = { fps: 10, qrbox: { width: 200, height: 200 } };
+            html5QrScanner.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                onScanFailure
+            ).catch(err => {
+                showToast('無法開啟相機權限或不支援相機', 'warning');
+                closeScannerModal();
+            });
+        }, 200);
+    }
+
+    function closeScannerModal() {
+        if (html5QrScanner) {
+            html5QrScanner.stop().then(() => {
+                html5QrScanner.clear();
+            }).catch(err => console.log(err));
+        }
+        closeModal('scannerModal');
+    }
+
+    function onScanSuccess(decodedText) {
+        closeScannerModal();
+        
+        let payloadStr = decodedText;
+        if (decodedText.includes('#data=')) {
+            payloadStr = decodedText.split('#data=')[1];
+        }
+
+        const parsed = parseDataPayload(payloadStr);
+        if (parsed) {
+            people = parsed.people;
+            items = parsed.items;
+            saveData();
+            updatePeopleUI();
+            updateItemsUI();
+            document.getElementById('resultContainer').classList.add('hidden');
+            showToast('🎉 成功經由 QR Code 匯入數據！', 'success');
+        } else {
+            showToast('無效的 AA 制 QR Code 數據', 'warning');
+        }
+    }
+
+    function onScanFailure(error) {
+        // Ignored for continuous scanning
+    }
+
+    // Export / Import Text Modal
+    function openExportImportModal() {
+        const area = document.getElementById('dataCodeArea');
+        area.value = generateCompressedDataPayload();
+        openModal('exportImportModal');
+    }
+
+    function copyDataCodeText() {
+        const area = document.getElementById('dataCodeArea');
+        area.select();
+        try {
+            document.execCommand('copy');
+            showToast('已複製數據代碼！', 'success');
+        } catch(e) {
+            showToast('複製失敗', 'warning');
+        }
+    }
+
+    function importDataFromCode() {
+        const area = document.getElementById('dataCodeArea');
+        const parsed = parseDataPayload(area.value);
+        if (parsed) {
+            people = parsed.people;
+            items = parsed.items;
+            saveData();
+            updatePeopleUI();
+            updateItemsUI();
+            document.getElementById('resultContainer').classList.add('hidden');
+            closeModal('exportImportModal');
+            showToast('🎉 數據匯入成功！', 'success');
+        } else {
+            showToast('請輸入有效的數據代碼', 'warning');
+        }
+    }
+
     function addPerson() {
         const input = document.getElementById('personName');
         const name = input.value.trim();
-        if (!name) return alert('請輸入名字');
-        if (people.includes(name)) return alert('名字不能重複');
+        if (!name) return showToast('請輸入成員名字', 'warning');
+        if (people.includes(name)) return showToast('成員名字不能重複', 'warning');
 
         people.push(name);
         input.value = '';
+        saveData();
         updatePeopleUI();
+        showToast(`已新增成員：${name}`, 'success');
     }
 
-    // 刪除成員
     function removePerson(name) {
         people = people.filter(p => p !== name);
-        // 同時清除項目中該成員相關資料
         items.forEach(item => {
             item.sharers = item.sharers.filter(s => s !== name);
         });
         items = items.filter(item => item.payer !== name && item.sharers.length > 0);
-        
+
+        saveData();
         updatePeopleUI();
         updateItemsUI();
+        document.getElementById('resultContainer').classList.add('hidden');
+        showToast(`已移除成員：${name}`);
     }
 
-    // 更新成員介面
     function updatePeopleUI() {
         const peopleList = document.getElementById('peopleList');
         const payerSelect = document.getElementById('payerSelect');
         const sharerCheckboxes = document.getElementById('sharerCheckboxes');
 
+        if (people.length === 0) {
+            peopleList.innerHTML = '<div class="text-xs text-slate-400 py-1">尚未新增成員</div>';
+            payerSelect.innerHTML = '<option value="">請先新增成員</option>';
+            sharerCheckboxes.innerHTML = '<div class="text-xs text-slate-400 py-1">尚未新增成員</div>';
+            return;
+        }
+
         peopleList.innerHTML = people.map(p => `
-            <span class="tag">
-                ${p}
-                <button class="btn-danger" onclick="removePerson('${p}')">✕</button>
+            <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
+                ${escapeHtml(p)}
+                <button onclick="removePerson('${escapeJs(p)}')" class="hover:bg-indigo-100 rounded-full w-4 h-4 flex items-center justify-center text-xs">✕</button>
             </span>
         `).join('');
 
-        payerSelect.innerHTML = people.map(p => `<option value="${p}">${p}</option>`).join('');
+        const currPayer = payerSelect.value;
+        payerSelect.innerHTML = people.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
+        if (people.includes(currPayer)) payerSelect.value = currPayer;
 
         sharerCheckboxes.innerHTML = people.map(p => `
-            <label>
-                <input type="checkbox" value="${p}" checked> ${p}
+            <label class="inline-flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer select-none">
+                <input type="checkbox" value="${escapeHtml(p)}" checked class="rounded text-indigo-600 focus:ring-indigo-500"> ${escapeHtml(p)}
             </label>
         `).join('');
     }
 
-    // 新增消費項目
+    function selectAllSharers(checked) {
+        const checkboxes = document.querySelectorAll('#sharerCheckboxes input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = checked);
+    }
+
     function addItem() {
         const nameInput = document.getElementById('itemName');
         const amountInput = document.getElementById('itemAmount');
         const payerSelect = document.getElementById('payerSelect');
-        
+
         const name = nameInput.value.trim() || '未命名消費';
         const amount = parseFloat(amountInput.value);
         const payer = payerSelect.value;
@@ -284,117 +484,221 @@
         const checkboxes = document.querySelectorAll('#sharerCheckboxes input[type="checkbox"]:checked');
         const sharers = Array.from(checkboxes).map(cb => cb.value);
 
-        if (isNaN(amount) || amount <= 0) return alert('請輸入有效的金額');
-        if (!payer) return alert('請先新增並選擇付款人');
-        if (sharers.length === 0) return alert('請至少選擇一位參與平分的人');
+        if (isNaN(amount) || amount <= 0) return showToast('請輸入有效的金額', 'warning');
+        if (!payer || !people.includes(payer)) return showToast('請先新增並選擇付款人', 'warning');
+        if (sharers.length === 0) return showToast('請至少選擇一位平分者', 'warning');
 
         items.push({ id: Date.now(), name, amount, payer, sharers });
 
         nameInput.value = '';
         amountInput.value = '';
+
+        saveData();
         updateItemsUI();
+        document.getElementById('resultContainer').classList.add('hidden');
+        showToast(`已新增：${name} ($${amount.toFixed(1)})`, 'success');
     }
 
-    // 刪除消費項目
     function removeItem(id) {
         items = items.filter(item => item.id !== id);
+        saveData();
         updateItemsUI();
+        document.getElementById('resultContainer').classList.add('hidden');
+        showToast('已刪除消費項目');
     }
 
-    // 更新消費項目介面
     function updateItemsUI() {
         const itemList = document.getElementById('itemList');
+        if (items.length === 0) {
+            itemList.innerHTML = '<li class="text-xs text-slate-400 py-3 text-center">尚未新增消費項目</li>';
+            return;
+        }
+
         itemList.innerHTML = items.map(item => `
-            <li class="item-row">
+            <li class="py-2.5 flex justify-between items-center text-xs">
                 <div>
-                    <strong>${item.name}</strong> - $${item.amount.toFixed(1)}
-                    <div class="item-details">
-                        由 <b>${item.payer}</b> 付款 | 平分成員: ${item.sharers.join(', ')}
-                    </div>
+                    <div class="font-bold text-slate-800 text-sm">${escapeHtml(item.name)} - <span class="text-indigo-600">$${item.amount.toFixed(1)}</span></div>
+                    <div class="text-slate-500 mt-0.5">由 <b>${escapeHtml(item.payer)}</b> 付款 | 平分: ${item.sharers.map(s => escapeHtml(s)).join(', ')}</div>
                 </div>
-                <button class="btn-danger" onclick="removeItem(${item.id})">刪除</button>
+                <button onclick="removeItem(${item.id})" class="text-rose-500 hover:bg-rose-50 px-2 py-1 rounded text-xs font-semibold">刪除</button>
             </li>
         `).join('');
     }
 
-    // 計算埋數 (最簡化轉賬算法)
     function calculate() {
-        if (people.length === 0) return alert('請先新增成員');
-        if (items.length === 0) return alert('請先新增消費項目');
+        if (people.length === 0) return showToast('請先新增成員', 'warning');
+        if (items.length === 0) return showToast('請先新增消費項目', 'warning');
 
-        // 1. 計算每個人最終的收支淨額 (結餘)
         const balances = {};
         people.forEach(p => balances[p] = 0);
-
         let totalExpense = 0;
 
         items.forEach(item => {
             totalExpense += item.amount;
-            // 付款者 +金額
-            balances[item.payer] += item.amount;
+            if (balances.hasOwnProperty(item.payer)) balances[item.payer] += item.amount;
             
-            // 平分者 -每人應付金額
-            const splitAmount = item.amount / item.sharers.length;
-            item.sharers.forEach(sharer => {
-                balances[sharer] -= splitAmount;
+            const split = item.amount / item.sharers.length;
+            item.sharers.forEach(s => {
+                if (balances.hasOwnProperty(s)) balances[s] -= split;
             });
         });
 
-        // 2. 將所有人分為「應收款者」與「應付款者」
-        const debtors = [];  // 欠錢者 (結餘 < 0)
-        const creditors = []; // 應收錢者 (結餘 > 0)
+        const debtors = [];
+        const creditors = [];
 
         Object.keys(balances).forEach(person => {
-            const amount = balances[person];
-            if (amount < -0.01) {
-                debtors.push({ name: person, amount: -amount }); // 取正數方便計算
-            } else if (amount > 0.01) {
-                creditors.push({ name: person, amount: amount });
-            }
+            const amt = balances[person];
+            if (amt < -0.01) debtors.push({ name: person, amount: -amt });
+            else if (amt > 0.01) creditors.push({ name: person, amount: amt });
         });
 
-        // 3. 貪婪演算法 Match 最少轉賬次數
         const transactions = [];
         let i = 0, j = 0;
 
         while (i < debtors.length && j < creditors.length) {
             const debtor = debtors[i];
             const creditor = creditors[j];
+            const minAmt = Math.min(debtor.amount, creditor.amount);
 
-            const minAmount = Math.min(debtor.amount, creditor.amount);
-            transactions.push({
-                from: debtor.name,
-                to: creditor.name,
-                amount: minAmount
-            });
-
-            debtor.amount -= minAmount;
-            creditor.amount -= minAmount;
+            transactions.push({ from: debtor.name, to: creditor.name, amount: minAmt });
+            debtor.amount -= minAmt;
+            creditor.amount -= minAmt;
 
             if (debtor.amount < 0.01) i++;
             if (creditor.amount < 0.01) j++;
         }
 
-        // 4. 渲染結果
-        const resultContainer = document.getElementById('resultContainer');
-        const totalExpenseEl = document.getElementById('totalExpense');
+        latestTransactions = transactions;
+        latestTotalExpense = totalExpense;
+
+        document.getElementById('totalExpense').innerText = `💰 總花費金額：$${totalExpense.toFixed(1)}`;
         const settlementList = document.getElementById('settlementList');
 
-        totalExpenseEl.innerText = `總花費金額：$${totalExpense.toFixed(1)}`;
-        
         if (transactions.length === 0) {
-            settlementList.innerHTML = '<div class="result-item">大家剛好平手，不需要額外轉賬！</div>';
+            settlementList.innerHTML = '<div class="text-emerald-800 font-bold">🎉 大家金額剛好平手，不需要轉賬！</div>';
         } else {
             settlementList.innerHTML = transactions.map(t => `
-                <div class="result-item">
-                    👉 <b>${t.from}</b> 給 <b>${t.to}</b> ： <span style="color:#d97706;">$${t.amount.toFixed(1)}</span>
+                <div class="text-emerald-900 font-semibold">
+                    👉 <b>${escapeHtml(t.from)}</b> 給 <b>${escapeHtml(t.to)}</b> ： <span class="text-amber-600 font-bold">$${t.amount.toFixed(1)}</span>
                 </div>
             `).join('');
         }
 
-        resultContainer.style.display = 'block';
+        document.getElementById('resultContainer').classList.remove('hidden');
     }
-</script>
 
+    function copyResultsText() {
+        if (latestTransactions.length === 0 && latestTotalExpense === 0) return;
+
+        let text = `📊 【AA 制埋數結算帳單】\n💰 總花費：$${latestTotalExpense.toFixed(1)}\n-------------------\n`;
+        if (latestTransactions.length === 0) {
+            text += '🎉 大家金額剛好平手，不需要額外轉賬！';
+        } else {
+            text += '轉賬方案：\n';
+            latestTransactions.forEach(t => {
+                text += `• ${t.from} ➡️ ${t.to} : $${t.amount.toFixed(1)}\n`;
+            });
+        }
+
+        const tempInput = document.createElement('textarea');
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        try {
+            document.execCommand('copy');
+            showToast('已成功複製結算報告！', 'success');
+        } catch (e) {
+            showToast('複製失敗', 'warning');
+        }
+        document.body.removeChild(tempInput);
+    }
+
+    // Modal & Toast Helpers
+    function openModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function switchPasscodeModal() {
+        document.getElementById('newPasscodeInput').value = currentPasscode;
+        openModal('switchPasscodeModal');
+    }
+
+    function applyNewPasscode() {
+        const val = document.getElementById('newPasscodeInput').value.trim() || '預設帳號';
+        currentPasscode = val;
+        document.getElementById('currentPasscodeTag').innerText = currentPasscode;
+        closeModal('switchPasscodeModal');
+        loadData();
+        updatePeopleUI();
+        updateItemsUI();
+        document.getElementById('resultContainer').classList.add('hidden');
+        showToast(`已切換至本機帳號 [${currentPasscode}]`);
+    }
+
+    function confirmResetData() {
+        if (confirm(`確定要清空本機帳號 [${currentPasscode}] 的所有數據嗎？`)) {
+            people = [];
+            items = [];
+            saveData();
+            updatePeopleUI();
+            updateItemsUI();
+            document.getElementById('resultContainer').classList.add('hidden');
+            showToast('已清空數據');
+        }
+    }
+
+    function showToast(message, type = 'normal') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg pointer-events-auto text-white ${
+            type === 'warning' ? 'bg-rose-500' : type === 'success' ? 'bg-emerald-600' : 'bg-slate-800'
+        }`;
+        toast.innerText = message;
+        container.appendChild(toast);
+
+        setTimeout(() => toast.remove(), 2600);
+    }
+
+    function handlePersonKeyPress(e) {
+        if (e.key === 'Enter') addPerson();
+    }
+
+    function escapeHtml(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function escapeJs(str) {
+        return String(str).replace(/'/g, "\\'");
+    }
+
+    window.addEventListener('load', () => {
+        document.getElementById('currentPasscodeTag').innerText = currentPasscode;
+
+        // Check URL hash for shared data payload
+        if (window.location.hash && window.location.hash.includes('data=')) {
+            const hashData = window.location.hash.split('data=')[1];
+            const parsed = parseDataPayload(hashData);
+            if (parsed) {
+                people = parsed.people;
+                items = parsed.items;
+                saveData();
+                showToast('🎉 已自動從分享連結載入帳目數據！', 'success');
+                // Clean hash from URL without refreshing
+                history.replaceState(null, "", window.location.pathname);
+            }
+        } else {
+            loadData();
+        }
+
+        updatePeopleUI();
+        updateItemsUI();
+    });
+</script>
 </body>
 </html>
