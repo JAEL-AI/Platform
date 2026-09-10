@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多人 AA 制埋數計算器</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 8px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        input[type="text"], input[type="number"], select {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-danger {
+            background-color: transparent;
+            color: var(--danger);
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            background-color: #fee2e2;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+            background: #f9fafb;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .checkbox-group label {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .item-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .item-details {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        .result-box {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .result-item {
+            font-size: 15px;
+            font-weight: bold;
+            color: #065f46;
+            margin: 6px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>👥 多人 AA 制埋數計算器</h1>
+
+    <!-- 1. 人數設定 -->
+    <div class="card">
+        <h2>1. 參與成員</h2>
+        <div class="input-group">
+            <input type="text" id="personName" placeholder="輸入成員名字（例如：阿明）">
+            <button onclick="addPerson()">新增成員</button>
+        </div>
+        <div class="tag-list" id="peopleList"></div>
+    </div>
+
+    <!-- 2. 新增消費 -->
+    <div class="card">
+        <h2>2. 新增消費項目</h2>
+        <div class="input-group">
+            <input type="text" id="itemName" placeholder="項目名稱（例如：晚飯/車費）">
+            <input type="number" id="itemAmount" placeholder="金額 ($)">
+        </div>
+        <div style="margin-bottom: 8px;">
+            <label style="font-size: 14px;"><b>付款人：</b></label>
+            <select id="payerSelect"></select>
+        </div>
+        <div>
+            <label style="font-size: 14px;"><b>參與平分的人：</b></label>
+            <div class="checkbox-group" id="sharerCheckboxes"></div>
+        </div>
+        <button style="width: 100%; margin-top: 10px;" onclick="addItem()">新增消費</button>
+    </div>
+
+    <!-- 3. 消費清單 -->
+    <div class="card">
+        <h2>3. 消費明細</h2>
+        <ul class="item-list" id="itemList"></ul>
+    </div>
+
+    <!-- 4. 結算結果 -->
+    <div class="card">
+        <h2>4. 結算方案（最簡轉賬）</h2>
+        <button style="width: 100%; background-color: #10b981;" onclick="calculate()">計算埋數</button>
+        <div id="resultContainer" style="display:none; margin-top: 15px;">
+            <p id="totalExpense" style="font-weight: bold; color: var(--text);"></p>
+            <div class="result-box" id="settlementList"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let people = [];
+    let items = [];
+
+    // 新增成員
+    function addPerson() {
+        const input = document.getElementById('personName');
+        const name = input.value.trim();
+        if (!name) return alert('請輸入名字');
+        if (people.includes(name)) return alert('名字不能重複');
+
+        people.push(name);
+        input.value = '';
+        updatePeopleUI();
+    }
+
+    // 刪除成員
+    function removePerson(name) {
+        people = people.filter(p => p !== name);
+        // 同時清除項目中該成員相關資料
+        items.forEach(item => {
+            item.sharers = item.sharers.filter(s => s !== name);
+        });
+        items = items.filter(item => item.payer !== name && item.sharers.length > 0);
+        
+        updatePeopleUI();
+        updateItemsUI();
+    }
+
+    // 更新成員介面
+    function updatePeopleUI() {
+        const peopleList = document.getElementById('peopleList');
+        const payerSelect = document.getElementById('payerSelect');
+        const sharerCheckboxes = document.getElementById('sharerCheckboxes');
+
+        peopleList.innerHTML = people.map(p => `
+            <span class="tag">
+                ${p}
+                <button class="btn-danger" onclick="removePerson('${p}')">✕</button>
+            </span>
+        `).join('');
+
+        payerSelect.innerHTML = people.map(p => `<option value="${p}">${p}</option>`).join('');
+
+        sharerCheckboxes.innerHTML = people.map(p => `
+            <label>
+                <input type="checkbox" value="${p}" checked> ${p}
+            </label>
+        `).join('');
+    }
+
+    // 新增消費項目
+    function addItem() {
+        const nameInput = document.getElementById('itemName');
+        const amountInput = document.getElementById('itemAmount');
+        const payerSelect = document.getElementById('payerSelect');
+        
+        const name = nameInput.value.trim() || '未命名消費';
+        const amount = parseFloat(amountInput.value);
+        const payer = payerSelect.value;
+
+        const checkboxes = document.querySelectorAll('#sharerCheckboxes input[type="checkbox"]:checked');
+        const sharers = Array.from(checkboxes).map(cb => cb.value);
+
+        if (isNaN(amount) || amount <= 0) return alert('請輸入有效的金額');
+        if (!payer) return alert('請先新增並選擇付款人');
+        if (sharers.length === 0) return alert('請至少選擇一位參與平分的人');
+
+        items.push({ id: Date.now(), name, amount, payer, sharers });
+
+        nameInput.value = '';
+        amountInput.value = '';
+        updateItemsUI();
+    }
+
+    // 刪除消費項目
+    function removeItem(id) {
+        items = items.filter(item => item.id !== id);
+        updateItemsUI();
+    }
+
+    // 更新消費項目介面
+    function updateItemsUI() {
+        const itemList = document.getElementById('itemList');
+        itemList.innerHTML = items.map(item => `
+            <li class="item-row">
+                <div>
+                    <strong>${item.name}</strong> - $${item.amount.toFixed(1)}
+                    <div class="item-details">
+                        由 <b>${item.payer}</b> 付款 | 平分成員: ${item.sharers.join(', ')}
+                    </div>
+                </div>
+                <button class="btn-danger" onclick="removeItem(${item.id})">刪除</button>
+            </li>
+        `).join('');
+    }
+
+    // 計算埋數 (最簡化轉賬算法)
+    function calculate() {
+        if (people.length === 0) return alert('請先新增成員');
+        if (items.length === 0) return alert('請先新增消費項目');
+
+        // 1. 計算每個人最終的收支淨額 (結餘)
+        const balances = {};
+        people.forEach(p => balances[p] = 0);
+
+        let totalExpense = 0;
+
+        items.forEach(item => {
+            totalExpense += item.amount;
+            // 付款者 +金額
+            balances[item.payer] += item.amount;
+            
+            // 平分者 -每人應付金額
+            const splitAmount = item.amount / item.sharers.length;
+            item.sharers.forEach(sharer => {
+                balances[sharer] -= splitAmount;
+            });
+        });
+
+        // 2. 將所有人分為「應收款者」與「應付款者」
+        const debtors = [];  // 欠錢者 (結餘 < 0)
+        const creditors = []; // 應收錢者 (結餘 > 0)
+
+        Object.keys(balances).forEach(person => {
+            const amount = balances[person];
+            if (amount < -0.01) {
+                debtors.push({ name: person, amount: -amount }); // 取正數方便計算
+            } else if (amount > 0.01) {
+                creditors.push({ name: person, amount: amount });
+            }
+        });
+
+        // 3. 貪婪演算法 Match 最少轉賬次數
+        const transactions = [];
+        let i = 0, j = 0;
+
+        while (i < debtors.length && j < creditors.length) {
+            const debtor = debtors[i];
+            const creditor = creditors[j];
+
+            const minAmount = Math.min(debtor.amount, creditor.amount);
+            transactions.push({
+                from: debtor.name,
+                to: creditor.name,
+                amount: minAmount
+            });
+
+            debtor.amount -= minAmount;
+            creditor.amount -= minAmount;
+
+            if (debtor.amount < 0.01) i++;
+            if (creditor.amount < 0.01) j++;
+        }
+
+        // 4. 渲染結果
+        const resultContainer = document.getElementById('resultContainer');
+        const totalExpenseEl = document.getElementById('totalExpense');
+        const settlementList = document.getElementById('settlementList');
+
+        totalExpenseEl.innerText = `總花費金額：$${totalExpense.toFixed(1)}`;
+        
+        if (transactions.length === 0) {
+            settlementList.innerHTML = '<div class="result-item">大家剛好平手，不需要額外轉賬！</div>';
+        } else {
+            settlementList.innerHTML = transactions.map(t => `
+                <div class="result-item">
+                    👉 <b>${t.from}</b> 給 <b>${t.to}</b> ： <span style="color:#d97706;">$${t.amount.toFixed(1)}</span>
+                </div>
+            `).join('');
+        }
+
+        resultContainer.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
