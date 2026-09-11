@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>旅遊 Portal</title>
+  <title>大阪・白濱・和歌山 5日遊 | 2027 行程與精準交通指南</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,10 +11,13 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
+  <!-- QR Code Generator Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -23,12 +26,15 @@
         extend: {
           colors: {
             brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
               500: '#2563eb',
               600: '#1d4ed8',
               700: '#1e40af',
-              900: '#0f172a',
+              900: '#1e3a8a',
             },
             sakura: {
+              100: '#ffe4e6',
               500: '#f43f5e',
             }
           },
@@ -41,138 +47,1188 @@
   </script>
 
   <style>
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
     .glass-card {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
     }
     .dark .glass-card {
-      background: rgba(15, 23, 42, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(30, 41, 59, 0.88);
+      backdrop-filter: blur(12px);
     }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white transition-colors duration-300 relative overflow-x-hidden">
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 min-h-screen flex flex-col">
 
-  <!-- Background decorative glows -->
-  <div class="absolute -top-40 -left-40 w-96 h-96 bg-brand-600/30 rounded-full blur-3xl pointer-events-none"></div>
-  <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-sakura-500/20 rounded-full blur-3xl pointer-events-none"></div>
+  <header class="sticky top-0 z-50 glass-card border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-3">
+          <span class="text-2xl">🌸</span>
+          <div>
+            <h1 class="font-bold text-lg sm:text-xl text-slate-900 dark:text-white leading-tight">大阪・白濱・和歌山</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400">2027/03/08 – 03/12 (5 Days) 精準交通版</p>
+          </div>
+        </div>
 
-  <header class="w-full max-w-5xl mx-auto px-6 py-6 flex justify-between items-center relative z-10">
-    <div class="flex items-center space-x-2">
-      <span class="text-2xl animate-pulse">🌸</span>
-      <span class="font-black text-lg tracking-tight text-white">Travel Platform</span>
+        <!-- Desktop Nav Items -->
+        <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm font-medium">
+          <a href="#overview" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">總覽</a>
+          <a href="#itinerary" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">每日行程</a>
+          <a href="#calculator" class="px-3 py-2 rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/60 transition font-semibold">
+            <i class="fa-solid fa-calculator mr-1"></i> AA 埋數計算機
+          </a>
+        </nav>
+
+        <div class="flex items-center space-x-2">
+          <!-- Dark Mode Toggle -->
+          <button id="themeToggle" onclick="toggleTheme()" class="p-2.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition focus:outline-none" title="切換深色/淺色模式">
+            <i class="fa-solid fa-moon text-lg dark:hidden"></i>
+            <i class="fa-solid fa-sun text-lg hidden dark:block text-amber-400"></i>
+          </button>
+
+          <!-- Mobile Menu Toggle -->
+          <button onclick="toggleMobileMenu()" class="md:hidden p-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none">
+            <i class="fa-solid fa-bars text-xl" id="menuIcon"></i>
+          </button>
+        </div>
+      </div>
     </div>
-    <button id="themeToggle" onclick="toggleTheme()" class="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 transition focus:outline-none" title="切換深色/淺色模式">
-      <i class="fa-solid fa-moon text-base dark:hidden"></i>
-      <i class="fa-solid fa-sun text-base hidden dark:block text-amber-400"></i>
-    </button>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobileMenu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pt-2 pb-4 space-y-1">
+      <a href="#overview" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 dark:hover:bg-slate-800">總覽資訊</a>
+      <a href="#itinerary" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 dark:hover:bg-slate-800">每日行程</a>
+      <a href="#calculator" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-brand-600 dark:text-brand-400 font-bold hover:bg-brand-50 dark:hover:bg-slate-800">AA 埋數計算機</a>
+    </div>
   </header>
 
-  <main class="w-full max-w-3xl mx-auto px-4 py-8 flex-grow flex flex-col justify-center items-center text-center relative z-10">
-    
-    <!-- Title -->
-    <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight mb-8">
-      <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-300 to-rose-400">Travel Platform</span>
-    </h1>
+  <section id="overview" class="relative bg-gradient-to-br from-slate-900 via-brand-900 to-indigo-950 text-white py-12 sm:py-16 px-4 overflow-hidden">
+    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
+    <div class="max-w-7xl mx-auto relative z-10">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-medium">
+          <span>🇯🇵 日本關西 5 日遊</span>
+          <span>•</span>
+          <span class="text-amber-300"><i class="fa-solid fa-plane"></i> 香港航空 HX616 / HX613</span>
+        </div>
 
-    <!-- Current Time Clock Card -->
-    <div class="w-full glass-card p-6 sm:p-8 rounded-3xl shadow-2xl mb-10 max-w-xl">
-      <div class="text-xs font-bold uppercase tracking-wider text-amber-300 mb-2 flex items-center justify-center gap-2">
-        <i class="fa-regular fa-clock"></i> 當前時間 CURRENT TIME
+        <!-- Live Countdown Widget Badge -->
+        <div id="countdownContainer" class="bg-black/30 backdrop-blur-md border border-white/20 rounded-xl px-4 py-2.5 flex items-center space-x-3 shadow-lg">
+          <div class="flex items-center space-x-1.5 text-amber-400 font-semibold text-xs sm:text-sm">
+            <i class="fa-solid fa-hourglass-half animate-pulse"></i>
+            <span>距離出發倒數：</span>
+          </div>
+          <div class="flex items-center space-x-2 text-center font-mono">
+            <div>
+              <span id="cd-days" class="text-lg sm:text-xl font-extrabold text-white">00</span>
+              <span class="text-[10px] text-slate-300 block -mt-1">天</span>
+            </div>
+            <span class="text-amber-400 font-bold text-sm">:</span>
+            <div>
+              <span id="cd-hours" class="text-lg sm:text-xl font-extrabold text-white">00</span>
+              <span class="text-[10px] text-slate-300 block -mt-1">時</span>
+            </div>
+            <span class="text-amber-400 font-bold text-sm">:</span>
+            <div>
+              <span id="cd-minutes" class="text-lg sm:text-xl font-extrabold text-white">00</span>
+              <span class="text-[10px] text-slate-300 block -mt-1">分</span>
+            </div>
+            <span class="text-amber-400 font-bold text-sm">:</span>
+            <div>
+              <span id="cd-seconds" class="text-lg sm:text-xl font-extrabold font-mono text-amber-300">00</span>
+              <span class="text-[10px] text-slate-300 block -mt-1">秒</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="text-sm font-semibold text-slate-300 mb-4" id="currentDate">----/--/--</div>
+      
+      <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4">大阪・白濱溫泉・和歌山</h2>
+      <p class="text-slate-300 max-w-2xl text-sm sm:text-base leading-relaxed mb-8">
+        溫泉名宿奢華假期、海鮮市場美味、和歌山採草莓拜訪貓咪站長、心齋橋與黑門市場購物，結合最新鐵路與巴士轉乘動線！
+      </p>
 
-      <div class="grid grid-cols-3 gap-3 text-center" id="clockDisplay">
-        <div class="bg-slate-950/60 p-3 sm:p-4 rounded-2xl border border-white/10">
-          <span class="block text-2xl sm:text-4xl font-black text-white" id="clockHours">--</span>
-          <span class="text-[10px] sm:text-xs text-slate-400 font-bold tracking-wider">時 HOURS</span>
+      <!-- Key Info Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Flight Info -->
+        <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
+          <div class="flex items-center space-x-3 mb-2">
+            <i class="fa-solid fa-plane-departure text-amber-400 text-lg"></i>
+            <span class="text-xs text-slate-300 font-semibold uppercase tracking-wider">去程航班</span>
+          </div>
+          <div class="text-lg font-bold">HX616</div>
+          <div class="text-xs text-slate-300">02:40 香港 (HKG) ➔ 07:15 關西 (KIX)</div>
         </div>
-        <div class="bg-slate-950/60 p-3 sm:p-4 rounded-2xl border border-white/10">
-          <span class="block text-2xl sm:text-4xl font-black text-white" id="clockMins">--</span>
-          <span class="text-[10px] sm:text-xs text-slate-400 font-bold tracking-wider">分 MINS</span>
+
+        <!-- Return Flight Info -->
+        <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
+          <div class="flex items-center space-x-3 mb-2">
+            <i class="fa-solid fa-plane-arrival text-amber-400 text-lg"></i>
+            <span class="text-xs text-slate-300 font-semibold uppercase tracking-wider">回程航班</span>
+          </div>
+          <div class="text-lg font-bold">HX613</div>
+          <div class="text-xs text-slate-300">20:20 關西 (KIX) ➔ 23:50 香港 (HKG)</div>
         </div>
-        <div class="bg-slate-950/60 p-3 sm:p-4 rounded-2xl border border-white/10">
-          <span class="block text-2xl sm:text-4xl font-black text-white" id="clockSecs">--</span>
-          <span class="text-[10px] sm:text-xs text-slate-400 font-bold tracking-wider">秒 SECS</span>
+
+        <!-- Hotel Info -->
+        <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
+          <div class="flex items-center space-x-3 mb-2">
+            <i class="fa-solid fa-hot-tub-person text-rose-400 text-lg"></i>
+            <span class="text-xs text-slate-300 font-semibold uppercase tracking-wider">白濱奢華溫泉</span>
+          </div>
+          <div class="text-base font-bold truncate">濱千鳥之湯 海舟</div>
+          <div class="text-xs text-slate-300">TEL: +81 739-82-2220</div>
+        </div>
+
+        <!-- Transit Ticket -->
+        <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
+          <div class="flex items-center space-x-3 mb-2">
+            <i class="fa-solid fa-train text-emerald-400 text-lg"></i>
+            <span class="text-xs text-slate-300 font-semibold uppercase tracking-wider">主要鐵路周遊券</span>
+          </div>
+          <div class="text-base font-bold">JR 關西廣域 5日券</div>
+          <div class="text-xs text-emerald-300 font-medium">⚠️ Kuroshio 特急全車指定席</div>
         </div>
       </div>
     </div>
+  </section>
 
-    <!-- The Two Primary Action Buttons -->
-    <div class="w-full max-w-md space-y-4">
-      <a href="202703OSAKA.html" class="w-full py-4 px-6 bg-brand-600 hover:bg-brand-500 text-white font-bold text-base sm:text-lg rounded-2xl transition duration-300 shadow-lg shadow-brand-600/40 flex items-center justify-center gap-3 group border border-brand-400/30">
-        <i class="fa-solid fa-map-location-dot text-xl group-hover:scale-110 transition"></i>
-        <span>2027年3月8-12日-日本大阪</span>
-        <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition"></i>
-      </a>
+  <!-- Main Content Layout -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 flex-grow">
 
-      <a href="AA_Cal.html" class="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base sm:text-lg rounded-2xl transition duration-300 shadow-lg shadow-emerald-600/40 flex items-center justify-center gap-3 group border border-emerald-400/30">
-        <i class="fa-solid fa-calculator text-xl group-hover:scale-110 transition"></i>
-        <span>開啟 AA 埋數計算機</span>
-        <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition"></i>
-      </a>
-    </div>
+    <section id="itinerary">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-calendar-days text-brand-500"></i> 每日行程與交通銜接
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">點擊切換天數，各節點含精確時間、月台轉乘與 Google 地圖連結。</p>
+        </div>
+
+        <!-- Day Selector Tabs -->
+        <div class="flex overflow-x-auto pb-2 sm:pb-0 gap-1 bg-slate-200/70 dark:bg-slate-800/80 p-1.5 rounded-xl text-xs sm:text-sm font-medium">
+          <button onclick="switchDay(1)" id="tab-1" class="day-tab px-3.5 py-2 rounded-lg transition whitespace-nowrap bg-white dark:bg-slate-700 text-brand-600 dark:text-white shadow-sm font-bold">Day 1 (3/8)</button>
+          <button onclick="switchDay(2)" id="tab-2" class="day-tab px-3.5 py-2 rounded-lg transition whitespace-nowrap text-slate-600 dark:text-slate-300 hover:text-slate-900">Day 2 (3/9)</button>
+          <button onclick="switchDay(3)" id="tab-3" class="day-tab px-3.5 py-2 rounded-lg transition whitespace-nowrap text-slate-600 dark:text-slate-300 hover:text-slate-900">Day 3 (3/10)</button>
+          <button onclick="switchDay(4)" id="tab-4" class="day-tab px-3.5 py-2 rounded-lg transition whitespace-nowrap text-slate-600 dark:text-slate-300 hover:text-slate-900">Day 4 (3/11)</button>
+          <button onclick="switchDay(5)" id="tab-5" class="day-tab px-3.5 py-2 rounded-lg transition whitespace-nowrap text-slate-600 dark:text-slate-300 hover:text-slate-900">Day 5 (3/12)</button>
+        </div>
+      </div>
+
+      <!-- Day Panels -->
+
+      <!-- DAY 1 -->
+      <div id="day-content-1" class="day-panel space-y-4">
+        <div class="bg-brand-50/50 dark:bg-slate-800/50 p-4 rounded-xl border border-brand-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">Day 1 • 2027/03/08 (週一)</span>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">抵達關西機場 ➔ 海鮮美食 ➔ 飯店溫泉奢華享受</h3>
+          </div>
+          <span class="px-3 py-1 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-full border border-slate-200 dark:border-slate-600 self-start sm:self-auto">宿：白濱 濱千鳥之湯 海舟</span>
+        </div>
+
+        <div class="relative border-l-2 border-brand-200 dark:border-slate-700 ml-4 sm:ml-6 space-y-6 py-2">
+          
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-brand-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
+                <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-plane mr-1"></i> 02:40 - 07:15</span>
+                <span class="px-2 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 text-xs rounded font-medium">航班</span>
+              </div>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">✈️ 香港飛往關西國際機場 (KIX)</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">搭乘香港航空 HX616，預計 07:15 抵達關西機場 T1。</p>
+            </div>
+          </div>
+
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-brand-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
+                <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-ticket mr-1"></i> 07:15 - 08:30</span>
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 text-xs rounded font-medium">票券劃位</span>
+              </div>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🛃 入境與 JR Pass 兌換 / 劃位</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">前往 2F JR 關西機場站，於綠色售票機兌換 JR Pass，並同步劃好 Day 1 (日根野➔白濱) 與 Day 2 (白濱➔和歌山) 的 Kuroshio 特急指定席。</p>
+            </div>
+          </div>
+
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-brand-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
+                <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-train mr-1"></i> 08:30 - 11:15</span>
+                <div class="flex items-center gap-2">
+                  <a href="kuroshio.html" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-md transition shadow-sm">
+                    <i class="fa-solid fa-train"></i> 黑潮號指南
+                  </a>
+                  <span class="px-2 py-0.5 bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300 text-xs rounded font-medium">鐵路轉乘</span>
+                </div>
+              </div>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🚆 關西機場 ➔ 日根野站 ➔ JR 白濱站</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">
+                1. 從關西機場搭乘 <b>JR 關空快速</b> (約 11 分鐘) 到 <b>日根野站</b>。<br>
+                2. 於日根野站月台同站轉乘 <b>JR 特急 Kuroshio (黑潮號)</b> 直達 <b>JR 白濱站</b> (約 1 小時 45 分鐘)。
+              </p>
+            </div>
+          </div>
+
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-amber-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
+                <span class="text-xs font-bold text-amber-600 dark:text-amber-400"><i class="fa-solid fa-utensils mr-1"></i> 11:30 - 13:30</span>
+                <a href="https://maps.google.com/?q=Toretore+Market+Shirahama" target="_blank" class="text-xs text-brand-600 dark:text-brand-400 hover:underline"><i class="fa-solid fa-location-dot"></i> Google 地圖</a>
+              </div>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🍱 Toretore Market とれとれ市場海鮮午餐</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">從白濱站搭乘<b>明光巴士</b> (約 5 分鐘) 直達 Toretore Market，享用西日本最大級海鮮市場的新鮮生魚片丼、現烤鮪魚與干貝燒。</p>
+            </div>
+          </div>
+
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-rose-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
+                <span class="text-xs font-bold text-rose-600 dark:text-rose-400"><i class="fa-solid fa-hot-tub-person mr-1"></i> 14:00+</span>
+                <a href="https://maps.google.com/?q=Hamachidori+no+Yu+Kaishu" target="_blank" class="text-xs text-brand-600 dark:text-brand-400 hover:underline"><i class="fa-solid fa-location-dot"></i> Google 地圖</a>
+              </div>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">♨️ 「濱千鳥之湯 海舟」 Check-in & 飯店全天奢華放鬆</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">從市場搭乘明光巴士至「草原之湯」站，入住海舟。下午起全程留在飯店享受海景足湯、太平洋第一排露天混浴/獨立湯屋、房內休息與多道精緻日式會席晚餐。</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- DAY 2 -->
+      <div id="day-content-2" class="day-panel hidden space-y-4">
+        <div class="bg-brand-50/50 dark:bg-slate-800/50 p-4 rounded-xl border border-brand-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">Day 2 • 2027/03/09 (週二)</span>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">採草莓 ➔ 拜訪貓咪站長 ➔ 前往大阪</h3>
+          </div>
+          <span class="px-3 py-1 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-full border border-slate-200 dark:border-slate-600 self-start sm:self-auto">宿：大阪市區飯店</span>
+        </div>
+
+        <div class="relative border-l-2 border-brand-200 dark:border-slate-700 ml-4 sm:ml-6 space-y-6 py-2">
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
+                <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-clock mr-1"></i> 09:20 - 10:40</span>
+                <a href="kuroshio.html" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-md transition shadow-sm">
+                  <i class="fa-solid fa-train"></i> 黑潮號指南
+                </a>
+              </div>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🚆 白濱 ➔ JR 和歌山站 (大行李寄放)</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">搭乘 JR 特急 Kuroshio 前往和歌山站。<b>💡必要撇步：</b>抵達後將大件行李寄存於 JR 和歌山站內的投幣置物櫃，輕裝轉乘。</p>
+            </div>
+          </div>
+
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-rose-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
+                <span class="text-xs font-bold text-rose-600 dark:text-rose-400"><i class="fa-solid fa-seedling mr-1"></i> 10:55 - 13:00</span>
+                <a href="https://maps.google.com/?q=一般社団法人貴志川いちご狩り園" target="_blank" class="text-xs text-brand-600 dark:text-brand-400 hover:underline"><i class="fa-solid fa-location-dot"></i> Google 地圖</a>
+              </div>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🍓 貴志川採草莓園 (溫室草莓吃到飽)</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">於 JR 和歌山站 9 號月台轉乘<b>和歌山電鐵貴志川線</b>（建議購買貴志川線 1 日券），搭至伊太祈曾/吉禮站，體驗溫室鮮採日本多倍體草莓無限吃到飽（須預約）。</p>
+            </div>
+          </div>
+
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-amber-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
+                <span class="text-xs font-bold text-amber-600 dark:text-amber-400"><i class="fa-solid fa-cat mr-1"></i> 13:30 - 15:00</span>
+                <a href="https://maps.google.com/?q=Kishi+Station+Wakayama" target="_blank" class="text-xs text-brand-600 dark:text-brand-400 hover:underline"><i class="fa-solid fa-location-dot"></i> Google 地圖</a>
+              </div>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🐱 貴志站拜訪貓咪站長 (二代玉 / 四代玉)</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">搭乘草莓/貓咪主題電車至終點「貴志站」，拜訪執勤中的貓咪站長，品嚐小玉咖啡廳 (Tama Cafe) 貓咪拉花咖啡與紀念品。</p>
+            </div>
+          </div>
+
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-clock mr-1"></i> 15:15 - 16:30</span>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🚆 和歌山 ➔ 大阪市區</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">返回 JR 和歌山站取回大行李，搭乘 JR 特急 Kuroshio 直達天王寺/大阪站。</p>
+            </div>
+          </div>
+
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
+                <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-store mr-1"></i> 17:30+</span>
+                <a href="https://maps.google.com/?q=Dotonbori+Osaka" target="_blank" class="text-xs text-brand-600 dark:text-brand-400 hover:underline"><i class="fa-solid fa-location-dot"></i> Google 地圖</a>
+              </div>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🛍️ 大阪 Check-in & 道頓堀夜遊美食</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">入住難波/心齋橋飯店，拍照打卡固力果跑跑人，享用章魚燒、串炸與拉麵宵夜。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 3 -->
+      <div id="day-content-3" class="day-panel hidden space-y-4">
+        <div class="bg-brand-50/50 dark:bg-slate-800/50 p-4 rounded-xl border border-brand-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">Day 3 • 2027/03/10 (週三)</span>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">大阪地標 ➔ 心齋橋 ➔ 梅田夜景</h3>
+          </div>
+          <span class="px-3 py-1 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-full border border-slate-200 dark:border-slate-600 self-start sm:self-auto">宿：大阪市區飯店</span>
+        </div>
+
+        <div class="relative border-l-2 border-brand-200 dark:border-slate-700 ml-4 sm:ml-6 space-y-6 py-2">
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-amber-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <span class="text-xs font-bold text-amber-600 dark:text-amber-400"><i class="fa-solid fa-landmark mr-1"></i> 09:30 - 12:00</span>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🏯 大阪城天守閣 & 公園漫步</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">搭乘 Osaka Metro 中央線至「谷町四丁目站」，參觀大阪城天守閣與綠意公園。</p>
+            </div>
+          </div>
+
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-bag-shopping mr-1"></i> 12:30 - 16:30</span>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🛍️ 心齋橋筋 & 難波血拼採購</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">搭乘長堀鶴見綠地線至心齋橋站，逛藥妝店、PARCO/大丸百貨與服飾品牌。</p>
+            </div>
+          </div>
+
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
+                <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-clock mr-1"></i> 15:15 - 16:30</span>
+                <a href="kuroshio.html" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-md transition shadow-sm">
+                  <i class="fa-solid fa-train"></i> 黑潮號指南
+                </a>
+              </div>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🚆 和歌山 ➔ 大阪市區</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">返回 JR 和歌山站取回大行李，搭乘 JR 特急 Kuroshio 直達天王寺/大阪站。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 4 -->
+      <div id="day-content-4" class="day-panel hidden space-y-4">
+        <div class="bg-brand-50/50 dark:bg-slate-800/50 p-4 rounded-xl border border-brand-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">Day 4 • 2027/03/11 (週四)</span>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">主題樂園 / 城市深遊二選一</h3>
+          </div>
+          <span class="px-3 py-1 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-full border border-slate-200 dark:border-slate-600 self-start sm:self-auto">宿：大阪市區飯店</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          <!-- Option A -->
+          <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border-2 border-brand-500 dark:border-brand-600 shadow-md relative">
+            <span class="absolute top-3 right-3 px-2 py-0.5 bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300 text-xs font-bold rounded">推薦選項 A</span>
+            <div class="text-2xl mb-2">🎢</div>
+            <h4 class="font-bold text-slate-900 dark:text-white text-lg">日本環球影城 (USJ) 全日暢玩</h4>
+            <p class="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+              暢玩「超級任天堂世界™」（瑪利歐賽車、庫巴城堡）與「哈利波特魔法世界」。
+            </p>
+            <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+              <span class="text-xs text-slate-500">轉乘：JR 環狀線 ➔ 西九條 ➔ JR 櫻島線至 Universal-City</span>
+              <a href="https://maps.google.com/?q=Universal+Studios+Japan" target="_blank" class="text-xs text-brand-600 dark:text-brand-400 font-semibold hover:underline">地圖</a>
+            </div>
+          </div>
+
+          <!-- Option B -->
+          <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative">
+            <span class="absolute top-3 right-3 px-2 py-0.5 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 text-xs font-bold rounded">選項 B</span>
+            <div class="text-2xl mb-2">🗼</div>
+            <h4 class="font-bold text-slate-900 dark:text-white text-lg">新世界 / 通天閣 / 阿倍野 HARUKAS</h4>
+            <p class="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+              走訪懷舊風情新世界，登上阿倍野 HARUKAS 300 展望台俯瞰絕美夕陽與市景。
+            </p>
+            <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+              <span class="text-xs text-slate-500">轉乘：Osaka Metro 堺筋線 / 御堂筋線</span>
+              <a href="https://maps.google.com/?q=Abeno+Harukas" target="_blank" class="text-xs text-brand-600 dark:text-brand-400 font-semibold hover:underline">地圖</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 5 -->
+      <div id="day-content-5" class="day-panel hidden space-y-4">
+        <div class="bg-brand-50/50 dark:bg-slate-800/50 p-4 rounded-xl border border-brand-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">Day 5 • 2027/03/12 (週五)</span>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">黑門市場 ➔ 市區補貨 ➔ 機場返港</h3>
+          </div>
+          <span class="px-3 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300 text-xs font-semibold rounded-full self-start sm:self-auto">返程日</span>
+        </div>
+
+        <div class="relative border-l-2 border-brand-200 dark:border-slate-700 ml-4 sm:ml-6 space-y-6 py-2">
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-amber-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
+                <span class="text-xs font-bold text-amber-600 dark:text-amber-400"><i class="fa-solid fa-drumstick-bite mr-1"></i> 09:30 - 12:30</span>
+                <a href="https://maps.google.com/?q=Kuromon+Market" target="_blank" class="text-xs text-brand-600 dark:text-brand-400 hover:underline"><i class="fa-solid fa-location-dot"></i> Google 地圖</a>
+              </div>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🥩 黑門市場「大阪廚房」美食早午餐</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">搭 Metro 至日本橋站 10 號出口，享用現烤和牛燒肉、海膽生魚片丼與海鮮大餐。</p>
+            </div>
+          </div>
+
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-box mr-1"></i> 13:00 - 16:30</span>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🛍️ 心齋橋/難波最後補貨 & 取行李</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">把握最後採購伴手禮與藥妝，隨後返回飯店取大件行李。</p>
+            </div>
+          </div>
+
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-train-subway mr-1"></i> 16:30 - 17:30</span>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">🚆 南海電鐵 Rapi:t 特急直達關西機場</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">於南海難波站搭乘<b>南海特急 Rapi:t</b> 直達關西機場站（車程僅約 35-39 分鐘，全車指定席）。</p>
+            </div>
+          </div>
+
+          <div class="relative pl-6 sm:pl-8">
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-blue-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+              <span class="text-xs font-bold text-blue-600 dark:text-blue-400"><i class="fa-solid fa-plane-departure mr-1"></i> 20:20 - 23:50</span>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base">✈️ HX613 登機返港</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">辦理報到託運與免稅店補貨後，20:20 起飛，預計 23:50 抵達香港國際機場。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section id="calculator" class="pt-6 border-t border-slate-200 dark:border-slate-800">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-md">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100 dark:border-slate-700">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fa-solid fa-users-gear text-indigo-500"></i> 多人 AA 制埋數計算器
+            </h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">無雲端依賴 · 本地 JSON 檔案備份/匯入 & QR Code / 連結分享</p>
+          </div>
+          <button onclick="confirmResetData()" class="self-start sm:self-auto px-3 py-1.5 text-xs text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-bold rounded-lg transition flex items-center gap-1">
+            <i class="fa-solid fa-trash-can"></i> 清空當前數據
+          </button>
+        </div>
+
+        <!-- Sharing & Local File Backup Toolbar -->
+        <div id="sharingToolbar" class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <button onclick="openExportModal()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition shadow-sm">
+            <i class="fa-solid fa-file-export"></i> 導出 JSON 檔案
+          </button>
+          <button onclick="triggerImportLocalFile()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+            <i class="fa-solid fa-file-import"></i> 匯入 JSON 檔案
+          </button>
+          <input type="file" id="localFileInput" accept=".json" class="hidden" onchange="handleLocalFileImport(event)">
+
+          <button onclick="showQRCodeModal()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+            <i class="fa-solid fa-qrcode"></i> 分享帳本 (QR Code / 連結)
+          </button>
+        </div>
+
+        <!-- VIEW: Calculator Main View -->
+        <div id="calculatorView" class="mt-6 space-y-6">
+          <!-- 1. Members Section -->
+          <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-3">1. 參與成員</h3>
+            <div class="flex gap-2 mb-3">
+              <input type="text" id="personName" placeholder="輸入成員名字（例如：阿明、小紅）" 
+                     onkeypress="handlePersonKeyPress(event)"
+                     class="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <button onclick="addPerson()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition shadow-sm">
+                新增成員
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-2 min-h-[32px]" id="peopleList"></div>
+          </div>
+
+          <!-- 2. Add Expense Section -->
+          <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-3">2. 新增消費項目</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+              <div>
+                <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 block">項目名稱</span>
+                <input type="text" id="itemName" placeholder="項目名稱（例：晚餐 / 車費）" 
+                       class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 block">金額 ($)</span>
+                <input type="number" id="itemAmount" placeholder="金額 ($)" step="0.1" min="0" 
+                       class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="text-xs font-bold text-slate-600 dark:text-slate-400 block mb-1">付款人：</label>
+              <select id="payerSelect" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+            </div>
+
+            <div class="mb-4">
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-xs font-bold text-slate-600 dark:text-slate-400">參與平分的人：</label>
+                <div class="space-x-1">
+                  <button onclick="selectAllSharers(true)" class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded transition">全選</button>
+                  <button onclick="selectAllSharers(false)" class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded transition">全不選</button>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-2 p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl" id="sharerCheckboxes"></div>
+            </div>
+
+            <button onclick="addItem()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition shadow-sm">
+              <i class="fa-solid fa-plus mr-1"></i> 新增消費項目
+            </button>
+          </div>
+
+          <!-- 3. Expense List -->
+          <div>
+            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2">3. 消費明細</h3>
+            <ul id="itemList" class="divide-y divide-slate-100 dark:divide-slate-700"></ul>
+          </div>
+
+          <!-- 4. Settlement Calculation -->
+          <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-4 rounded-xl">
+            <h3 class="font-bold text-emerald-900 dark:text-emerald-300 text-base mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-hand-holding-dollar"></i> 4. 結算方案（最簡轉賬）
+            </h3>
+            <button onclick="calculate()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow-sm">
+              <i class="fa-solid fa-calculator mr-1"></i> 計算埋數
+            </button>
+
+            <div id="resultContainer" class="hidden mt-4 pt-3 border-t border-emerald-200/60 dark:border-emerald-800/60">
+              <p id="totalExpense" class="font-bold text-slate-800 dark:text-slate-200 text-sm mb-2"></p>
+              <div id="settlementList" class="bg-white/80 dark:bg-slate-900/60 border border-emerald-200 dark:border-emerald-800 rounded-xl p-3 space-y-1.5 mb-3 text-xs sm:text-sm"></div>
+              <button onclick="copyResultsText()" class="w-full py-2 bg-slate-700 dark:bg-slate-800 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition">
+                <i class="fa-solid fa-copy mr-1"></i> 複製文字結算報告
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
   </main>
 
-  <footer class="w-full py-6 text-center text-xs text-slate-500 relative z-10">
-    🌸 Travel Platform
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Modal 1: Export Bill to Local File -->
+  <div id="exportModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none transition-all duration-200">
+    <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl p-6 max-w-sm w-full shadow-xl border border-slate-200 dark:border-slate-700">
+      <h3 class="text-base font-bold mb-1">📤 導出帳本為本地 JSON 檔案</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">輸入此帳冊名稱，系統會生成可離線保存的數據檔案：</p>
+      
+      <input type="text" id="exportTitleInput" placeholder="例如：2027 大阪關西之旅" 
+             class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-900 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 mb-3">
+
+      <div class="flex gap-2">
+        <button onclick="executeExportToFile()" class="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition">
+          <i class="fa-solid fa-download mr-1"></i> 下載 JSON 檔案
+        </button>
+        <button onclick="closeModal('exportModal')" class="flex-1 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition">
+          取消
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Import Local File Preview -->
+  <div id="importPreviewModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none transition-all duration-200">
+    <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl p-6 max-w-md w-full shadow-xl border border-slate-200 dark:border-slate-700">
+      <h3 class="text-base font-bold mb-1">📥 檢視並匯入本地帳本檔案</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">已成功讀取 JSON 檔案內容，確認後將載入至計算器：</p>
+      
+      <div id="importPreviewContent" class="space-y-2 text-xs bg-slate-50 dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 mb-4"></div>
+
+      <div class="flex gap-2">
+        <button id="confirmImportBtn" class="flex-1 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl transition">
+          確認載入至計算器
+        </button>
+        <button onclick="closeModal('importPreviewModal')" class="flex-1 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition">
+          取消
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Merged QR Code & Copy Share Link Modal -->
+  <div id="qrModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none transition-all duration-200">
+    <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl p-6 max-w-sm w-full text-center shadow-xl border border-slate-200 dark:border-slate-700">
+      <h3 class="text-base font-bold mb-1">📱 分享帳本 (QR Code / 連結)</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">供朋友用手機相機直接掃描，或複製網址連結發送至群組：</p>
+      
+      <div class="flex justify-center p-3 bg-white border border-slate-200 rounded-2xl mb-3">
+        <div id="qrcodeCanvas"></div>
+      </div>
+
+      <div class="mb-4">
+        <input type="text" id="shareUrlInput" readonly 
+               class="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] text-slate-600 dark:text-slate-300 text-center select-all focus:outline-none">
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="copyShareableLinkFromModal()" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+          📋 複製分享連結
+        </button>
+        <button onclick="closeModal('qrModal')" class="flex-1 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition">
+          關閉
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400 space-y-2">
+      <p>🌸 大阪・白濱・和歌山 5 日遊行程單 | 精準交通轉乘版</p>
+      <p>HX616 (02:40-07:15) • HX613 (20:20-23:50)</p>
+    </div>
   </footer>
 
   <script>
-    // Theme Switcher Logic
+    // Trip Departure Date Target (March 8, 2027 at 02:40:00 HKT)
+    const TRIP_DEPARTURE_DATE = new Date('2027-03-08T02:40:00+08:00').getTime();
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = TRIP_DEPARTURE_DATE - now;
+
+      if (distance <= 0) {
+        document.getElementById('countdownContainer').innerHTML = `
+          <div class="flex items-center space-x-2 text-emerald-400 font-bold text-sm">
+            <i class="fa-solid fa-plane-departure text-lg animate-bounce"></i>
+            <span>🎉 旅程已經啟程！祝旅途愉快！</span>
+          </div>
+        `;
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById('cd-days').innerText = String(days).padStart(2, '0');
+      document.getElementById('cd-hours').innerText = String(hours).padStart(2, '0');
+      document.getElementById('cd-minutes').innerText = String(minutes).padStart(2, '0');
+      document.getElementById('cd-seconds').innerText = String(seconds).padStart(2, '0');
+    }
+
+    // Theme Switcher
     function toggleTheme() {
       if (document.documentElement.classList.contains('dark')) {
         document.documentElement.classList.remove('dark');
-        localStorage.setItem('osaka_theme', 'light');
+        localStorage.setItem('theme', 'light');
       } else {
         document.documentElement.classList.add('dark');
-        localStorage.setItem('osaka_theme', 'dark');
+        localStorage.setItem('theme', 'dark');
       }
     }
 
-    if (localStorage.getItem('osaka_theme') === 'dark' || (!('osaka_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
 
-    // Live Current Time Display
-    function initClock() {
-      function update() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const date = String(now.getDate()).padStart(2, '0');
-        const days = ['日', '一', '二', '三', '四', '五', '六'];
-        const dayName = days[now.getDay()];
+    // Mobile Menu
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
 
-        const hours = String(now.getHours()).padStart(2, '0');
-        const mins = String(now.getMinutes()).padStart(2, '0');
-        const secs = String(now.getSeconds()).padStart(2, '0');
+    // Day Switcher
+    function switchDay(dayNum) {
+      document.querySelectorAll('.day-panel').forEach(panel => panel.classList.add('hidden'));
+      const targetPanel = document.getElementById(`day-content-${dayNum}`);
+      if (targetPanel) targetPanel.classList.remove('hidden');
 
-        const dateElem = document.getElementById('currentDate');
-        if (dateElem) {
-          dateElem.innerText = `${year}年${month}月${date}日 星期${dayName}`;
+      document.querySelectorAll('.day-tab').forEach(tab => {
+        tab.classList.remove('bg-white', 'dark:bg-slate-700', 'text-brand-600', 'dark:text-white', 'shadow-sm', 'font-bold');
+        tab.classList.add('text-slate-600', 'dark:text-slate-300');
+      });
+
+      const activeTab = document.getElementById(`tab-${dayNum}`);
+      if (activeTab) {
+        activeTab.classList.add('bg-white', 'dark:bg-slate-700', 'text-brand-600', 'dark:text-white', 'shadow-sm', 'font-bold');
+        activeTab.classList.remove('text-slate-600', 'dark:text-slate-300');
+      }
+    }
+
+    // Multi-person AA Calculator Logic from aa.html
+    let people = [];
+    let items = [];
+    let pendingImportData = null;
+    let latestTransactions = [];
+    let latestTotalExpense = 0;
+
+    function saveData() {
+      try {
+        localStorage.setItem('aa_cal_people', JSON.stringify(people));
+        localStorage.setItem('aa_cal_items', JSON.stringify(items));
+      } catch(e) {
+        console.error("Failed to save to local storage", e);
+      }
+    }
+
+    function loadData() {
+      try {
+        const savedPeople = localStorage.getItem('aa_cal_people');
+        const savedItems = localStorage.getItem('aa_cal_items');
+
+        people = savedPeople ? JSON.parse(savedPeople) : ["阿明", "Bob", "Chris"];
+        items = savedItems ? JSON.parse(savedItems) : [];
+      } catch(e) {
+        people = ["阿明", "Bob", "Chris"];
+        items = [];
+      }
+    }
+
+    function openExportModal() {
+      if (people.length === 0 && items.length === 0) {
+        return showToast('目前沒有任何成員或消費資料可導出', 'warning');
+      }
+      const dateStr = new Date().toLocaleDateString('zh-HK').replace(/\//g, '-');
+      document.getElementById('exportTitleInput').value = `大阪旅行AA帳單_${dateStr}`;
+      openModal('exportModal');
+    }
+
+    function executeExportToFile() {
+      const titleInput = document.getElementById('exportTitleInput');
+      const title = titleInput.value.trim() || `AA帳單_${new Date().toISOString().slice(0,10)}`;
+
+      let totalAmt = 0;
+      items.forEach(i => totalAmt += i.amount);
+
+      const billRecord = {
+        version: '1.0',
+        title: title,
+        exportDate: new Date().toLocaleString('zh-HK'),
+        totalAmount: totalAmt,
+        people: people,
+        items: items
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(billRecord, null, 2));
+      const downloadAnchor = document.createElement('a');
+      const sanitizedTitle = title.replace(/[/\\?%*:|"<>]/g, '_');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `${sanitizedTitle}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      closeModal('exportModal');
+      showToast(`🎉 成功導出帳本檔案 [${sanitizedTitle}.json]！`, 'success');
+    }
+
+    function triggerImportLocalFile() {
+      document.getElementById('localFileInput').click();
+    }
+
+    function handleLocalFileImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data && Array.isArray(data.people) && Array.isArray(data.items)) {
+            pendingImportData = data;
+
+            let previewHtml = `
+              <div><b>帳冊標題：</b> ${escapeHtml(data.title || '無標題')}</div>
+              <div><b>匯出時間：</b> ${escapeHtml(data.exportDate || '未知')}</div>
+              <div><b>參與成員 (${data.people.length} 人)：</b> ${data.people.map(p => escapeHtml(p)).join(', ')}</div>
+              <div><b>消費項目 (${data.items.length} 項)：</b> 總計 $${(data.totalAmount || 0).toFixed(1)}</div>
+            `;
+            document.getElementById('importPreviewContent').innerHTML = previewHtml;
+
+            document.getElementById('confirmImportBtn').onclick = applyImportedBill;
+            openModal('importPreviewModal');
+          } else {
+            showToast('無效的 AA 制帳本 JSON 檔案結構', 'warning');
+          }
+        } catch(err) {
+          showToast('讀取 JSON 檔案失敗，請確保格式正確', 'warning');
         }
+        event.target.value = '';
+      };
+      reader.readAsText(file);
+    }
 
-        const hElem = document.getElementById('clockHours');
-        const mElem = document.getElementById('clockMins');
-        const sElem = document.getElementById('clockSecs');
+    function applyImportedBill() {
+      if (!pendingImportData) return;
 
-        if (hElem) hElem.innerText = hours;
-        if (mElem) mElem.innerText = mins;
-        if (sElem) sElem.innerText = secs;
+      people = JSON.parse(JSON.stringify(pendingImportData.people));
+      items = JSON.parse(JSON.stringify(pendingImportData.items));
+
+      saveData();
+      updatePeopleUI();
+      updateItemsUI();
+      document.getElementById('resultContainer').classList.add('hidden');
+
+      closeModal('importPreviewModal');
+      showToast(`🎉 已成功載入帳冊：「${pendingImportData.title || '匯入帳單'}」！`, 'success');
+      pendingImportData = null;
+    }
+
+    function generateCompressedDataPayload() {
+      const payload = { p: people, i: items };
+      const jsonStr = JSON.stringify(payload);
+      return btoa(encodeURIComponent(jsonStr));
+    }
+
+    function parseDataPayload(encodedStr) {
+      try {
+        const jsonStr = decodeURIComponent(atob(encodedStr.trim()));
+        const parsed = JSON.parse(jsonStr);
+        if (Array.isArray(parsed.p) && Array.isArray(parsed.i)) {
+          return { people: parsed.p, items: parsed.i };
+        }
+      } catch(e) {
+        console.error("Failed to parse data payload", e);
+      }
+      return null;
+    }
+
+    function showQRCodeModal() {
+      if (people.length === 0 && items.length === 0) {
+        return showToast('目前沒有任何成員或消費資料可分享', 'warning');
       }
 
-      update();
-      setInterval(update, 1000);
+      const encodedData = generateCompressedDataPayload();
+      const shareUrl = window.location.origin + window.location.pathname + '#data=' + encodedData;
+
+      document.getElementById('shareUrlInput').value = shareUrl;
+
+      const container = document.getElementById('qrcodeCanvas');
+      container.innerHTML = '';
+      
+      new QRCode(container, {
+        text: shareUrl,
+        width: 180,
+        height: 180,
+        colorDark: "#1e293b",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.L
+      });
+
+      openModal('qrModal');
+    }
+
+    function copyShareableLinkFromModal() {
+      const shareUrl = document.getElementById('shareUrlInput').value;
+      if (!shareUrl) return;
+
+      const tempInput = document.createElement('input');
+      tempInput.value = shareUrl;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        showToast('已成功複製分享連結！可直接發送至聊天群組', 'success');
+      } catch(e) {
+        showToast('複製失敗，請手動複製網址', 'warning');
+      }
+      document.body.removeChild(tempInput);
+    }
+
+    function addPerson() {
+      const input = document.getElementById('personName');
+      const name = input.value.trim();
+      if (!name) return showToast('請輸入成員名字', 'warning');
+      if (people.includes(name)) return showToast('成員名字不能重複', 'warning');
+
+      people.push(name);
+      input.value = '';
+      saveData();
+      updatePeopleUI();
+      showToast(`已新增成員：${name}`, 'success');
+    }
+
+    function removePerson(name) {
+      people = people.filter(p => p !== name);
+      items.forEach(item => {
+        item.sharers = item.sharers.filter(s => s !== name);
+      });
+      items = items.filter(item => item.payer !== name && item.sharers.length > 0);
+
+      saveData();
+      updatePeopleUI();
+      updateItemsUI();
+      document.getElementById('resultContainer').classList.add('hidden');
+      showToast(`已移除成員：${name}`);
+    }
+
+    function updatePeopleUI() {
+      const peopleList = document.getElementById('peopleList');
+      const payerSelect = document.getElementById('payerSelect');
+      const sharerCheckboxes = document.getElementById('sharerCheckboxes');
+
+      if (people.length === 0) {
+        peopleList.innerHTML = '<div class="text-xs text-slate-400 py-1">尚未新增成員</div>';
+        payerSelect.innerHTML = '<option value="">請先新增成員</option>';
+        sharerCheckboxes.innerHTML = '<div class="text-xs text-slate-400 py-1">尚未新增成員</div>';
+        return;
+      }
+
+      peopleList.innerHTML = people.map(p => `
+        <span class="inline-flex items-center gap-1.5 bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-3 py-1 rounded-full text-xs font-semibold">
+          ${escapeHtml(p)}
+          <button onclick="removePerson('${escapeJs(p)}')" class="hover:text-rose-600 rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold">✕</button>
+        </span>
+      `).join('');
+
+      const currPayer = payerSelect.value;
+      payerSelect.innerHTML = people.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
+      if (people.includes(currPayer)) payerSelect.value = currPayer;
+
+      sharerCheckboxes.innerHTML = people.map(p => `
+        <label class="inline-flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+          <input type="checkbox" value="${escapeHtml(p)}" checked class="rounded text-indigo-600 focus:ring-indigo-500"> ${escapeHtml(p)}
+        </label>
+      `).join('');
+    }
+
+    function selectAllSharers(checked) {
+      const checkboxes = document.querySelectorAll('#sharerCheckboxes input[type="checkbox"]');
+      checkboxes.forEach(cb => cb.checked = checked);
+    }
+
+    function addItem() {
+      const nameInput = document.getElementById('itemName');
+      const amountInput = document.getElementById('itemAmount');
+      const payerSelect = document.getElementById('payerSelect');
+
+      const name = nameInput.value.trim() || '未命名消費';
+      const amount = parseFloat(amountInput.value);
+      const payer = payerSelect.value;
+
+      const checkboxes = document.querySelectorAll('#sharerCheckboxes input[type="checkbox"]:checked');
+      const sharers = Array.from(checkboxes).map(cb => cb.value);
+
+      if (isNaN(amount) || amount <= 0) return showToast('請輸入有效的金額', 'warning');
+      if (!payer || !people.includes(payer)) return showToast('請先新增並選擇付款人', 'warning');
+      if (sharers.length === 0) return showToast('請至少選擇一位平分者', 'warning');
+
+      items.push({ id: Date.now(), name, amount, payer, sharers });
+
+      nameInput.value = '';
+      amountInput.value = '';
+
+      saveData();
+      updateItemsUI();
+      document.getElementById('resultContainer').classList.add('hidden');
+      showToast(`已新增：${name} ($${amount.toFixed(1)})`, 'success');
+    }
+
+    function removeItem(id) {
+      items = items.filter(item => item.id !== id);
+      saveData();
+      updateItemsUI();
+      document.getElementById('resultContainer').classList.add('hidden');
+      showToast('已刪除消費項目');
+    }
+
+    function updateItemsUI() {
+      const itemList = document.getElementById('itemList');
+      if (items.length === 0) {
+        itemList.innerHTML = '<li class="text-xs text-slate-400 py-3 text-center">尚未新增消費項目</li>';
+        return;
+      }
+
+      itemList.innerHTML = items.map(item => `
+        <li class="py-2.5 flex justify-between items-center text-xs border-b border-slate-100 dark:border-slate-700/60">
+          <div>
+            <div class="font-bold text-slate-800 dark:text-slate-200 text-sm">${escapeHtml(item.name)} - <span class="text-brand-600 dark:text-brand-400 font-mono">$${item.amount.toFixed(1)}</span></div>
+            <div class="text-slate-500 dark:text-slate-400 mt-0.5">由 <b>${escapeHtml(item.payer)}</b> 付款 | 平分: ${item.sharers.map(s => escapeHtml(s)).join(', ')}</div>
+          </div>
+          <button onclick="removeItem(${item.id})" class="text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 px-2 py-1 rounded text-xs font-semibold transition">刪除</button>
+        </li>
+      `).join('');
+    }
+
+    function calculate() {
+      if (people.length === 0) return showToast('請先新增成員', 'warning');
+      if (items.length === 0) return showToast('請先新增消費項目', 'warning');
+
+      const balances = {};
+      people.forEach(p => balances[p] = 0);
+      let totalExpense = 0;
+
+      items.forEach(item => {
+        totalExpense += item.amount;
+        if (balances.hasOwnProperty(item.payer)) balances[item.payer] += item.amount;
+        
+        const split = item.amount / item.sharers.length;
+        item.sharers.forEach(s => {
+          if (balances.hasOwnProperty(s)) balances[s] -= split;
+        });
+      });
+
+      const debtors = [];
+      const creditors = [];
+
+      Object.keys(balances).forEach(person => {
+        const amt = balances[person];
+        if (amt < -0.01) debtors.push({ name: person, amount: -amt });
+        else if (amt > 0.01) creditors.push({ name: person, amount: amt });
+      });
+
+      const transactions = [];
+      let i = 0, j = 0;
+
+      while (i < debtors.length && j < creditors.length) {
+        const debtor = debtors[i];
+        const creditor = creditors[j];
+        const minAmt = Math.min(debtor.amount, creditor.amount);
+
+        transactions.push({ from: debtor.name, to: creditor.name, amount: minAmt });
+        debtor.amount -= minAmt;
+        creditor.amount -= minAmt;
+
+        if (debtor.amount < 0.01) i++;
+        if (creditor.amount < 0.01) j++;
+      }
+
+      latestTransactions = transactions;
+      latestTotalExpense = totalExpense;
+
+      document.getElementById('totalExpense').innerText = `💰 總花費金額：$${totalExpense.toFixed(1)}`;
+      const settlementList = document.getElementById('settlementList');
+
+      if (transactions.length === 0) {
+        settlementList.innerHTML = '<div class="text-emerald-800 dark:text-emerald-300 font-bold">🎉 大家金額剛好平手，不需要轉賬！</div>';
+      } else {
+        settlementList.innerHTML = transactions.map(t => `
+          <div class="text-slate-800 dark:text-slate-100 font-semibold flex items-center gap-2">
+            <i class="fa-solid fa-arrow-right-long text-amber-500"></i>
+            <span>👉 <b>${escapeHtml(t.from)}</b> 給 <b>${escapeHtml(t.to)}</b> ： <span class="text-amber-600 dark:text-amber-400 font-bold font-mono text-base">$${t.amount.toFixed(1)}</span></span>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('resultContainer').classList.remove('hidden');
+    }
+
+    function copyResultsText() {
+      if (latestTransactions.length === 0 && latestTotalExpense === 0) return;
+
+      let text = `📊 【大阪 5 日遊 AA 制埋數結算帳單】\n💰 總花費：$${latestTotalExpense.toFixed(1)}\n-------------------\n`;
+      if (latestTransactions.length === 0) {
+        text += '🎉 大家金額剛好平手，不需要額外轉賬！';
+      } else {
+        text += '轉賬方案：\n';
+        latestTransactions.forEach(t => {
+          text += `• ${t.from} ➡️ ${t.to} : $${t.amount.toFixed(1)}\n`;
+        });
+      }
+
+      const tempInput = document.createElement('textarea');
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        showToast('已成功複製結算報告！', 'success');
+      } catch (e) {
+        showToast('複製失敗', 'warning');
+      }
+      document.body.removeChild(tempInput);
+    }
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function confirmResetData() {
+      if (confirm('確定要清空當前的所有成員與消費數據嗎？此動作無法復原。')) {
+        people = [];
+        items = [];
+        saveData();
+        updatePeopleUI();
+        updateItemsUI();
+        document.getElementById('resultContainer').classList.add('hidden');
+        showToast('已清空當前數據');
+      }
+    }
+
+    function showToast(message, type = 'normal') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg pointer-events-auto text-white ${
+        type === 'warning' ? 'bg-rose-500' : type === 'success' ? 'bg-emerald-600' : 'bg-slate-800 dark:bg-slate-700'
+      }`;
+      toast.innerText = message;
+      container.appendChild(toast);
+
+      setTimeout(() => toast.remove(), 2600);
+    }
+
+    function handlePersonKeyPress(e) {
+      if (e.key === 'Enter') addPerson();
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function escapeJs(str) {
+      return String(str).replace(/'/g, "\\'");
     }
 
     window.onload = function() {
-      initClock();
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+
+      if (window.location.hash && window.location.hash.includes('data=')) {
+        const hashData = window.location.hash.split('data=')[1];
+        const parsed = parseDataPayload(hashData);
+        if (parsed) {
+          people = parsed.people;
+          items = parsed.items;
+          saveData();
+          showToast('🎉 已自動從分享連結載入帳目數據！', 'success');
+          history.replaceState(null, "", window.location.pathname);
+        }
+      } else {
+        loadData();
+      }
+
+      updatePeopleUI();
+      updateItemsUI();
     };
   </script>
 </body>
