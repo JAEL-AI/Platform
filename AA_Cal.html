@@ -345,7 +345,9 @@
         try {
             const savedArchives = localStorage.getItem('aa_offline_archived_bills');
             const list = savedArchives ? JSON.parse(savedArchives) : [];
-            document.getElementById('historyCountBadge').innerText = list.length;
+            // 只統計屬於當前本機群組帳號的歷史帳冊
+            const groupList = list.filter(b => (b.passcode || '預設帳號') === currentPasscode);
+            document.getElementById('historyCountBadge').innerText = groupList.length;
         } catch(e) {
             document.getElementById('historyCountBadge').innerText = '0';
         }
@@ -455,13 +457,15 @@
     }
 
     function clearAllHistoryConfirm() {
-        if (archivedBills.length === 0) return showToast('沒有歷史紀錄可清空');
-        if (confirm('確定要清空所有已歸檔的歷史帳冊嗎？此動作無法復原。')) {
-            archivedBills = [];
+        const groupBills = archivedBills.filter(b => (b.passcode || '預設帳號') === currentPasscode);
+        if (groupBills.length === 0) return showToast(`本機群組 [${currentPasscode}] 沒有歷史紀錄可清空`);
+        if (confirm(`確定要清空本機群組 [${currentPasscode}] 的所有已歸檔歷史帳冊嗎？此動作無法復原。`)) {
+            // 只移除當前群組的歷史紀錄，保留其他群組資料
+            archivedBills = archivedBills.filter(b => (b.passcode || '預設帳號') !== currentPasscode);
             saveData();
             updateHistoryBadge();
             renderHistoryUI();
-            showToast('已清空所有歷史紀錄');
+            showToast(`已清空群組 [${currentPasscode}] 的歷史紀錄`);
         }
     }
 
@@ -508,17 +512,20 @@
         updateHistoryBadge();
         const container = document.getElementById('historyListContainer');
 
-        if (archivedBills.length === 0) {
+        // 嚴格篩選屬於當前群組帳號的帳冊
+        const groupBills = archivedBills.filter(b => (b.passcode || '預設帳號') === currentPasscode);
+
+        if (groupBills.length === 0) {
             container.innerHTML = `
                 <div class="text-center py-8 text-slate-400 text-xs">
                     <p class="text-2xl mb-1">📭</p>
-                    尚未有任何歸檔紀錄。<br>在計算器中按下「💾 存檔至歷史頁面」即可在此隨時召回！
+                    目前群組 [${escapeHtml(currentPasscode)}] 尚未有任何歸檔紀錄。<br>在計算器中按下「💾 存檔至歷史頁面」即可在此隨時召回！
                 </div>
             `;
             return;
         }
 
-        container.innerHTML = archivedBills.map(b => `
+        container.innerHTML = groupBills.map(b => `
             <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 hover:border-indigo-300 transition flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
                     <div class="font-bold text-slate-800 text-sm flex items-center gap-2">
