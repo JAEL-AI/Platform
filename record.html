@@ -122,10 +122,48 @@
     let currentPasscode = localStorage.getItem('aa_offline_passcode') || '預設帳號';
     let archivedBills = [];
 
+    // 取得當前群組獨立的 LocalStorage 儲存 Key，確保跨群組物理隔離
+    function getArchiveStorageKey(passcode) {
+        return `aa_offline_${passcode || '預設帳號'}_archived_bills`;
+    }
+
+    // 自動遷移舊版全域 Key 資料至各群組獨立 Key，隨後徹底清除全域 Key
+    function migrateLegacyGlobalStorage() {
+        try {
+            const legacyData = localStorage.getItem('aa_offline_archived_bills');
+            if (legacyData) {
+                const legacyBills = JSON.parse(legacyData);
+                if (Array.isArray(legacyBills) && legacyBills.length > 0) {
+                    const grouped = {};
+                    legacyBills.forEach(bill => {
+                        const code = bill.passcode || '預設帳號';
+                        if (!grouped[code]) grouped[code] = [];
+                        grouped[code].push(bill);
+                    });
+                    
+                    Object.keys(grouped).forEach(code => {
+                        const key = getArchiveStorageKey(code);
+                        const existing = localStorage.getItem(key);
+                        const existingList = existing ? JSON.parse(existing) : [];
+                        const merged = existingList.concat(grouped[code]);
+                        localStorage.setItem(key, JSON.stringify(merged));
+                    });
+                }
+                // 轉移完畢後清理舊全域 Key，消除洩漏後門
+                localStorage.removeItem('aa_offline_archived_bills');
+            }
+        } catch(e) {
+            console.error("Migration failed:", e);
+        }
+    }
+
     function loadRecords() {
         currentPasscode = localStorage.getItem('aa_offline_passcode') || '預設帳號';
+        migrateLegacyGlobalStorage();
+
         try {
-            const data = localStorage.getItem('aa_offline_archived_bills');
+            // 嚴格僅讀取當前群組 Key，其他群組數據絕不進入記憶體
+            const data = localStorage.getItem(getArchiveStorageKey(currentPasscode));
             archivedBills = data ? JSON.parse(data) : [];
         } catch(e) {
             archivedBills = [];
@@ -138,7 +176,8 @@
 
     function saveRecords() {
         try {
-            localStorage.setItem('aa_offline_archived_bills', JSON.stringify(archivedBills));
+            // 僅寫入當前群組專屬 Key
+            localStorage.setItem(getArchiveStorageKey(currentPasscode), JSON.stringify(archivedBills));
         } catch(e) {
             console.error("Failed to save records", e);
         }
@@ -150,14 +189,14 @@
         const container = document.getElementById('archiveListContainer');
         const searchKw = (document.getElementById('searchInput').value || '').trim().toLowerCase();
 
-        // 嚴格隔離：僅篩選屬於當前群組帳號 (currentPasscode) 的歷史帳冊
-        let groupBills = archivedBills.filter(b => (b.passcode || '預設帳號') === currentPasscode);
+        // archivedBills 在記憶體中僅包含當前群組資料
+        let groupBills = archivedBills;
 
         let filtered = groupBills.filter(b => {
             return !searchKw || 
-                b.title.toLowerCase().includes(searchKw) ||
-                b.people.some(p => p.toLowerCase().includes(searchKw)) ||
-                (b.items && b.items.some(i => i.name.toLowerCase().includes(searchKw)));
+                (b.title && b.title.toLowerCase().includes(searchKw)) ||
+                (b.people && b.people.some(p => p.toLowerCase().includes(searchKw))) ||
+                (b.items && b.items.some(i => i.name && i.name.toLowerCase().includes(searchKw)));
         });
 
         document.getElementById('recordCountTag').innerText = groupBills.length;
@@ -177,10 +216,10 @@
                 <div class="space-y-1">
                     <div class="font-bold text-slate-800 text-sm flex items-center gap-2 flex-wrap">
                         <span>${escapeHtml(b.title)}</span>
-                        <span class="text-[10px] bg-indigo-100 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">${escapeHtml(b.passcode || '預設帳號')}</span>
+                        <span class="text-[10px] bg-indigo-100 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">${escapeHtml(currentPasscode)}</span>
                     </div>
                     <div class="text-xs text-slate-500">
-                        建立時間: ${escapeHtml(b.date)} | 成員: ${b.people.length} 人 (${escapeHtml(b.people.join(', '))})
+                        建立時間: ${escapeHtml(b.date)} | 成員: ${b.people ? b.people.length : 0} 人 (${b.people ? b.people.map(p => escapeHtml(p)).join(', ') : ''})
                     </div>
                     <div class="text-xs font-semibold text-emerald-600">
                         💰 總消費金額: $${b.totalAmount ? b.totalAmount.toFixed(1) : '0.0'} (${b.items ? b.items.length : 0} 項消費)
@@ -213,6 +252,7 @@
         currentPasscode = val;
         localStorage.setItem('aa_offline_passcode', currentPasscode);
         closeModal('switchPasscodeModal');
+        // 切換群組時重新載入並替換全域快取
         renderArchiveList();
         showToast(`已切換至本機群組 [${currentPasscode}]`);
     }
@@ -221,15 +261,12 @@
         const record = archivedBills.find(b => b.id === billId);
         if (!record) return showToast('找不到該筆歷史紀錄', 'warning');
 
-        const passcode = record.passcode || '預設帳號';
+        const passcode = currentPasscode;
         localStorage.setItem('aa_offline_passcode', passcode);
         localStorage.setItem(`aa_offline_${passcode}_people`, JSON.stringify(record.people));
         localStorage.setItem(`aa_offline_${passcode}_items`, JSON.stringify(record.items));
         
-        // Flag for toast alert on main calculator page
         localStorage.setItem('aa_offline_recalled_flag', record.title);
-
-        // Redirect to calculator page
         window.location.href = 'AA_Cal.html';
     }
 
@@ -238,12 +275,12 @@
         if (!record) return;
 
         document.getElementById('detailTitle').innerText = record.title;
-        document.getElementById('detailMeta').innerText = `建立時間：${record.date} | 屬性群組：${record.passcode || '預設帳號'}`;
+        document.getElementById('detailMeta').innerText = `建立時間：${record.date} | 屬性群組：${currentPasscode}`;
 
         let detailHtml = `
             <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100">
                 <div class="font-bold text-indigo-700 text-sm mb-1">💰 總花費：$${(record.totalAmount || 0).toFixed(1)}</div>
-                <div class="text-slate-600">👥 參與成員 (${record.people.length} 人)：${record.people.map(p => escapeHtml(p)).join(', ')}</div>
+                <div class="text-slate-600">👥 參與成員 (${record.people ? record.people.length : 0} 人)：${record.people ? record.people.map(p => escapeHtml(p)).join(', ') : ''}</div>
             </div>
             <div class="font-bold text-slate-700 mt-3 mb-1">消費明細清單 (${record.items ? record.items.length : 0} 項)：</div>
             <ul class="divide-y divide-slate-100 bg-slate-50 p-2.5 rounded-xl border border-slate-200 max-h-52 overflow-y-auto">
@@ -258,7 +295,7 @@
                         <div>
                             <span class="font-bold text-slate-800">${escapeHtml(it.name)}</span> 
                             <span class="text-indigo-600 font-bold">$${it.amount.toFixed(1)}</span>
-                            <div class="text-[11px] text-slate-500">付款: <b>${escapeHtml(it.payer)}</b> | 平分: ${it.sharers.map(s => escapeHtml(s)).join(', ')}</div>
+                            <div class="text-[11px] text-slate-500">付款: <b>${escapeHtml(it.payer)}</b> | 平分: ${it.sharers ? it.sharers.map(s => escapeHtml(s)).join(', ') : ''}</div>
                         </div>
                     </li>
                 `;
@@ -282,10 +319,9 @@
     }
 
     function exportJSONBackup() {
-        const groupBills = archivedBills.filter(b => (b.passcode || '預設帳號') === currentPasscode);
-        if (groupBills.length === 0) return showToast('當前群組沒有數據可導出', 'warning');
+        if (archivedBills.length === 0) return showToast('當前群組沒有數據可導出', 'warning');
         
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(groupBills, null, 2));
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(archivedBills, null, 2));
         const downloadAnchor = document.createElement('a');
         downloadAnchor.setAttribute("href", dataStr);
         downloadAnchor.setAttribute("download", `aa_records_${currentPasscode}_${new Date().toISOString().slice(0,10)}.json`);
@@ -308,7 +344,6 @@
             try {
                 const imported = JSON.parse(evt.target.result);
                 if (Array.isArray(imported)) {
-                    // 自動將匯入的紀錄歸屬給當前群組
                     imported.forEach(b => b.passcode = currentPasscode);
                     archivedBills = imported.concat(archivedBills);
                     saveRecords();
@@ -325,10 +360,9 @@
     }
 
     function confirmClearAllRecords() {
-        const groupBills = archivedBills.filter(b => (b.passcode || '預設帳號') === currentPasscode);
-        if (groupBills.length === 0) return showToast('當前群組沒有歷史紀錄可清空');
+        if (archivedBills.length === 0) return showToast('當前群組沒有歷史紀錄可清空');
         if (confirm(`確定要清空本機群組 [${currentPasscode}] 的所有已歸檔歷史帳冊嗎？此動作無法復原。`)) {
-            archivedBills = archivedBills.filter(b => (b.passcode || '預設帳號') !== currentPasscode);
+            archivedBills = [];
             saveRecords();
             renderArchiveList();
             showToast(`已清空群組 [${currentPasscode}] 的所有歷史帳冊`);
@@ -364,7 +398,7 @@
     }
 
     function escapeHtml(str) {
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     window.addEventListener('load', () => {
