@@ -72,6 +72,14 @@
     .modal-overlay {
       transition: opacity 0.2s ease, visibility 0.2s ease;
     }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 0.3; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .animate-radar-ring {
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 min-h-screen flex flex-col overflow-x-hidden">
@@ -89,7 +97,7 @@
 
         <!-- Desktop Nav Items -->
         <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm font-medium">
-          <a href="#overview" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">總覽</a>
+          <a href="#overview" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">總覽與航班</a>
           <a href="#itinerary" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">每日行程</a>
           <a href="#calculator" class="px-3 py-2 rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/60 transition font-semibold">
             <i class="fa-solid fa-calculator mr-1"></i> AA 埋數計算機
@@ -113,55 +121,59 @@
 
     <!-- Mobile Dropdown Menu -->
     <div id="mobileMenu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pt-2 pb-4 space-y-1">
-      <a href="#overview" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 dark:hover:bg-slate-800">總覽資訊</a>
+      <a href="#overview" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 dark:hover:bg-slate-800">總覽與航班</a>
       <a href="#itinerary" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 dark:hover:bg-slate-800">每日行程</a>
       <a href="#calculator" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-brand-600 dark:text-brand-400 font-bold hover:bg-brand-50 dark:hover:bg-slate-800">AA 埋數計算機</a>
     </div>
   </header>
 
-  <section id="overview" class="relative bg-gradient-to-br from-slate-900 via-brand-900 to-indigo-950 text-white py-10 sm:py-16 px-4 overflow-hidden">
+  <section id="overview" class="relative bg-gradient-to-br from-slate-950 via-brand-950 to-indigo-950 text-white py-8 sm:py-12 px-4 overflow-hidden">
     <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
-    <div class="max-w-7xl mx-auto relative z-10">
-      <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-medium mb-4">
-        <span>🇯🇵 日本關西 5 日遊</span>
-        <span>•</span>
-        <span class="text-amber-300"><i class="fa-solid fa-plane"></i> 香港航空 HX616 / HX613</span>
-      </div>
+    <div class="max-w-7xl mx-auto relative z-10 space-y-6">
       
-      <h2 class="text-2xl sm:text-5xl font-extrabold tracking-tight mb-3 sm:mb-4">大阪・白濱溫泉・和歌山</h2>
-      <p class="text-slate-300 max-w-2xl text-xs sm:text-base leading-relaxed mb-6 sm:mb-8">
-        溫泉名宿奢華假期、海鮮市場美味、和歌山採草莓拜訪貓咪站長、心齋橋與黑門市場購物，結合最新鐵路與巴士轉乘動線！
-      </p>
-
-      <!-- Live Trip Countdown Card -->
-      <div class="bg-white/10 backdrop-blur-md p-4 sm:p-6 rounded-2xl border border-white/20 shadow-xl max-w-2xl">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center space-x-2">
-            <span class="animate-pulse flex h-3 w-3 rounded-full bg-emerald-400"></span>
-            <span class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-200">距離出發倒數 (HX616 02:40 AM)</span>
+      <!-- Title & Header Tags -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div>
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-medium mb-3">
+            <span>🇯🇵 日本關西 5 日遊</span>
+            <span>•</span>
+            <span class="text-amber-300"><i class="fa-solid fa-plane"></i> 香港航空 HX616 / HX613</span>
           </div>
-          <span class="text-[10px] sm:text-xs text-amber-300 font-mono font-medium">2027/03/08 02:40</span>
+          
+          <h2 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">大阪・白濱溫泉・和歌山</h2>
         </div>
 
-        <div class="grid grid-cols-4 gap-2 sm:gap-4 text-center">
-          <div class="bg-black/20 p-2 sm:p-3 rounded-xl border border-white/10">
-            <span id="cd-days" class="block text-xl sm:text-3xl font-extrabold font-mono text-white">--</span>
-            <span class="text-[10px] sm:text-xs text-slate-300 uppercase">天 (Days)</span>
+        <!-- Live Trip Countdown Card -->
+        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-xl max-w-md w-full shrink-0">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center space-x-2">
+              <span class="animate-pulse flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+              <span class="text-xs font-semibold uppercase tracking-wider text-slate-200">出發倒數 (HX616 STD 02:40 AM)</span>
+            </div>
+            <span class="text-[10px] sm:text-xs text-amber-300 font-mono font-medium">2027/03/08 02:40</span>
           </div>
-          <div class="bg-black/20 p-2 sm:p-3 rounded-xl border border-white/10">
-            <span id="cd-hours" class="block text-xl sm:text-3xl font-extrabold font-mono text-white">--</span>
-            <span class="text-[10px] sm:text-xs text-slate-300 uppercase">時 (Hours)</span>
-          </div>
-          <div class="bg-black/20 p-2 sm:p-3 rounded-xl border border-white/10">
-            <span id="cd-mins" class="block text-xl sm:text-3xl font-extrabold font-mono text-white">--</span>
-            <span class="text-[10px] sm:text-xs text-slate-300 uppercase">分 (Mins)</span>
-          </div>
-          <div class="bg-black/20 p-2 sm:p-3 rounded-xl border border-white/10">
-            <span id="cd-secs" class="block text-xl sm:text-3xl font-extrabold font-mono text-white">--</span>
-            <span class="text-[10px] sm:text-xs text-slate-300 uppercase">秒 (Secs)</span>
+
+          <div class="grid grid-cols-4 gap-2 text-center">
+            <div class="bg-black/30 p-2 rounded-xl border border-white/10">
+              <span id="cd-days" class="block text-lg sm:text-2xl font-extrabold font-mono text-white">--</span>
+              <span class="text-[9px] sm:text-[10px] text-slate-300 uppercase">天 (Days)</span>
+            </div>
+            <div class="bg-black/30 p-2 rounded-xl border border-white/10">
+              <span id="cd-hours" class="block text-lg sm:text-2xl font-extrabold font-mono text-white">--</span>
+              <span class="text-[9px] sm:text-[10px] text-slate-300 uppercase">時 (Hours)</span>
+            </div>
+            <div class="bg-black/30 p-2 rounded-xl border border-white/10">
+              <span id="cd-mins" class="block text-lg sm:text-2xl font-extrabold font-mono text-white">--</span>
+              <span class="text-[9px] sm:text-[10px] text-slate-300 uppercase">分 (Mins)</span>
+            </div>
+            <div class="bg-black/30 p-2 rounded-xl border border-white/10">
+              <span id="cd-secs" class="block text-lg sm:text-2xl font-extrabold font-mono text-white">--</span>
+              <span class="text-[9px] sm:text-[10px] text-slate-300 uppercase">秒 (Secs)</span>
+            </div>
           </div>
         </div>
       </div>
+
     </div>
   </section>
 
@@ -201,15 +213,56 @@
 
         <div class="relative border-l-2 border-brand-200 dark:border-slate-700 ml-4 sm:ml-6 space-y-6 py-2">
           
+          <!-- Flight HX616 Detailed Card -->
           <div class="relative pl-6 sm:pl-8">
-            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-brand-500 border-4 border-white dark:border-slate-900"></div>
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
-                <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-plane mr-1"></i> 02:40 - 07:15</span>
-                <span class="px-2 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 text-xs rounded font-medium">航班</span>
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-sky-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-sky-200 dark:border-sky-900/60">
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="px-2.5 py-0.5 bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 text-xs font-extrabold rounded-md">
+                    <i class="fa-solid fa-plane-departure mr-1"></i> 香港航空 HX616
+                  </span>
+                  <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">A330-300</span>
+                </div>
+                
+                <!-- Quick Radar Links -->
+                <div class="flex items-center space-x-1.5 text-xs">
+                  <a href="https://www.flightradar24.com/data/flights/hx616" target="_blank" class="px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-md font-bold transition flex items-center gap-1">
+                    <i class="fa-solid fa-plane text-[10px]"></i> Flightradar24
+                  </a>
+                  <a href="https://www.flightaware.com/live/flight/CRK616" target="_blank" class="px-2 py-1 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-md font-bold transition flex items-center gap-1">
+                    <i class="fa-solid fa-globe text-[10px]"></i> FlightAware
+                  </a>
+                </div>
               </div>
-              <h4 class="font-bold text-slate-900 dark:text-white text-base">✈️ 香港飛往關西國際機場 (KIX)</h4>
-              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">搭乘香港航空 HX616，預計 07:15 抵達關西機場 T1。</p>
+
+              <h4 class="font-extrabold text-slate-900 dark:text-white text-base sm:text-lg">✈️ 去程航班：香港 (HKG) ➔ 大阪關西 (KIX)</h4>
+              
+              <!-- STD & STA Highlight Box -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-sky-50/70 dark:bg-slate-900/80 p-3 sm:p-4 rounded-xl border border-sky-100 dark:border-slate-700/80 my-3">
+                <div class="flex items-center justify-between border-b sm:border-b-0 sm:border-r border-sky-200 dark:border-slate-700 pb-2 sm:pb-0 sm:pr-4">
+                  <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">STD (預計起飛時間)</span>
+                    <span class="text-xl font-mono font-extrabold text-sky-600 dark:text-sky-400">02:40 AM</span>
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 block">香港國際機場 (HKG) T1</span>
+                  </div>
+                  <i class="fa-solid fa-plane-departure text-sky-400 text-xl hidden xs:block"></i>
+                </div>
+
+                <div class="flex items-center justify-between pt-1 sm:pt-0 sm:pl-2">
+                  <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">STA (預計抵達時間)</span>
+                    <span class="text-xl font-mono font-extrabold text-emerald-600 dark:text-emerald-400">07:15 AM</span>
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 block">關西國際機場 (KIX) T1</span>
+                  </div>
+                  <i class="fa-solid fa-plane-arrival text-emerald-400 text-xl hidden xs:block"></i>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-600 dark:text-slate-300">
+                • <b>預計飛行時間：</b>3 小時 35 分鐘<br>
+                • <b>建議預備：</b>請於 03/08 00:40 AM 前抵達香港機場 T1 辦理登機與行李託運。
+              </p>
             </div>
           </div>
 
@@ -471,12 +524,56 @@
             </div>
           </div>
 
+          <!-- Flight HX613 Detailed Card -->
           <div class="relative pl-6 sm:pl-8">
-            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-blue-500 border-4 border-white dark:border-slate-900"></div>
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-              <span class="text-xs font-bold text-blue-600 dark:text-blue-400"><i class="fa-solid fa-plane-departure mr-1"></i> 20:20 - 23:50</span>
-              <h4 class="font-bold text-slate-900 dark:text-white text-base">✈️ HX613 登機返港</h4>
-              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">辦理報到託運與免稅店補貨後，20:20 起飛，預計 23:50 抵達香港國際機場。</p>
+            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-900"></div>
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-indigo-200 dark:border-indigo-900/60">
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="px-2.5 py-0.5 bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 text-xs font-extrabold rounded-md">
+                    <i class="fa-solid fa-plane-arrival mr-1"></i> 香港航空 HX613
+                  </span>
+                  <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">A330-300</span>
+                </div>
+                
+                <!-- Quick Radar Links -->
+                <div class="flex items-center space-x-1.5 text-xs">
+                  <a href="https://www.flightradar24.com/data/flights/hx613" target="_blank" class="px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-md font-bold transition flex items-center gap-1">
+                    <i class="fa-solid fa-plane text-[10px]"></i> Flightradar24
+                  </a>
+                  <a href="https://www.flightaware.com/live/flight/CRK613" target="_blank" class="px-2 py-1 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-md font-bold transition flex items-center gap-1">
+                    <i class="fa-solid fa-globe text-[10px]"></i> FlightAware
+                  </a>
+                </div>
+              </div>
+
+              <h4 class="font-extrabold text-slate-900 dark:text-white text-base sm:text-lg">✈️ 回程航班：大阪關西 (KIX) ➔ 香港 (HKG)</h4>
+
+              <!-- STD & STA Highlight Box -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-indigo-50/70 dark:bg-slate-900/80 p-3 sm:p-4 rounded-xl border border-indigo-100 dark:border-slate-700/80 my-3">
+                <div class="flex items-center justify-between border-b sm:border-b-0 sm:border-r border-indigo-200 dark:border-slate-700 pb-2 sm:pb-0 sm:pr-4">
+                  <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">STD (預計起飛時間)</span>
+                    <span class="text-xl font-mono font-extrabold text-indigo-600 dark:text-indigo-400">20:20 PM</span>
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 block">關西國際機場 (KIX) T1</span>
+                  </div>
+                  <i class="fa-solid fa-plane-departure text-indigo-400 text-xl hidden xs:block"></i>
+                </div>
+
+                <div class="flex items-center justify-between pt-1 sm:pt-0 sm:pl-2">
+                  <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">STA (預計抵達時間)</span>
+                    <span class="text-xl font-mono font-extrabold text-emerald-600 dark:text-emerald-400">23:50 PM</span>
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 block">香港國際機場 (HKG) T1</span>
+                  </div>
+                  <i class="fa-solid fa-plane-arrival text-emerald-400 text-xl hidden xs:block"></i>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-600 dark:text-slate-300">
+                • <b>預計飛行時間：</b>4 小時 30 分鐘<br>
+                • <b>報到托運：</b>請於 18:20 PM 前抵達 KIX Terminal 1 櫃檯辦理退稅與預備行李託運。
+              </p>
             </div>
           </div>
         </div>
@@ -484,7 +581,7 @@
 
     </section>
 
-    <!-- Section: AA Calculator (Imported from aa.html) -->
+    <!-- Section: AA Calculator -->
     <section id="calculator" class="pt-6 border-t border-slate-200 dark:border-slate-800">
       <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700 shadow-md">
         
@@ -738,7 +835,7 @@
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    // AA Calculator JS Logic (from aa.html)
+    // AA Calculator JS Logic
     let people = [];
     let items = [];
     let pendingImportData = null;
