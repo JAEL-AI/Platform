@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>多人 AA 制埋數計算器 (含歷史帳冊召回版)</title>
+    <title>多人 AA 制埋數計算器</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QR Code Generator Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- HTML5 QR Code Camera Scanner Library -->
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -20,70 +18,43 @@
         .modal-overlay {
             transition: opacity 0.2s ease, visibility 0.2s ease;
         }
-        #qr-reader video {
-            border-radius: 12px;
-            object-fit: cover;
-        }
-        .tab-btn.active {
-            background-color: #4f46e5;
-            color: #ffffff;
-            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
-        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen p-4 flex justify-center items-start">
 
 <div class="w-full max-w-xl space-y-4 my-2">
 
-    <!-- Header & Navigation Tabs -->
+    <!-- Header & Action Toolbar -->
     <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
                 <h1 class="text-xl font-bold text-indigo-600 flex items-center gap-2">
                     <span>👥</span> 多人 AA 制埋數計算器
                 </h1>
-                <p class="text-xs text-slate-500 mt-0.5">無雲端依賴 · 支持歷史紀錄召回 & 離線跨裝置同步</p>
+                <p class="text-xs text-slate-500 mt-0.5">無雲端依賴 · 本地 JSON 檔案備份/匯入 & QR Code/連結分享</p>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="switchPasscodeModal()" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-lg transition">
-                    🔑 切換本機群組
-                </button>
-            </div>
-        </div>
-
-        <!-- Page View Navigation Tabs -->
-        <div class="mt-4 flex bg-slate-100 p-1 rounded-xl border border-slate-200">
-            <button id="tabCalcBtn" class="tab-btn active flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-600 flex items-center justify-center gap-1.5 cursor-default">
-                <span>🧮</span> 即時計算器
-            </button>
-            <a href="record.html" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-600 hover:text-indigo-600 flex items-center justify-center gap-1.5">
-                <span>📚</span> 歷史帳冊頁面 (<span id="historyCountBadge">0</span>) ↗
-            </a>
-        </div>
-
-        <!-- Sharing & Save Toolbar (Calculator View) -->
-        <div id="sharingToolbar" class="mt-3 pt-2 grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <button onclick="saveToHistoryModal()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                <span>💾</span> 存檔至歷史頁面
-            </button>
-            <button onclick="showQRCodeModal()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                <span>📱</span> 顯示 QR Code
-            </button>
-            <button onclick="openScannerModal()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                <span>📷</span> 掃描 QR
-            </button>
-            <button onclick="copyShareableLink()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                <span>🔗</span> 複製連結
+            <button onclick="confirmResetData()" class="px-3 py-1.5 text-xs text-rose-500 hover:bg-rose-50 font-bold rounded-lg transition">
+                🗑️ 清空當前數據
             </button>
         </div>
 
-        <div class="mt-3 flex items-center justify-between text-xs text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-            <span>目前本機帳號: <b id="currentPasscodeTag" class="text-indigo-600 font-bold">預設帳號</b></span>
-            <button onclick="confirmResetData()" class="text-rose-500 hover:underline">清空此帳號當前數據</button>
+        <!-- Sharing & Local File Backup Toolbar -->
+        <div id="sharingToolbar" class="mt-4 grid grid-cols-3 gap-2">
+            <button onclick="openExportModal()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                <span>📤</span> 導出 JSON 檔案
+            </button>
+            <button onclick="triggerImportLocalFile()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                <span>📥</span> 匯入 JSON 檔案
+            </button>
+            <input type="file" id="localFileInput" accept=".json" class="hidden" onchange="handleLocalFileImport(event)">
+
+            <button onclick="showQRCodeModal()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                <span>📱</span> 分享帳本 (QR Code / 連結)
+            </button>
         </div>
     </div>
 
-    <!-- VIEW 1: Calculator Main View -->
+    <!-- VIEW: Calculator Main View -->
     <div id="calculatorView" class="space-y-4">
         <!-- 1. Members Section -->
         <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
@@ -153,59 +124,68 @@
         </div>
     </div>
 
-    <!-- VIEW 2: History Page Archive -->
-    <div id="historyView" class="hidden space-y-4">
-        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
-            <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
-                <div>
-                    <h2 class="text-base font-bold text-slate-800">📚 已儲存的歷史帳冊</h2>
-                    <p class="text-xs text-slate-500">所有已存檔的帳冊均保存在本機，可隨時召回（Recall）載入重新編輯。</p>
-                </div>
-                <button onclick="clearAllHistoryConfirm()" class="text-xs text-rose-500 hover:underline">清空所有歷史</button>
-            </div>
-
-            <div id="historyListContainer" class="space-y-3"></div>
-        </div>
-    </div>
-
 </div>
 
 <!-- Toast Notification Container -->
 <div id="toastContainer" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-<!-- Modal 0: Save Current Bill to History -->
-<div id="saveHistoryModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none">
+<!-- Modal 1: Export Bill to Local File -->
+<div id="exportModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none">
     <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
-        <h3 class="text-lg font-bold text-slate-800 mb-1">💾 歸檔儲存至歷史帳冊</h3>
-        <p class="text-xs text-slate-500 mb-3">輸入此帳冊的名稱，方便日後在獨立的「歷史帳冊頁面 (`record.html`)」中檢視與召回（Recall）：</p>
+        <h3 class="text-lg font-bold text-slate-800 mb-1">📤 導出帳本為本地 JSON 檔案</h3>
+        <p class="text-xs text-slate-500 mb-3">輸入此帳冊名稱，系統會生成可離線保存的數據檔案：</p>
         
-        <input type="text" id="historyTitleInput" placeholder="例如：2026 日本關西之旅 / 9月生日餐" 
+        <input type="text" id="exportTitleInput" placeholder="例如：2026 日本關西之旅 / 9月生日餐" 
                class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 mb-3">
 
         <div class="flex gap-2">
-            <button onclick="executeSaveToHistory()" class="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl">
-                確認存檔
+            <button onclick="executeExportToFile()" class="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl">
+                📥 下載 JSON 檔案
             </button>
-            <button onclick="closeModal('saveHistoryModal')" class="flex-1 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl">
+            <button onclick="closeModal('exportModal')" class="flex-1 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl">
                 取消
             </button>
         </div>
     </div>
 </div>
 
-<!-- Modal 1: QR Code Modal -->
+<!-- Modal 2: Import Local File Preview -->
+<div id="importPreviewModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+        <h3 class="text-lg font-bold text-slate-800 mb-1">📥 檢視並匯入本地帳本檔案</h3>
+        <p class="text-xs text-slate-500 mb-3">已成功讀取 JSON 檔案內容，確認後將載入至計算器：</p>
+        
+        <div id="importPreviewContent" class="space-y-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200 mb-4"></div>
+
+        <div class="flex gap-2">
+            <button id="confirmImportBtn" class="flex-1 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl">
+                確認載入至計算器
+            </button>
+            <button onclick="closeModal('importPreviewModal')" class="flex-1 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl">
+                取消
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 3: Merged QR Code & Copy Share Link Modal -->
 <div id="qrModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none">
     <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-xl">
-        <h3 class="text-lg font-bold text-slate-800 mb-1">📱 掃描 QR Code 載入帳目</h3>
-        <p class="text-xs text-slate-500 mb-4">使用另一部手機掃描此 QR Code，即可直接同步載入目前的成員與消費金額。</p>
+        <h3 class="text-lg font-bold text-slate-800 mb-1">📱 分享帳本 (QR Code / 連結)</h3>
+        <p class="text-xs text-slate-500 mb-3">供朋友用手機相機直接掃描，或複製網址連結發送至群組：</p>
         
-        <div class="flex justify-center p-3 bg-slate-50 border border-slate-200 rounded-2xl mb-4">
+        <div class="flex justify-center p-3 bg-slate-50 border border-slate-200 rounded-2xl mb-3">
             <div id="qrcodeCanvas"></div>
         </div>
 
+        <div class="mb-4">
+            <input type="text" id="shareUrlInput" readonly 
+                   class="w-full px-2.5 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-[11px] text-slate-600 text-center select-all focus:outline-none">
+        </div>
+
         <div class="flex gap-2">
-            <button onclick="copyShareableLink()" class="flex-1 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl">
-                複製連結
+            <button onclick="copyShareableLinkFromModal()" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                📋 複製分享連結
             </button>
             <button onclick="closeModal('qrModal')" class="flex-1 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl">
                 關閉
@@ -214,79 +194,17 @@
     </div>
 </div>
 
-<!-- Modal 2: Camera Scanner Modal -->
-<div id="scannerModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none">
-    <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-xl">
-        <h3 class="text-lg font-bold text-slate-800 mb-1">📷 掃描對方的 QR Code</h3>
-        <p class="text-xs text-slate-500 mb-3">對準另一部手機螢幕顯示的 AA 制 QR Code：</p>
-        
-        <div id="qr-reader" class="w-full bg-slate-900 rounded-xl overflow-hidden mb-4 min-h-[220px]"></div>
-
-        <button onclick="closeScannerModal()" class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl">
-            取消 / 關閉相機
-        </button>
-    </div>
-</div>
-
-<!-- Modal 3: View History Detail Report Modal -->
-<div id="historyDetailModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none">
-    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl max-h-[90vh] overflow-y-auto">
-        <h3 id="historyDetailTitle" class="text-lg font-bold text-slate-800 mb-1">歷史帳冊詳情</h3>
-        <p id="historyDetailMeta" class="text-xs text-slate-500 mb-3"></p>
-        
-        <div id="historyDetailContent" class="space-y-3 text-xs mb-4"></div>
-
-        <div class="grid grid-cols-2 gap-2">
-            <button id="historyDetailRecallBtn" class="py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl">
-                📥 載入並編輯此帳本
-            </button>
-            <button onclick="closeModal('historyDetailModal')" class="py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl">
-                關閉
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal 4: Switch Local Group Passcode Modal -->
-<div id="switchPasscodeModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none">
-    <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
-        <h3 class="text-lg font-bold text-slate-800 mb-1">🔑 本機切換 / 建立群組帳號</h3>
-        <p class="text-xs text-slate-500 mb-3">輸入代碼以切換至不同的本地賬單（例如：`JAPAN_2026` 或 `DINNER`）：</p>
-        
-        <input type="text" id="newPasscodeInput" placeholder="例如：1234 / 日本旅行" 
-               class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-3">
-
-        <div class="flex gap-2">
-            <button onclick="applyNewPasscode()" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl">
-                切換帳號
-            </button>
-            <button onclick="closeModal('switchPasscodeModal')" class="flex-1 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl">
-                取消
-            </button>
-        </div>
-    </div>
-</div>
-
 <script>
-    let currentPasscode = localStorage.getItem('aa_offline_passcode') || '預設帳號';
     let people = [];
     let items = [];
-    let archivedBills = [];
+    let pendingImportData = null;
     let latestTransactions = [];
     let latestTotalExpense = 0;
-    let html5QrScanner = null;
-
-    function getStorageKey(type) {
-        return `aa_offline_${currentPasscode}_${type}`;
-    }
 
     function saveData() {
         try {
-            localStorage.setItem(getStorageKey('people'), JSON.stringify(people));
-            localStorage.setItem(getStorageKey('items'), JSON.stringify(items));
-            localStorage.setItem('aa_offline_passcode', currentPasscode);
-            // 獨立 Key 儲存，保護資料隔離
-            localStorage.setItem(getStorageKey('archived_bills'), JSON.stringify(archivedBills));
+            localStorage.setItem('aa_cal_people', JSON.stringify(people));
+            localStorage.setItem('aa_cal_items', JSON.stringify(items));
         } catch(e) {
             console.error("Failed to save to local storage", e);
         }
@@ -294,263 +212,107 @@
 
     function loadData() {
         try {
-            const savedPeople = localStorage.getItem(getStorageKey('people'));
-            const savedItems = localStorage.getItem(getStorageKey('items'));
-            const savedArchives = localStorage.getItem(getStorageKey('archived_bills'));
+            const savedPeople = localStorage.getItem('aa_cal_people');
+            const savedItems = localStorage.getItem('aa_cal_items');
 
             people = savedPeople ? JSON.parse(savedPeople) : [];
             items = savedItems ? JSON.parse(savedItems) : [];
-            archivedBills = savedArchives ? JSON.parse(savedArchives) : [];
         } catch(e) {
             people = [];
             items = [];
-            archivedBills = [];
         }
     }
 
-    function saveToHistoryModal() {
+    function openExportModal() {
         if (people.length === 0 && items.length === 0) {
-            return showToast('目前沒有任何成員或消費資料可存檔', 'warning');
+            return showToast('目前沒有任何成員或消費資料可導出', 'warning');
         }
-
-        const dateStr = new Date().toLocaleDateString('zh-HK');
-        document.getElementById('historyTitleInput').value = `${currentPasscode} - ${dateStr}`;
-        openModal('saveHistoryModal');
+        const dateStr = new Date().toLocaleDateString('zh-HK').replace(/\//g, '-');
+        document.getElementById('exportTitleInput').value = `AA帳單_${dateStr}`;
+        openModal('exportModal');
     }
 
-    function executeSaveToHistory() {
-        const titleInput = document.getElementById('historyTitleInput');
-        const title = titleInput.value.trim() || `帳冊 - ${new Date().toLocaleString()}`;
+    function executeExportToFile() {
+        const titleInput = document.getElementById('exportTitleInput');
+        const title = titleInput.value.trim() || `AA帳單_${new Date().toISOString().slice(0,10)}`;
 
         let totalAmt = 0;
         items.forEach(i => totalAmt += i.amount);
 
         const billRecord = {
-            id: 'bill_' + Date.now(),
+            version: '1.0',
             title: title,
-            passcode: currentPasscode,
-            date: new Date().toLocaleString('zh-HK'),
-            people: JSON.parse(JSON.stringify(people)),
-            items: JSON.parse(JSON.stringify(items)),
-            totalAmount: totalAmt
+            exportDate: new Date().toLocaleString('zh-HK'),
+            totalAmount: totalAmt,
+            people: people,
+            items: items
         };
 
-        archivedBills.unshift(billRecord);
-        saveData();
-        updateHistoryBadge();
-        closeModal('saveHistoryModal');
-        showToast('🎉 已成功歸檔！點擊頂部「歷史帳冊頁面」即可隨時查看與召回', 'success');
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(billRecord, null, 2));
+        const downloadAnchor = document.createElement('a');
+        const sanitizedTitle = title.replace(/[/\\?%*:|"<>]/g, '_');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `${sanitizedTitle}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+
+        closeModal('exportModal');
+        showToast(`🎉 成功導出帳本檔案 [${sanitizedTitle}.json]！`, 'success');
     }
 
-    function updateHistoryBadge() {
-        try {
-            const savedArchives = localStorage.getItem(getStorageKey('archived_bills'));
-            const list = savedArchives ? JSON.parse(savedArchives) : [];
-            document.getElementById('historyCountBadge').innerText = list.length;
-        } catch(e) {
-            document.getElementById('historyCountBadge').innerText = '0';
-        }
+    function triggerImportLocalFile() {
+        document.getElementById('localFileInput').click();
     }
 
-    function loadData() {
-        try {
-            const savedPeople = localStorage.getItem(getStorageKey('people'));
-            const savedItems = localStorage.getItem(getStorageKey('items'));
-            const savedArchives = localStorage.getItem('aa_offline_archived_bills');
+    function handleLocalFileImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
 
-            people = savedPeople ? JSON.parse(savedPeople) : [];
-            items = savedItems ? JSON.parse(savedItems) : [];
-            archivedBills = savedArchives ? JSON.parse(savedArchives) : [];
-        } catch(e) {
-            people = [];
-            items = [];
-            archivedBills = [];
-        }
-    }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data && Array.isArray(data.people) && Array.isArray(data.items)) {
+                    pendingImportData = data;
 
-    // View Switching (Calculator vs History Page)
-    function switchView(viewName) {
-        const calcView = document.getElementById('calculatorView');
-        const historyView = document.getElementById('historyView');
-        const tabCalcBtn = document.getElementById('tabCalcBtn');
-        const tabHistoryBtn = document.getElementById('tabHistoryBtn');
-        const sharingToolbar = document.getElementById('sharingToolbar');
+                    let previewHtml = `
+                        <div><b>帳冊標題：</b> ${escapeHtml(data.title || '無標題')}</div>
+                        <div><b>匯出時間：</b> ${escapeHtml(data.exportDate || '未知')}</div>
+                        <div><b>參與成員 (${data.people.length} 人)：</b> ${data.people.map(p => escapeHtml(p)).join(', ')}</div>
+                        <div><b>消費項目 (${data.items.length} 項)：</b> 總計 $${(data.totalAmount || 0).toFixed(1)}</div>
+                    `;
+                    document.getElementById('importPreviewContent').innerHTML = previewHtml;
 
-        if (viewName === 'calc') {
-            calcView.classList.remove('hidden');
-            historyView.classList.add('hidden');
-            tabCalcBtn.classList.add('active');
-            tabHistoryBtn.classList.remove('active');
-            sharingToolbar.classList.remove('hidden');
-        } else {
-            calcView.classList.add('hidden');
-            historyView.classList.remove('hidden');
-            tabCalcBtn.classList.remove('active');
-            tabHistoryBtn.classList.add('active');
-            sharingToolbar.classList.add('hidden');
-            renderHistoryUI();
-        }
-    }
-
-    // History Archive Logic
-    function saveToHistoryModal() {
-        if (people.length === 0 && items.length === 0) {
-            return showToast('目前沒有任何成員或消費資料可存檔', 'warning');
-        }
-
-        const dateStr = new Date().toLocaleDateString('zh-HK');
-        document.getElementById('historyTitleInput').value = `${currentPasscode} - ${dateStr}`;
-        openModal('saveHistoryModal');
-    }
-
-    function executeSaveToHistory() {
-        const titleInput = document.getElementById('historyTitleInput');
-        const title = titleInput.value.trim() || `帳冊 - ${new Date().toLocaleString()}`;
-
-        // Calculate totals for metadata
-        let totalAmt = 0;
-        items.forEach(i => totalAmt += i.amount);
-
-        const billRecord = {
-            id: 'bill_' + Date.now(),
-            title: title,
-            passcode: currentPasscode,
-            date: new Date().toLocaleString('zh-HK'),
-            people: JSON.parse(JSON.stringify(people)),
-            items: JSON.parse(JSON.stringify(items)),
-            totalAmount: totalAmt
+                    document.getElementById('confirmImportBtn').onclick = applyImportedBill;
+                    openModal('importPreviewModal');
+                } else {
+                    showToast('無效的 AA 制帳本 JSON 檔案結構', 'warning');
+                }
+            } catch(err) {
+                showToast('讀取 JSON 檔案失敗，請確保格式正確', 'warning');
+            }
+            event.target.value = '';
         };
-
-        archivedBills.unshift(billRecord); // Add to beginning of array
-        saveData();
-        updateHistoryBadge();
-        closeModal('saveHistoryModal');
-        showToast('🎉 已成功歸檔儲存至「歷史帳冊頁面」！', 'success');
+        reader.readAsText(file);
     }
 
-    function recallHistoryBill(billId) {
-        const record = archivedBills.find(b => b.id === billId);
-        if (!record) return showToast('找不到該筆歷史紀錄', 'warning');
+    function applyImportedBill() {
+        if (!pendingImportData) return;
 
-        people = JSON.parse(JSON.stringify(record.people));
-        items = JSON.parse(JSON.stringify(record.items));
-        currentPasscode = record.passcode || currentPasscode;
+        people = JSON.parse(JSON.stringify(pendingImportData.people));
+        items = JSON.parse(JSON.stringify(pendingImportData.items));
 
         saveData();
-        document.getElementById('currentPasscodeTag').innerText = currentPasscode;
         updatePeopleUI();
         updateItemsUI();
         document.getElementById('resultContainer').classList.add('hidden');
 
-        closeModal('historyDetailModal');
-        switchView('calc');
-        showToast(`已成功召回（Recall）帳冊：「${record.title}」！`, 'success');
+        closeModal('importPreviewModal');
+        showToast(`🎉 已成功載入帳冊：「${pendingImportData.title || '匯入帳單'}」！`, 'success');
+        pendingImportData = null;
     }
 
-    function deleteHistoryBill(billId) {
-        archivedBills = archivedBills.filter(b => b.id !== billId);
-        saveData();
-        updateHistoryBadge();
-        renderHistoryUI();
-        showToast('已刪除歷史紀錄');
-    }
-
-    function clearAllHistoryConfirm() {
-        const groupBills = archivedBills.filter(b => (b.passcode || '預設帳號') === currentPasscode);
-        if (groupBills.length === 0) return showToast(`本機群組 [${currentPasscode}] 沒有歷史紀錄可清空`);
-        if (confirm(`確定要清空本機群組 [${currentPasscode}] 的所有已歸檔歷史帳冊嗎？此動作無法復原。`)) {
-            // 只移除當前群組的歷史紀錄，保留其他群組資料
-            archivedBills = archivedBills.filter(b => (b.passcode || '預設帳號') !== currentPasscode);
-            saveData();
-            updateHistoryBadge();
-            renderHistoryUI();
-            showToast(`已清空群組 [${currentPasscode}] 的歷史紀錄`);
-        }
-    }
-
-    function viewHistoryDetail(billId) {
-        const record = archivedBills.find(b => b.id === billId);
-        if (!record) return;
-
-        document.getElementById('historyDetailTitle').innerText = record.title;
-        document.getElementById('historyDetailMeta').innerText = `建立時間：${record.date} | 帳號：${record.passcode}`;
-
-        let detailHtml = `
-            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <div class="font-bold text-indigo-600 mb-1">💰 總花費：$${record.totalAmount.toFixed(1)}</div>
-                <div>👥 成員 (${record.people.length} 人)：${record.people.map(p => escapeHtml(p)).join(', ')}</div>
-            </div>
-            <div class="font-bold text-slate-700 mt-2">消費清單 (${record.items.length} 項)：</div>
-            <ul class="divide-y divide-slate-100 bg-slate-50 p-2 rounded-xl border border-slate-200 max-h-48 overflow-y-auto">
-        `;
-
-        if (record.items.length === 0) {
-            detailHtml += `<li class="py-1 text-slate-400">尚無消費項目</li>`;
-        } else {
-            record.items.forEach(it => {
-                detailHtml += `
-                    <li class="py-1.5 flex justify-between items-center text-xs">
-                        <span><b>${escapeHtml(it.name)}</b> ($${it.amount.toFixed(1)}) - 付款: ${escapeHtml(it.payer)}</span>
-                    </li>
-                `;
-            });
-        }
-        detailHtml += `</ul>`;
-
-        document.getElementById('historyDetailContent').innerHTML = detailHtml;
-        document.getElementById('historyDetailRecallBtn').onclick = () => recallHistoryBill(record.id);
-
-        openModal('historyDetailModal');
-    }
-
-    function updateHistoryBadge() {
-        document.getElementById('historyCountBadge').innerText = archivedBills.length;
-    }
-
-    function renderHistoryUI() {
-        updateHistoryBadge();
-        const container = document.getElementById('historyListContainer');
-
-        // 嚴格篩選屬於當前群組帳號的帳冊
-        const groupBills = archivedBills.filter(b => (b.passcode || '預設帳號') === currentPasscode);
-
-        if (groupBills.length === 0) {
-            container.innerHTML = `
-                <div class="text-center py-8 text-slate-400 text-xs">
-                    <p class="text-2xl mb-1">📭</p>
-                    目前群組 [${escapeHtml(currentPasscode)}] 尚未有任何歸檔紀錄。<br>在計算器中按下「💾 存檔至歷史頁面」即可在此隨時召回！
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = groupBills.map(b => `
-            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 hover:border-indigo-300 transition flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                <div>
-                    <div class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                        <span>${escapeHtml(b.title)}</span>
-                        <span class="text-[10px] bg-indigo-100 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">${escapeHtml(b.passcode)}</span>
-                    </div>
-                    <div class="text-xs text-slate-500 mt-1">
-                        日期: ${b.date} | 成員: ${b.people.length} 人 | 金額: <b class="text-emerald-600">$${b.totalAmount.toFixed(1)}</b>
-                    </div>
-                </div>
-                <div class="flex items-center gap-1.5 self-end sm:self-auto">
-                    <button onclick="viewHistoryDetail('${b.id}')" class="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-lg transition">
-                        👁️ 詳情
-                    </button>
-                    <button onclick="recallHistoryBill('${b.id}')" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
-                        📥 召回載入
-                    </button>
-                    <button onclick="deleteHistoryBill('${b.id}')" class="px-2 py-1.5 text-rose-500 hover:bg-rose-50 text-xs font-bold rounded-lg transition">
-                        ✕
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    // Encoding & Compression for Sharing
     function generateCompressedDataPayload() {
         const payload = { p: people, i: items };
         const jsonStr = JSON.stringify(payload);
@@ -578,13 +340,15 @@
         const encodedData = generateCompressedDataPayload();
         const shareUrl = window.location.origin + window.location.pathname + '#data=' + encodedData;
 
+        document.getElementById('shareUrlInput').value = shareUrl;
+
         const container = document.getElementById('qrcodeCanvas');
         container.innerHTML = '';
         
         new QRCode(container, {
             text: shareUrl,
-            width: 210,
-            height: 210,
+            width: 200,
+            height: 200,
             colorDark: "#1e293b",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.L
@@ -593,13 +357,9 @@
         openModal('qrModal');
     }
 
-    function copyShareableLink() {
-        if (people.length === 0 && items.length === 0) {
-            return showToast('目前沒有任何成員或消費資料可分享', 'warning');
-        }
-
-        const encodedData = generateCompressedDataPayload();
-        const shareUrl = window.location.origin + window.location.pathname + '#data=' + encodedData;
+    function copyShareableLinkFromModal() {
+        const shareUrl = document.getElementById('shareUrlInput').value;
+        if (!shareUrl) return;
 
         const tempInput = document.createElement('input');
         tempInput.value = shareUrl;
@@ -609,65 +369,10 @@
             document.execCommand('copy');
             showToast('已成功複製分享連結！可直接發送至聊天群組', 'success');
         } catch(e) {
-            showToast('複製失敗，請手動複製', 'warning');
+            showToast('複製失敗，請手動複製網址', 'warning');
         }
         document.body.removeChild(tempInput);
     }
-
-    // Camera Scanning Logic
-    function openScannerModal() {
-        openModal('scannerModal');
-
-        setTimeout(() => {
-            if (!html5QrScanner) {
-                html5QrScanner = new Html5Qrcode("qr-reader");
-            }
-            
-            const config = { fps: 10, qrbox: { width: 200, height: 200 } };
-            html5QrScanner.start(
-                { facingMode: "environment" },
-                config,
-                onScanSuccess,
-                onScanFailure
-            ).catch(err => {
-                showToast('無法開啟相機權限或不支援相機', 'warning');
-                closeScannerModal();
-            });
-        }, 200);
-    }
-
-    function closeScannerModal() {
-        if (html5QrScanner) {
-            html5QrScanner.stop().then(() => {
-                html5QrScanner.clear();
-            }).catch(err => console.log(err));
-        }
-        closeModal('scannerModal');
-    }
-
-    function onScanSuccess(decodedText) {
-        closeScannerModal();
-        
-        let payloadStr = decodedText;
-        if (decodedText.includes('#data=')) {
-            payloadStr = decodedText.split('#data=')[1];
-        }
-
-        const parsed = parseDataPayload(payloadStr);
-        if (parsed) {
-            people = parsed.people;
-            items = parsed.items;
-            saveData();
-            updatePeopleUI();
-            updateItemsUI();
-            document.getElementById('resultContainer').classList.add('hidden');
-            showToast('🎉 成功經由 QR Code 匯入數據！', 'success');
-        } else {
-            showToast('無效的 AA 制 QR Code 數據', 'warning');
-        }
-    }
-
-    function onScanFailure(error) {}
 
     function addPerson() {
         const input = document.getElementById('personName');
@@ -872,7 +577,6 @@
         document.body.removeChild(tempInput);
     }
 
-    // Modal & Toast Helpers
     function openModal(id) {
         const modal = document.getElementById(id);
         modal.classList.remove('opacity-0', 'pointer-events-none');
@@ -883,25 +587,8 @@
         modal.classList.add('opacity-0', 'pointer-events-none');
     }
 
-    function switchPasscodeModal() {
-        document.getElementById('newPasscodeInput').value = currentPasscode;
-        openModal('switchPasscodeModal');
-    }
-
-    function applyNewPasscode() {
-        const val = document.getElementById('newPasscodeInput').value.trim() || '預設帳號';
-        currentPasscode = val;
-        document.getElementById('currentPasscodeTag').innerText = currentPasscode;
-        closeModal('switchPasscodeModal');
-        loadData();
-        updatePeopleUI();
-        updateItemsUI();
-        document.getElementById('resultContainer').classList.add('hidden');
-        showToast(`已切換至本機帳號 [${currentPasscode}]`);
-    }
-
     function confirmResetData() {
-        if (confirm(`確定要清空本機帳號 [${currentPasscode}] 的當前編輯數據嗎？`)) {
+        if (confirm('確定要清空當前的所有成員與消費數據嗎？此動作無法復原。')) {
             people = [];
             items = [];
             saveData();
@@ -937,15 +624,6 @@
     }
 
     window.addEventListener('load', () => {
-        document.getElementById('currentPasscodeTag').innerText = currentPasscode;
-
-        // Check if recalled from record.html
-        const recalledTitle = localStorage.getItem('aa_offline_recalled_flag');
-        if (recalledTitle) {
-            localStorage.removeItem('aa_offline_recalled_flag');
-            showToast(`🎉 已成功從歷史紀錄召回帳冊：「${recalledTitle}」！`, 'success');
-        }
-
         if (window.location.hash && window.location.hash.includes('data=')) {
             const hashData = window.location.hash.split('data=')[1];
             const parsed = parseDataPayload(hashData);
@@ -962,7 +640,6 @@
 
         updatePeopleUI();
         updateItemsUI();
-        updateHistoryBadge();
     });
 </script>
 </body>
