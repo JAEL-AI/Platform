@@ -46,7 +46,7 @@
             </div>
             <div class="flex items-center justify-between bg-indigo-50 px-3 py-2 rounded-xl border border-indigo-100">
                 <span class="text-xs font-bold text-indigo-700 truncate">🔑 目前群組: <span id="currentPasscodeTag">預設帳號</span></span>
-                <button onclick="openModal('switchPasscodeModal')" class="text-xs text-indigo-600 hover:underline font-bold shrink-0 ml-1">🔑 切換</button>
+                <button onclick="openSwitchPasscodeModal()" class="text-xs text-indigo-600 hover:underline font-bold shrink-0 ml-1">🔑 切換</button>
             </div>
         </div>
 
@@ -76,6 +76,25 @@
 
 </div>
 
+<!-- Modal: Detail Modal -->
+<div id="detailModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl max-h-[90vh] overflow-y-auto">
+        <h3 id="detailTitle" class="text-lg font-bold text-slate-800 mb-1">歷史帳冊詳情</h3>
+        <p id="detailMeta" class="text-xs text-slate-500 mb-3"></p>
+        
+        <div id="detailContent" class="space-y-3 text-xs mb-4"></div>
+
+        <div class="grid grid-cols-2 gap-2">
+            <button id="detailRecallBtn" class="py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl">
+                📥 載入並編輯此帳本
+            </button>
+            <button onclick="closeModal('detailModal')" class="py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl">
+                關閉
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- Modal: Switch Passcode Modal -->
 <div id="switchPasscodeModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none">
     <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
@@ -96,7 +115,9 @@
     </div>
 </div>
 
-<script>
+<!-- Toast Notification Container -->
+<div id="toastContainer" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
 <script>
     let currentPasscode = localStorage.getItem('aa_offline_passcode') || '預設帳號';
     let archivedBills = [];
@@ -109,8 +130,9 @@
         } catch(e) {
             archivedBills = [];
         }
-        if (document.getElementById('currentPasscodeTag')) {
-            document.getElementById('currentPasscodeTag').innerText = currentPasscode;
+        const tag = document.getElementById('currentPasscodeTag');
+        if (tag) {
+            tag.innerText = currentPasscode;
         }
     }
 
@@ -126,7 +148,7 @@
         loadRecords();
 
         const container = document.getElementById('archiveListContainer');
-        const searchKw = document.getElementById('searchInput').value.trim().toLowerCase();
+        const searchKw = (document.getElementById('searchInput').value || '').trim().toLowerCase();
 
         // 嚴格隔離：僅篩選屬於當前群組帳號 (currentPasscode) 的歷史帳冊
         let groupBills = archivedBills.filter(b => (b.passcode || '預設帳號') === currentPasscode);
@@ -135,7 +157,7 @@
             return !searchKw || 
                 b.title.toLowerCase().includes(searchKw) ||
                 b.people.some(p => p.toLowerCase().includes(searchKw)) ||
-                b.items.some(i => i.name.toLowerCase().includes(searchKw));
+                (b.items && b.items.some(i => i.name.toLowerCase().includes(searchKw)));
         });
 
         document.getElementById('recordCountTag').innerText = groupBills.length;
@@ -180,6 +202,11 @@
         `).join('');
     }
 
+    function openSwitchPasscodeModal() {
+        document.getElementById('newPasscodeInput').value = currentPasscode;
+        openModal('switchPasscodeModal');
+    }
+
     function applyNewPasscode() {
         const input = document.getElementById('newPasscodeInput');
         const val = input.value.trim() || '預設帳號';
@@ -188,136 +215,6 @@
         closeModal('switchPasscodeModal');
         renderArchiveList();
         showToast(`已切換至本機群組 [${currentPasscode}]`);
-    }
-
-    function exportJSONBackup() {
-        const groupBills = archivedBills.filter(b => (b.passcode || '預設帳號') === currentPasscode);
-        if (groupBills.length === 0) return showToast('當前群組沒有數據可導出', 'warning');
-        
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(groupBills, null, 2));
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", `aa_records_${currentPasscode}_${new Date().toISOString().slice(0,10)}.json`);
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        downloadAnchor.remove();
-        showToast(`🎉 已成功導出群組 [${currentPasscode}] 的 JSON 備份！`, 'success');
-    }
-
-    function importJSONBackup(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            try {
-                const imported = JSON.parse(evt.target.result);
-                if (Array.isArray(imported)) {
-                    // 自動將匯入的紀錄歸屬給當前群組
-                    imported.forEach(b => b.passcode = currentPasscode);
-                    archivedBills = imported.concat(archivedBills);
-                    saveRecords();
-                    renderArchiveList();
-                    showToast(`🎉 成功匯入 ${imported.length} 筆歷史紀錄至群組 [${currentPasscode}]！`, 'success');
-                } else {
-                    showToast('無效的 JSON 備份格式', 'warning');
-                }
-            } catch(err) {
-                showToast('讀取 JSON 檔案失敗', 'warning');
-            }
-        };
-        reader.readAsText(file);
-    }
-
-    function confirmClearAllRecords() {
-        const groupBills = archivedBills.filter(b => (b.passcode || '預設帳號') === currentPasscode);
-        if (groupBills.length === 0) return showToast('當前群組沒有歷史紀錄可清空');
-        if (confirm(`確定要清空本機群組 [${currentPasscode}] 的所有已歸檔歷史帳冊嗎？此動作無法復原。`)) {
-            archivedBills = archivedBills.filter(b => (b.passcode || '預設帳號') !== currentPasscode);
-            saveRecords();
-            renderArchiveList();
-            showToast(`已清空群組 [${currentPasscode}] 的所有歷史帳冊`);
-        }
-    }
-
-    function saveRecords() {
-        try {
-            localStorage.setItem('aa_offline_archived_bills', JSON.stringify(archivedBills));
-        } catch(e) {
-            console.error("Failed to save records", e);
-        }
-    }
-
-    function populatePasscodeFilter() {
-        const select = document.getElementById('passcodeFilter');
-        const passcodes = Array.from(new Set(archivedBills.map(b => b.passcode || '預設帳號')));
-        
-        const currVal = select.value;
-        select.innerHTML = '<option value="">所有群組帳號</option>' + 
-            passcodes.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
-        select.value = currVal;
-    }
-
-    function renderArchiveList() {
-        loadRecords();
-        populatePasscodeFilter();
-
-        const container = document.getElementById('archiveListContainer');
-        const searchKw = document.getElementById('searchInput').value.trim().toLowerCase();
-        const selectedPasscode = document.getElementById('passcodeFilter').value;
-
-        let filtered = archivedBills.filter(b => {
-            const matchesSearch = !searchKw || 
-                b.title.toLowerCase().includes(searchKw) ||
-                (b.passcode && b.passcode.toLowerCase().includes(searchKw)) ||
-                b.people.some(p => p.toLowerCase().includes(searchKw)) ||
-                b.items.some(i => i.name.toLowerCase().includes(searchKw));
-
-            const matchesPasscode = !selectedPasscode || (b.passcode || '預設帳號') === selectedPasscode;
-
-            return matchesSearch && matchesPasscode;
-        });
-
-        document.getElementById('recordCountTag').innerText = archivedBills.length;
-
-        if (filtered.length === 0) {
-            container.innerHTML = `
-                <div class="text-center py-10 text-slate-400 text-xs">
-                    <p class="text-3xl mb-2">📭</p>
-                    ${archivedBills.length === 0 ? '目前尚未有任何歸檔歷史紀錄。<br>請在主計算器中點擊「💾 存檔至歷史頁面」！' : '找不到符合條件的歷史帳冊。'}
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = filtered.map(b => `
-            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-indigo-300 transition flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div class="space-y-1">
-                    <div class="font-bold text-slate-800 text-sm flex items-center gap-2 flex-wrap">
-                        <span>${escapeHtml(b.title)}</span>
-                        <span class="text-[10px] bg-indigo-100 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">${escapeHtml(b.passcode || '預設帳號')}</span>
-                    </div>
-                    <div class="text-xs text-slate-500">
-                        建立時間: ${escapeHtml(b.date)} | 成員: ${b.people.length} 人 (${escapeHtml(b.people.join(', '))})
-                    </div>
-                    <div class="text-xs font-semibold text-emerald-600">
-                        💰 總消費金額: $${b.totalAmount ? b.totalAmount.toFixed(1) : '0.0'} (${b.items ? b.items.length : 0} 項消費)
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
-                    <button onclick="viewDetail('${b.id}')" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-lg transition">
-                        👁️ 詳情
-                    </button>
-                    <button onclick="recallBill('${b.id}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
-                        📥 召回載入
-                    </button>
-                    <button onclick="deleteRecord('${b.id}')" class="px-2.5 py-1.5 text-rose-500 hover:bg-rose-50 text-xs font-bold rounded-lg transition">
-                        ✕ 刪除
-                    </button>
-                </div>
-            </div>
-        `).join('');
     }
 
     function recallBill(billId) {
@@ -384,27 +281,18 @@
         }
     }
 
-    function confirmClearAllRecords() {
-        if (archivedBills.length === 0) return showToast('目前沒有歷史紀錄可清空');
-        if (confirm('確定要清空所有已歸檔的歷史帳冊嗎？此動作無法復原。')) {
-            archivedBills = [];
-            saveRecords();
-            renderArchiveList();
-            showToast('已清空所有歷史帳冊');
-        }
-    }
-
     function exportJSONBackup() {
-        if (archivedBills.length === 0) return showToast('沒有數據可導出', 'warning');
+        const groupBills = archivedBills.filter(b => (b.passcode || '預設帳號') === currentPasscode);
+        if (groupBills.length === 0) return showToast('當前群組沒有數據可導出', 'warning');
         
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(archivedBills, null, 2));
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(groupBills, null, 2));
         const downloadAnchor = document.createElement('a');
         downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", `aa_records_backup_${new Date().toISOString().slice(0,10)}.json`);
+        downloadAnchor.setAttribute("download", `aa_records_${currentPasscode}_${new Date().toISOString().slice(0,10)}.json`);
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         downloadAnchor.remove();
-        showToast('🎉 已成功導出 JSON 備份檔案！', 'success');
+        showToast(`🎉 已成功導出群組 [${currentPasscode}] 的 JSON 備份！`, 'success');
     }
 
     function triggerImportJSON() {
@@ -420,10 +308,12 @@
             try {
                 const imported = JSON.parse(evt.target.result);
                 if (Array.isArray(imported)) {
-                    archivedBills = imported.concat(archivedBills); // Merge
+                    // 自動將匯入的紀錄歸屬給當前群組
+                    imported.forEach(b => b.passcode = currentPasscode);
+                    archivedBills = imported.concat(archivedBills);
                     saveRecords();
                     renderArchiveList();
-                    showToast(`🎉 成功匯入 ${imported.length} 筆歷史紀錄！`, 'success');
+                    showToast(`🎉 成功匯入 ${imported.length} 筆歷史紀錄至群組 [${currentPasscode}]！`, 'success');
                 } else {
                     showToast('無效的 JSON 備份格式', 'warning');
                 }
@@ -432,6 +322,17 @@
             }
         };
         reader.readAsText(file);
+    }
+
+    function confirmClearAllRecords() {
+        const groupBills = archivedBills.filter(b => (b.passcode || '預設帳號') === currentPasscode);
+        if (groupBills.length === 0) return showToast('當前群組沒有歷史紀錄可清空');
+        if (confirm(`確定要清空本機群組 [${currentPasscode}] 的所有已歸檔歷史帳冊嗎？此動作無法復原。`)) {
+            archivedBills = archivedBills.filter(b => (b.passcode || '預設帳號') !== currentPasscode);
+            saveRecords();
+            renderArchiveList();
+            showToast(`已清空群組 [${currentPasscode}] 的所有歷史帳冊`);
+        }
     }
 
     function openModal(id) {
@@ -445,7 +346,13 @@
     }
 
     function showToast(message, type = 'normal') {
-        const container = document.getElementById('toastContainer');
+        let container = document.getElementById('toastContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none';
+            document.body.appendChild(container);
+        }
         const toast = document.createElement('div');
         toast.className = `toast px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg pointer-events-auto text-white ${
             type === 'warning' ? 'bg-rose-500' : type === 'success' ? 'bg-emerald-600' : 'bg-slate-800'
