@@ -11,6 +11,9 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
+  <!-- QR Code Generator Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -82,8 +85,6 @@
         <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm font-medium">
           <a href="#overview" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">總覽</a>
           <a href="#itinerary" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">每日行程</a>
-          <a href="#transit" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">交通與轉乘</a>
-          <a href="#checklist" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">行前清單</a>
           <a href="#calculator" class="px-3 py-2 rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/60 transition font-semibold">
             <i class="fa-solid fa-calculator mr-1"></i> AA 埋數計算機
           </a>
@@ -108,8 +109,6 @@
     <div id="mobileMenu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pt-2 pb-4 space-y-1">
       <a href="#overview" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 dark:hover:bg-slate-800">總覽資訊</a>
       <a href="#itinerary" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 dark:hover:bg-slate-800">每日行程</a>
-      <a href="#transit" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 dark:hover:bg-slate-800">交通轉乘指南</a>
-      <a href="#checklist" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 dark:hover:bg-slate-800">行前備忘錄</a>
       <a href="#calculator" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-brand-600 dark:text-brand-400 font-bold hover:bg-brand-50 dark:hover:bg-slate-800">AA 埋數計算機</a>
     </div>
   </header>
@@ -213,7 +212,7 @@
           <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <i class="fa-solid fa-calendar-days text-brand-500"></i> 每日行程與交通銜接
           </h2>
-          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">點擊切換天數，各節點含精確時間、月台轉乘與 Google 地圖連結。</p>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">點擊切換天數，各節點含精確時間與 Google 地圖連結。</p>
         </div>
 
         <!-- Day Selector Tabs -->
@@ -269,7 +268,12 @@
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
               <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
                 <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-train mr-1"></i> 08:30 - 11:15</span>
-                <span class="px-2 py-0.5 bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300 text-xs rounded font-medium">鐵路轉乘</span>
+                <div class="flex items-center gap-2">
+                  <a href="kuroshio.html" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-md transition shadow-sm">
+                    <i class="fa-solid fa-train"></i> 黑潮號指南
+                  </a>
+                  <span class="px-2 py-0.5 bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300 text-xs rounded font-medium">鐵路轉乘</span>
+                </div>
               </div>
               <h4 class="font-bold text-slate-900 dark:text-white text-base">🚆 關西機場 ➔ 日根野站 ➔ JR 白濱站</h4>
               <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">
@@ -320,7 +324,12 @@
           <div class="relative pl-6 sm:pl-8">
             <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-900"></div>
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-              <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-clock mr-1"></i> 09:20 - 10:40</span>
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
+                <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-clock mr-1"></i> 09:20 - 10:40</span>
+                <a href="kuroshio.html" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-md transition shadow-sm">
+                  <i class="fa-solid fa-train"></i> 黑潮號指南
+                </a>
+              </div>
               <h4 class="font-bold text-slate-900 dark:text-white text-base">🚆 白濱 ➔ JR 和歌山站 (大行李寄放)</h4>
               <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">搭乘 JR 特急 Kuroshio 前往和歌山站。<b>💡必要撇步：</b>抵達後將大件行李寄存於 JR 和歌山站內的投幣置物櫃，輕裝轉乘。</p>
             </div>
@@ -353,7 +362,12 @@
           <div class="relative pl-6 sm:pl-8">
             <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-900"></div>
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-              <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-clock mr-1"></i> 15:15 - 16:30</span>
+              <div class="flex flex-wrap justify-between items-start gap-2 mb-1">
+                <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-clock mr-1"></i> 15:15 - 16:30</span>
+                <a href="kuroshio.html" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-md transition shadow-sm">
+                  <i class="fa-solid fa-train"></i> 黑潮號指南
+                </a>
+              </div>
               <h4 class="font-bold text-slate-900 dark:text-white text-base">🚆 和歌山 ➔ 大阪市區</h4>
               <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">返回 JR 和歌山站取回大行李，搭乘 JR 特急 Kuroshio 直達天王寺/大阪站。</p>
             </div>
@@ -511,165 +525,184 @@
 
     </section>
 
-    <section id="transit" class="pt-6 border-t border-slate-200 dark:border-slate-800">
-      <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
-        <i class="fa-solid fa-train-subway text-brand-500"></i> 精準交通與轉乘圖解指南
-      </h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Ticket Card 1 -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm">
-          <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-xl mb-3">
-            <i class="fa-solid fa-ticket"></i>
-          </div>
-          <h3 class="font-bold text-slate-900 dark:text-white text-base mb-2">1. JR 關西廣域周遊券 (5日)</h3>
-          <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-2">
-            <li>• <b>領票方式：</b>於 KIX 站 2F 綠色售票機掃描護照（含 IC 晶片）與 e-Ticket QR Code 領取。</li>
-            <li>• <b>日根野轉乘：</b>機場出發搭乘 <b>JR 關空快速</b> 至「日根野站」（約 11 分），同站月台轉乘 <b>Kuroshio 特急</b> 直達白濱。</li>
-            <li>• <b>劃位關鍵：</b>Kuroshio 特急為<b>全車指定席</b>，請於 Day 1 兌換 Pass 時在售票機預約好 Day 1 與 Day 2 座位。</li>
-          </ul>
-        </div>
-
-        <!-- Ticket Card 2 -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm">
-          <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300 flex items-center justify-center font-bold text-xl mb-3">
-            <i class="fa-solid fa-cat"></i>
-          </div>
-          <h3 class="font-bold text-slate-900 dark:text-white text-base mb-2">2. 和歌山貴志川線 & 行李攻略</h3>
-          <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-2">
-            <li>• <b>大行李寄放：</b>搭 Kuroshio 抵達 JR 和歌山站後，直接存放在站內投幣式置物櫃 (Coin Locker)。</li>
-            <li>• <b>換乘貴志川線：</b>至 JR 和歌山站 <b>9 號月台</b>，推薦現場購買「貴志川線一日乘車券」(約 800 JPY)。</li>
-            <li>• <b>貓咪站長值勤：</b>二代玉 (Nitama) 在貴志站；四代玉 (Yontama) 在伊太祈曾站，每週輪休時間請留意官網。</li>
-          </ul>
-        </div>
-
-        <!-- Ticket Card 3 -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm">
-          <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-300 flex items-center justify-center font-bold text-xl mb-3">
-            <i class="fa-solid fa-plane-departure"></i>
-          </div>
-          <h3 class="font-bold text-slate-900 dark:text-white text-base mb-2">3. 白濱巴士 & 機場南海 Rapi:t</h3>
-          <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-2">
-            <li>• <b>白濱市內：</b>由 JR 白濱站搭乘<b>明光巴士</b>可直達 Toretore Market 及「海舟」飯店（草原之湯站）。可使用 ICOCA / 交通卡。</li>
-            <li>• <b>Day 5 機場接駁：</b>於<b>南海難波站</b>搭乘南海特急 Rapi:t，最快 35-39 分鐘直達 KIX T1（建議線上提前買 Rapi:t 電子折扣票）。</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section id="checklist" class="pt-6 border-t border-slate-200 dark:border-slate-800">
-      <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <i class="fa-solid fa-clipboard-check text-emerald-500"></i> 行前與重要憑證清單
-          </h2>
-          <span class="text-xs text-slate-400">點擊勾選標記狀態</span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="checklistContainer">
-          <label class="flex items-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 cursor-pointer transition">
-            <input type="checkbox" class="w-4 h-4 text-brand-600 rounded focus:ring-brand-500 border-slate-300">
-            <span class="ml-3 text-sm text-slate-700 dark:text-slate-200">護照正本（有效期 > 6個月）</span>
-          </label>
-          <label class="flex items-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 cursor-pointer transition">
-            <input type="checkbox" class="w-4 h-4 text-brand-600 rounded focus:ring-brand-500 border-slate-300">
-            <span class="ml-3 text-sm text-slate-700 dark:text-slate-200">JR 關西廣域 Pass QR Code 憑證</span>
-          </label>
-          <label class="flex items-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 cursor-pointer transition">
-            <input type="checkbox" class="w-4 h-4 text-brand-600 rounded focus:ring-brand-500 border-slate-300">
-            <span class="ml-3 text-sm text-slate-700 dark:text-slate-200">香港航空機票行程單 (HX616/613)</span>
-          </label>
-          <label class="flex items-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 cursor-pointer transition">
-            <input type="checkbox" class="w-4 h-4 text-brand-600 rounded focus:ring-brand-500 border-slate-300">
-            <span class="ml-3 text-sm text-slate-700 dark:text-slate-200">白濱「濱千鳥之湯 海舟」預約單</span>
-          </label>
-          <label class="flex items-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 cursor-pointer transition">
-            <input type="checkbox" class="w-4 h-4 text-brand-600 rounded focus:ring-brand-500 border-slate-300">
-            <span class="ml-3 text-sm text-slate-700 dark:text-slate-200">貴志川採草莓預約確認信</span>
-          </label>
-          <label class="flex items-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 cursor-pointer transition">
-            <input type="checkbox" class="w-4 h-4 text-brand-600 rounded focus:ring-brand-500 border-slate-300">
-            <span class="ml-3 text-sm text-slate-700 dark:text-slate-200">日圓現金 / 信用卡 / 日本 eSIM</span>
-          </label>
-        </div>
-      </div>
-    </section>
-
     <section id="calculator" class="pt-6 border-t border-slate-200 dark:border-slate-800">
       <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-md">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100 dark:border-slate-700">
           <div>
             <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <i class="fa-solid fa-calculator text-brand-500"></i> 👥 多人 AA 制埋數計算器
+              <i class="fa-solid fa-users-gear text-indigo-500"></i> 多人 AA 制埋數計算器
             </h2>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">逐一新增參與成員與消費明細，自動計算最簡化轉賬方案。資料自動儲存於瀏覽器。</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">無雲端依賴 · 本地 JSON 檔案備份/匯入 & QR Code / 連結分享</p>
           </div>
-          <button onclick="resetCalculator()" class="self-start sm:self-auto text-xs text-rose-500 hover:text-rose-700 font-semibold flex items-center gap-1">
-            <i class="fa-solid fa-rotate-left"></i> 重置計算器
+          <button onclick="confirmResetData()" class="self-start sm:self-auto px-3 py-1.5 text-xs text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-bold rounded-lg transition flex items-center gap-1">
+            <i class="fa-solid fa-trash-can"></i> 清空當前數據
           </button>
         </div>
 
-        <!-- 1. 參與成員 -->
-        <div class="mb-6 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">1. 參與成員</label>
-          <div class="flex gap-2 mb-3">
-            <input type="text" id="personName" placeholder="輸入成員名字（例如：阿明）" class="flex-grow text-sm px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white" onkeydown="if(event.key==='Enter') addPerson()">
-            <button onclick="addPerson()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-lg transition shadow-sm">新增成員</button>
-          </div>
-          <div class="flex flex-wrap gap-2" id="peopleList"></div>
-        </div>
+        <!-- Sharing & Local File Backup Toolbar -->
+        <div id="sharingToolbar" class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <button onclick="openExportModal()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition shadow-sm">
+            <i class="fa-solid fa-file-export"></i> 導出 JSON 檔案
+          </button>
+          <button onclick="triggerImportLocalFile()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+            <i class="fa-solid fa-file-import"></i> 匯入 JSON 檔案
+          </button>
+          <input type="file" id="localFileInput" accept=".json" class="hidden" onchange="handleLocalFileImport(event)">
 
-        <!-- 2. 新增消費項目 -->
-        <div class="mb-6 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-3">2. 新增消費項目</label>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-            <div>
-              <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 block">項目名稱</span>
-              <input type="text" id="itemName" placeholder="例如：晚飯 / 車費" class="w-full text-sm px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white">
-            </div>
-            <div>
-              <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 block">金額 ($ / ¥)</span>
-              <input type="number" id="itemAmount" placeholder="金額 ($)" class="w-full text-sm px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white">
-            </div>
-          </div>
-          <div class="mb-3">
-            <label class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 block">付款人：</label>
-            <select id="payerSelect" class="w-full sm:w-1/2 text-sm px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"></select>
-          </div>
-          <div class="mb-4">
-            <label class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 block">參與平分的人：</label>
-            <div id="sharerCheckboxes" class="flex flex-wrap gap-3 bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700"></div>
-          </div>
-          <button onclick="addItem()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-lg transition shadow-sm">
-            <i class="fa-solid fa-plus mr-1"></i> 新增消費
+          <button onclick="showQRCodeModal()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+            <i class="fa-solid fa-qrcode"></i> 分享帳本 (QR Code / 連結)
           </button>
         </div>
 
-        <!-- 3. 消費清單 -->
-        <div class="mb-6">
-          <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2">3. 消費明細</h3>
-          <ul class="divide-y divide-slate-100 dark:divide-slate-700" id="itemList"></ul>
-        </div>
+        <!-- VIEW: Calculator Main View -->
+        <div id="calculatorView" class="mt-6 space-y-6">
+          <!-- 1. Members Section -->
+          <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-3">1. 參與成員</h3>
+            <div class="flex gap-2 mb-3">
+              <input type="text" id="personName" placeholder="輸入成員名字（例如：阿明、小紅）" 
+                     onkeypress="handlePersonKeyPress(event)"
+                     class="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <button onclick="addPerson()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition shadow-sm">
+                新增成員
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-2 min-h-[32px]" id="peopleList"></div>
+          </div>
 
-        <!-- 4. 結算結果 -->
-        <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-4 rounded-xl">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-            <h3 class="font-bold text-emerald-900 dark:text-emerald-300 text-base flex items-center gap-2">
-              <i class="fa-solid fa-hand-holding-dollar"></i> 4. 結算方案（最簡轉賬）
-            </h3>
-            <button onclick="calculate()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-sm self-start sm:self-auto">
-              <i class="fa-solid fa-calculator mr-1"></i> 計算埋數
+          <!-- 2. Add Expense Section -->
+          <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-3">2. 新增消費項目</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+              <div>
+                <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 block">項目名稱</span>
+                <input type="text" id="itemName" placeholder="項目名稱（例：晚餐 / 車費）" 
+                       class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 block">金額 ($)</span>
+                <input type="number" id="itemAmount" placeholder="金額 ($)" step="0.1" min="0" 
+                       class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="text-xs font-bold text-slate-600 dark:text-slate-400 block mb-1">付款人：</label>
+              <select id="payerSelect" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+            </div>
+
+            <div class="mb-4">
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-xs font-bold text-slate-600 dark:text-slate-400">參與平分的人：</label>
+                <div class="space-x-1">
+                  <button onclick="selectAllSharers(true)" class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded transition">全選</button>
+                  <button onclick="selectAllSharers(false)" class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded transition">全不選</button>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-2 p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl" id="sharerCheckboxes"></div>
+            </div>
+
+            <button onclick="addItem()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition shadow-sm">
+              <i class="fa-solid fa-plus mr-1"></i> 新增消費項目
             </button>
           </div>
-          <div id="resultContainer" class="hidden space-y-2 pt-2 border-t border-emerald-200/60 dark:border-emerald-800/60">
-            <p id="totalExpense" class="font-bold text-slate-800 dark:text-slate-200 text-sm"></p>
-            <div id="settlementList" class="space-y-1.5 text-xs sm:text-sm text-emerald-800 dark:text-emerald-200 font-medium"></div>
+
+          <!-- 3. Expense List -->
+          <div>
+            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2">3. 消費明細</h3>
+            <ul id="itemList" class="divide-y divide-slate-100 dark:divide-slate-700"></ul>
+          </div>
+
+          <!-- 4. Settlement Calculation -->
+          <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-4 rounded-xl">
+            <h3 class="font-bold text-emerald-900 dark:text-emerald-300 text-base mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-hand-holding-dollar"></i> 4. 結算方案（最簡轉賬）
+            </h3>
+            <button onclick="calculate()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow-sm">
+              <i class="fa-solid fa-calculator mr-1"></i> 計算埋數
+            </button>
+
+            <div id="resultContainer" class="hidden mt-4 pt-3 border-t border-emerald-200/60 dark:border-emerald-800/60">
+              <p id="totalExpense" class="font-bold text-slate-800 dark:text-slate-200 text-sm mb-2"></p>
+              <div id="settlementList" class="bg-white/80 dark:bg-slate-900/60 border border-emerald-200 dark:border-emerald-800 rounded-xl p-3 space-y-1.5 mb-3 text-xs sm:text-sm"></div>
+              <button onclick="copyResultsText()" class="w-full py-2 bg-slate-700 dark:bg-slate-800 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition">
+                <i class="fa-solid fa-copy mr-1"></i> 複製文字結算報告
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
   </main>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Modal 1: Export Bill to Local File -->
+  <div id="exportModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none transition-all duration-200">
+    <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl p-6 max-w-sm w-full shadow-xl border border-slate-200 dark:border-slate-700">
+      <h3 class="text-base font-bold mb-1">📤 導出帳本為本地 JSON 檔案</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">輸入此帳冊名稱，系統會生成可離線保存的數據檔案：</p>
+      
+      <input type="text" id="exportTitleInput" placeholder="例如：2027 大阪關西之旅" 
+             class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-900 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 mb-3">
+
+      <div class="flex gap-2">
+        <button onclick="executeExportToFile()" class="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition">
+          <i class="fa-solid fa-download mr-1"></i> 下載 JSON 檔案
+        </button>
+        <button onclick="closeModal('exportModal')" class="flex-1 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition">
+          取消
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Import Local File Preview -->
+  <div id="importPreviewModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none transition-all duration-200">
+    <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl p-6 max-w-md w-full shadow-xl border border-slate-200 dark:border-slate-700">
+      <h3 class="text-base font-bold mb-1">📥 檢視並匯入本地帳本檔案</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">已成功讀取 JSON 檔案內容，確認後將載入至計算器：</p>
+      
+      <div id="importPreviewContent" class="space-y-2 text-xs bg-slate-50 dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 mb-4"></div>
+
+      <div class="flex gap-2">
+        <button id="confirmImportBtn" class="flex-1 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl transition">
+          確認載入至計算器
+        </button>
+        <button onclick="closeModal('importPreviewModal')" class="flex-1 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition">
+          取消
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Merged QR Code & Copy Share Link Modal -->
+  <div id="qrModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 opacity-0 pointer-events-none transition-all duration-200">
+    <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl p-6 max-w-sm w-full text-center shadow-xl border border-slate-200 dark:border-slate-700">
+      <h3 class="text-base font-bold mb-1">📱 分享帳本 (QR Code / 連結)</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">供朋友用手機相機直接掃描，或複製網址連結發送至群組：</p>
+      
+      <div class="flex justify-center p-3 bg-white border border-slate-200 rounded-2xl mb-3">
+        <div id="qrcodeCanvas"></div>
+      </div>
+
+      <div class="mb-4">
+        <input type="text" id="shareUrlInput" readonly 
+               class="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] text-slate-600 dark:text-slate-300 text-center select-all focus:outline-none">
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="copyShareableLinkFromModal()" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+          📋 複製分享連結
+        </button>
+        <button onclick="closeModal('qrModal')" class="flex-1 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition">
+          關閉
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 mt-12">
@@ -749,88 +782,253 @@
       }
     }
 
-    // Multi-person AA Calculator Logic based on AA_Cal
-    let people = ["阿明", "Bob", "Chris"];
+    // Multi-person AA Calculator Logic from aa.html
+    let people = [];
     let items = [];
+    let pendingImportData = null;
+    let latestTransactions = [];
+    let latestTotalExpense = 0;
 
-    function loadCalculatorState() {
-      const savedPeople = localStorage.getItem('osaka_aa_people');
-      const savedItems = localStorage.getItem('osaka_aa_items');
+    function saveData() {
+      try {
+        localStorage.setItem('aa_cal_people', JSON.stringify(people));
+        localStorage.setItem('aa_cal_items', JSON.stringify(items));
+      } catch(e) {
+        console.error("Failed to save to local storage", e);
+      }
+    }
 
-      if (savedPeople) {
-        people = JSON.parse(savedPeople);
+    function loadData() {
+      try {
+        const savedPeople = localStorage.getItem('aa_cal_people');
+        const savedItems = localStorage.getItem('aa_cal_items');
+
+        people = savedPeople ? JSON.parse(savedPeople) : ["阿明", "Bob", "Chris"];
+        items = savedItems ? JSON.parse(savedItems) : [];
+      } catch(e) {
+        people = ["阿明", "Bob", "Chris"];
+        items = [];
       }
-      if (savedItems) {
-        items = JSON.parse(savedItems);
+    }
+
+    function openExportModal() {
+      if (people.length === 0 && items.length === 0) {
+        return showToast('目前沒有任何成員或消費資料可導出', 'warning');
       }
+      const dateStr = new Date().toLocaleDateString('zh-HK').replace(/\//g, '-');
+      document.getElementById('exportTitleInput').value = `大阪旅行AA帳單_${dateStr}`;
+      openModal('exportModal');
+    }
+
+    function executeExportToFile() {
+      const titleInput = document.getElementById('exportTitleInput');
+      const title = titleInput.value.trim() || `AA帳單_${new Date().toISOString().slice(0,10)}`;
+
+      let totalAmt = 0;
+      items.forEach(i => totalAmt += i.amount);
+
+      const billRecord = {
+        version: '1.0',
+        title: title,
+        exportDate: new Date().toLocaleString('zh-HK'),
+        totalAmount: totalAmt,
+        people: people,
+        items: items
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(billRecord, null, 2));
+      const downloadAnchor = document.createElement('a');
+      const sanitizedTitle = title.replace(/[/\\?%*:|"<>]/g, '_');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `${sanitizedTitle}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      closeModal('exportModal');
+      showToast(`🎉 成功導出帳本檔案 [${sanitizedTitle}.json]！`, 'success');
+    }
+
+    function triggerImportLocalFile() {
+      document.getElementById('localFileInput').click();
+    }
+
+    function handleLocalFileImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data && Array.isArray(data.people) && Array.isArray(data.items)) {
+            pendingImportData = data;
+
+            let previewHtml = `
+              <div><b>帳冊標題：</b> ${escapeHtml(data.title || '無標題')}</div>
+              <div><b>匯出時間：</b> ${escapeHtml(data.exportDate || '未知')}</div>
+              <div><b>參與成員 (${data.people.length} 人)：</b> ${data.people.map(p => escapeHtml(p)).join(', ')}</div>
+              <div><b>消費項目 (${data.items.length} 項)：</b> 總計 $${(data.totalAmount || 0).toFixed(1)}</div>
+            `;
+            document.getElementById('importPreviewContent').innerHTML = previewHtml;
+
+            document.getElementById('confirmImportBtn').onclick = applyImportedBill;
+            openModal('importPreviewModal');
+          } else {
+            showToast('無效的 AA 制帳本 JSON 檔案結構', 'warning');
+          }
+        } catch(err) {
+          showToast('讀取 JSON 檔案失敗，請確保格式正確', 'warning');
+        }
+        event.target.value = '';
+      };
+      reader.readAsText(file);
+    }
+
+    function applyImportedBill() {
+      if (!pendingImportData) return;
+
+      people = JSON.parse(JSON.stringify(pendingImportData.people));
+      items = JSON.parse(JSON.stringify(pendingImportData.items));
+
+      saveData();
       updatePeopleUI();
       updateItemsUI();
+      document.getElementById('resultContainer').classList.add('hidden');
+
+      closeModal('importPreviewModal');
+      showToast(`🎉 已成功載入帳冊：「${pendingImportData.title || '匯入帳單'}」！`, 'success');
+      pendingImportData = null;
     }
 
-    function saveCalculatorState() {
-      localStorage.setItem('osaka_aa_people', JSON.stringify(people));
-      localStorage.setItem('osaka_aa_items', JSON.stringify(items));
+    function generateCompressedDataPayload() {
+      const payload = { p: people, i: items };
+      const jsonStr = JSON.stringify(payload);
+      return btoa(encodeURIComponent(jsonStr));
     }
 
-    // 新增成員
+    function parseDataPayload(encodedStr) {
+      try {
+        const jsonStr = decodeURIComponent(atob(encodedStr.trim()));
+        const parsed = JSON.parse(jsonStr);
+        if (Array.isArray(parsed.p) && Array.isArray(parsed.i)) {
+          return { people: parsed.p, items: parsed.i };
+        }
+      } catch(e) {
+        console.error("Failed to parse data payload", e);
+      }
+      return null;
+    }
+
+    function showQRCodeModal() {
+      if (people.length === 0 && items.length === 0) {
+        return showToast('目前沒有任何成員或消費資料可分享', 'warning');
+      }
+
+      const encodedData = generateCompressedDataPayload();
+      const shareUrl = window.location.origin + window.location.pathname + '#data=' + encodedData;
+
+      document.getElementById('shareUrlInput').value = shareUrl;
+
+      const container = document.getElementById('qrcodeCanvas');
+      container.innerHTML = '';
+      
+      new QRCode(container, {
+        text: shareUrl,
+        width: 180,
+        height: 180,
+        colorDark: "#1e293b",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.L
+      });
+
+      openModal('qrModal');
+    }
+
+    function copyShareableLinkFromModal() {
+      const shareUrl = document.getElementById('shareUrlInput').value;
+      if (!shareUrl) return;
+
+      const tempInput = document.createElement('input');
+      tempInput.value = shareUrl;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        showToast('已成功複製分享連結！可直接發送至聊天群組', 'success');
+      } catch(e) {
+        showToast('複製失敗，請手動複製網址', 'warning');
+      }
+      document.body.removeChild(tempInput);
+    }
+
     function addPerson() {
       const input = document.getElementById('personName');
       const name = input.value.trim();
-      if (!name) return alert('請輸入名字');
-      if (people.includes(name)) return alert('名字不能重複');
+      if (!name) return showToast('請輸入成員名字', 'warning');
+      if (people.includes(name)) return showToast('成員名字不能重複', 'warning');
 
       people.push(name);
       input.value = '';
-      saveCalculatorState();
+      saveData();
       updatePeopleUI();
+      showToast(`已新增成員：${name}`, 'success');
     }
 
-    // 刪除成員
     function removePerson(name) {
       people = people.filter(p => p !== name);
-      // 同時清除項目中該成員相關資料
       items.forEach(item => {
         item.sharers = item.sharers.filter(s => s !== name);
       });
       items = items.filter(item => item.payer !== name && item.sharers.length > 0);
-      saveCalculatorState();
+
+      saveData();
       updatePeopleUI();
       updateItemsUI();
+      document.getElementById('resultContainer').classList.add('hidden');
+      showToast(`已移除成員：${name}`);
     }
 
-    // 更新成員介面
     function updatePeopleUI() {
       const peopleList = document.getElementById('peopleList');
       const payerSelect = document.getElementById('payerSelect');
       const sharerCheckboxes = document.getElementById('sharerCheckboxes');
 
       if (people.length === 0) {
-        peopleList.innerHTML = `<span class="text-xs text-slate-400 italic">尚無成員，請於上方新增。</span>`;
-      } else {
-        peopleList.innerHTML = people.map(p => `
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-            ${p}
-            <button onclick="removePerson('${p}')" class="text-indigo-500 hover:text-rose-600 font-bold ml-1">✕</button>
-          </span>
-        `).join('');
+        peopleList.innerHTML = '<div class="text-xs text-slate-400 py-1">尚未新增成員</div>';
+        payerSelect.innerHTML = '<option value="">請先新增成員</option>';
+        sharerCheckboxes.innerHTML = '<div class="text-xs text-slate-400 py-1">尚未新增成員</div>';
+        return;
       }
 
-      payerSelect.innerHTML = people.map(p => `<option value="${p}">${p}</option>`).join('');
+      peopleList.innerHTML = people.map(p => `
+        <span class="inline-flex items-center gap-1.5 bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-3 py-1 rounded-full text-xs font-semibold">
+          ${escapeHtml(p)}
+          <button onclick="removePerson('${escapeJs(p)}')" class="hover:text-rose-600 rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold">✕</button>
+        </span>
+      `).join('');
 
-      sharerCheckboxes.innerHTML = people.length > 0 ? people.map(p => `
-        <label class="inline-flex items-center text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
-          <input type="checkbox" value="${p}" checked class="w-3.5 h-3.5 text-brand-600 rounded border-slate-300">
-          <span class="ml-1.5">${p}</span>
+      const currPayer = payerSelect.value;
+      payerSelect.innerHTML = people.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
+      if (people.includes(currPayer)) payerSelect.value = currPayer;
+
+      sharerCheckboxes.innerHTML = people.map(p => `
+        <label class="inline-flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+          <input type="checkbox" value="${escapeHtml(p)}" checked class="rounded text-indigo-600 focus:ring-indigo-500"> ${escapeHtml(p)}
         </label>
-      `).join('') : `<span class="text-xs text-slate-400 italic">請先新增成員</span>`;
+      `).join('');
     }
 
-    // 新增消費項目
+    function selectAllSharers(checked) {
+      const checkboxes = document.querySelectorAll('#sharerCheckboxes input[type="checkbox"]');
+      checkboxes.forEach(cb => cb.checked = checked);
+    }
+
     function addItem() {
       const nameInput = document.getElementById('itemName');
       const amountInput = document.getElementById('itemAmount');
       const payerSelect = document.getElementById('payerSelect');
-      
+
       const name = nameInput.value.trim() || '未命名消費';
       const amount = parseFloat(amountInput.value);
       const payer = payerSelect.value;
@@ -838,142 +1036,202 @@
       const checkboxes = document.querySelectorAll('#sharerCheckboxes input[type="checkbox"]:checked');
       const sharers = Array.from(checkboxes).map(cb => cb.value);
 
-      if (isNaN(amount) || amount <= 0) return alert('請輸入有效的金額');
-      if (!payer) return alert('請先新增並選擇付款人');
-      if (sharers.length === 0) return alert('請至少選擇一位參與平分的人');
+      if (isNaN(amount) || amount <= 0) return showToast('請輸入有效的金額', 'warning');
+      if (!payer || !people.includes(payer)) return showToast('請先新增並選擇付款人', 'warning');
+      if (sharers.length === 0) return showToast('請至少選擇一位平分者', 'warning');
 
       items.push({ id: Date.now(), name, amount, payer, sharers });
 
       nameInput.value = '';
       amountInput.value = '';
-      saveCalculatorState();
+
+      saveData();
       updateItemsUI();
+      document.getElementById('resultContainer').classList.add('hidden');
+      showToast(`已新增：${name} ($${amount.toFixed(1)})`, 'success');
     }
 
-    // 刪除消費項目
     function removeItem(id) {
       items = items.filter(item => item.id !== id);
-      saveCalculatorState();
+      saveData();
       updateItemsUI();
+      document.getElementById('resultContainer').classList.add('hidden');
+      showToast('已刪除消費項目');
     }
 
-    // 更新消費項目介面
     function updateItemsUI() {
       const itemList = document.getElementById('itemList');
       if (items.length === 0) {
-        itemList.innerHTML = `<li class="p-3 text-center text-xs text-slate-400 italic">尚無消費紀錄。</li>`;
-      } else {
-        itemList.innerHTML = items.map(item => `
-          <li class="flex justify-between items-center py-2.5 px-1 border-b border-slate-100 dark:border-slate-700/60">
-            <div>
-              <div class="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                ${item.name} - <span class="text-brand-600 dark:text-brand-400 font-mono">$${item.amount.toFixed(1)}</span>
-              </div>
-              <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                由 <b>${item.payer}</b> 付款 | 平分成員: ${item.sharers.join(', ')}
-              </div>
-            </div>
-            <button onclick="removeItem(${item.id})" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1 rounded hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">
-              <i class="fa-solid fa-trash"></i> 刪除
-            </button>
-          </li>
-        `).join('');
+        itemList.innerHTML = '<li class="text-xs text-slate-400 py-3 text-center">尚未新增消費項目</li>';
+        return;
       }
+
+      itemList.innerHTML = items.map(item => `
+        <li class="py-2.5 flex justify-between items-center text-xs border-b border-slate-100 dark:border-slate-700/60">
+          <div>
+            <div class="font-bold text-slate-800 dark:text-slate-200 text-sm">${escapeHtml(item.name)} - <span class="text-brand-600 dark:text-brand-400 font-mono">$${item.amount.toFixed(1)}</span></div>
+            <div class="text-slate-500 dark:text-slate-400 mt-0.5">由 <b>${escapeHtml(item.payer)}</b> 付款 | 平分: ${item.sharers.map(s => escapeHtml(s)).join(', ')}</div>
+          </div>
+          <button onclick="removeItem(${item.id})" class="text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 px-2 py-1 rounded text-xs font-semibold transition">刪除</button>
+        </li>
+      `).join('');
     }
 
-    // 重置計算器
-    function resetCalculator() {
-      if (confirm("確定要重置所有成員與消費紀錄嗎？")) {
-        people = [];
-        items = [];
-        saveCalculatorState();
-        updatePeopleUI();
-        updateItemsUI();
-        document.getElementById('resultContainer').classList.add('hidden');
-      }
-    }
-
-    // 計算埋數 (最簡化轉賬算法)
     function calculate() {
-      if (people.length === 0) return alert('請先新增成員');
-      if (items.length === 0) return alert('請先新增消費項目');
+      if (people.length === 0) return showToast('請先新增成員', 'warning');
+      if (items.length === 0) return showToast('請先新增消費項目', 'warning');
 
-      // 1. 計算每個人最終的收支淨額 (結餘)
       const balances = {};
       people.forEach(p => balances[p] = 0);
-
       let totalExpense = 0;
 
       items.forEach(item => {
         totalExpense += item.amount;
-        balances[item.payer] += item.amount;
+        if (balances.hasOwnProperty(item.payer)) balances[item.payer] += item.amount;
         
-        const splitAmount = item.amount / item.sharers.length;
-        item.sharers.forEach(sharer => {
-          balances[sharer] -= splitAmount;
+        const split = item.amount / item.sharers.length;
+        item.sharers.forEach(s => {
+          if (balances.hasOwnProperty(s)) balances[s] -= split;
         });
       });
 
-      // 2. 將所有人分為「應收款者」與「應付款者」
-      const debtors = [];  // 欠錢者
-      const creditors = []; // 應收錢者
+      const debtors = [];
+      const creditors = [];
 
       Object.keys(balances).forEach(person => {
-        const amount = balances[person];
-        if (amount < -0.01) {
-          debtors.push({ name: person, amount: -amount });
-        } else if (amount > 0.01) {
-          creditors.push({ name: person, amount: amount });
-        }
+        const amt = balances[person];
+        if (amt < -0.01) debtors.push({ name: person, amount: -amt });
+        else if (amt > 0.01) creditors.push({ name: person, amount: amt });
       });
 
-      // 3. 最少轉賬次數匹配
       const transactions = [];
       let i = 0, j = 0;
 
       while (i < debtors.length && j < creditors.length) {
         const debtor = debtors[i];
         const creditor = creditors[j];
+        const minAmt = Math.min(debtor.amount, creditor.amount);
 
-        const minAmount = Math.min(debtor.amount, creditor.amount);
-        transactions.push({
-          from: debtor.name,
-          to: creditor.name,
-          amount: minAmount
-        });
-
-        debtor.amount -= minAmount;
-        creditor.amount -= minAmount;
+        transactions.push({ from: debtor.name, to: creditor.name, amount: minAmt });
+        debtor.amount -= minAmt;
+        creditor.amount -= minAmt;
 
         if (debtor.amount < 0.01) i++;
         if (creditor.amount < 0.01) j++;
       }
 
-      // 4. 渲染結果
-      const resultContainer = document.getElementById('resultContainer');
-      const totalExpenseEl = document.getElementById('totalExpense');
+      latestTransactions = transactions;
+      latestTotalExpense = totalExpense;
+
+      document.getElementById('totalExpense').innerText = `💰 總花費金額：$${totalExpense.toFixed(1)}`;
       const settlementList = document.getElementById('settlementList');
 
-      totalExpenseEl.innerText = `總花費金額：$${totalExpense.toFixed(1)}`;
-      
       if (transactions.length === 0) {
-        settlementList.innerHTML = '<div class="text-emerald-700 dark:text-emerald-300 font-bold">🎉 大家剛好平手，不需要額外轉賬！</div>';
+        settlementList.innerHTML = '<div class="text-emerald-800 dark:text-emerald-300 font-bold">🎉 大家金額剛好平手，不需要轉賬！</div>';
       } else {
         settlementList.innerHTML = transactions.map(t => `
-          <div class="flex items-center gap-2 py-0.5">
+          <div class="text-slate-800 dark:text-slate-100 font-semibold flex items-center gap-2">
             <i class="fa-solid fa-arrow-right-long text-amber-500"></i>
-            <span>👉 <b>${t.from}</b> 給 <b>${t.to}</b> ： <span class="font-mono font-bold text-amber-600 dark:text-amber-400 text-base">$${t.amount.toFixed(1)}</span></span>
+            <span>👉 <b>${escapeHtml(t.from)}</b> 給 <b>${escapeHtml(t.to)}</b> ： <span class="text-amber-600 dark:text-amber-400 font-bold font-mono text-base">$${t.amount.toFixed(1)}</span></span>
           </div>
         `).join('');
       }
 
-      resultContainer.classList.remove('hidden');
+      document.getElementById('resultContainer').classList.remove('hidden');
+    }
+
+    function copyResultsText() {
+      if (latestTransactions.length === 0 && latestTotalExpense === 0) return;
+
+      let text = `📊 【大阪 5 日遊 AA 制埋數結算帳單】\n💰 總花費：$${latestTotalExpense.toFixed(1)}\n-------------------\n`;
+      if (latestTransactions.length === 0) {
+        text += '🎉 大家金額剛好平手，不需要額外轉賬！';
+      } else {
+        text += '轉賬方案：\n';
+        latestTransactions.forEach(t => {
+          text += `• ${t.from} ➡️ ${t.to} : $${t.amount.toFixed(1)}\n`;
+        });
+      }
+
+      const tempInput = document.createElement('textarea');
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        showToast('已成功複製結算報告！', 'success');
+      } catch (e) {
+        showToast('複製失敗', 'warning');
+      }
+      document.body.removeChild(tempInput);
+    }
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function confirmResetData() {
+      if (confirm('確定要清空當前的所有成員與消費數據嗎？此動作無法復原。')) {
+        people = [];
+        items = [];
+        saveData();
+        updatePeopleUI();
+        updateItemsUI();
+        document.getElementById('resultContainer').classList.add('hidden');
+        showToast('已清空當前數據');
+      }
+    }
+
+    function showToast(message, type = 'normal') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg pointer-events-auto text-white ${
+        type === 'warning' ? 'bg-rose-500' : type === 'success' ? 'bg-emerald-600' : 'bg-slate-800 dark:bg-slate-700'
+      }`;
+      toast.innerText = message;
+      container.appendChild(toast);
+
+      setTimeout(() => toast.remove(), 2600);
+    }
+
+    function handlePersonKeyPress(e) {
+      if (e.key === 'Enter') addPerson();
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function escapeJs(str) {
+      return String(str).replace(/'/g, "\\'");
     }
 
     window.onload = function() {
-      loadCalculatorState();
       updateCountdown();
       setInterval(updateCountdown, 1000);
+
+      if (window.location.hash && window.location.hash.includes('data=')) {
+        const hashData = window.location.hash.split('data=')[1];
+        const parsed = parseDataPayload(hashData);
+        if (parsed) {
+          people = parsed.people;
+          items = parsed.items;
+          saveData();
+          showToast('🎉 已自動從分享連結載入帳目數據！', 'success');
+          history.replaceState(null, "", window.location.pathname);
+        }
+      } else {
+        loadData();
+      }
+
+      updatePeopleUI();
+      updateItemsUI();
     };
   </script>
 </body>
