@@ -285,7 +285,8 @@
             localStorage.setItem(getStorageKey('people'), JSON.stringify(people));
             localStorage.setItem(getStorageKey('items'), JSON.stringify(items));
             localStorage.setItem('aa_offline_passcode', currentPasscode);
-            localStorage.setItem('aa_offline_archived_bills', JSON.stringify(archivedBills));
+            // 獨立 Key 儲存，保護資料隔離
+            localStorage.setItem(getStorageKey('archived_bills'), JSON.stringify(archivedBills));
         } catch(e) {
             console.error("Failed to save to local storage", e);
         }
@@ -295,7 +296,7 @@
         try {
             const savedPeople = localStorage.getItem(getStorageKey('people'));
             const savedItems = localStorage.getItem(getStorageKey('items'));
-            const savedArchives = localStorage.getItem('aa_offline_archived_bills');
+            const savedArchives = localStorage.getItem(getStorageKey('archived_bills'));
 
             people = savedPeople ? JSON.parse(savedPeople) : [];
             items = savedItems ? JSON.parse(savedItems) : [];
@@ -343,11 +344,9 @@
 
     function updateHistoryBadge() {
         try {
-            const savedArchives = localStorage.getItem('aa_offline_archived_bills');
+            const savedArchives = localStorage.getItem(getStorageKey('archived_bills'));
             const list = savedArchives ? JSON.parse(savedArchives) : [];
-            // 只統計屬於當前本機群組帳號的歷史帳冊
-            const groupList = list.filter(b => (b.passcode || '預設帳號') === currentPasscode);
-            document.getElementById('historyCountBadge').innerText = groupList.length;
+            document.getElementById('historyCountBadge').innerText = list.length;
         } catch(e) {
             document.getElementById('historyCountBadge').innerText = '0';
         }
