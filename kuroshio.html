@@ -1,628 +1,712 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Train, 
-  Clock, 
-  MapPin, 
-  Search, 
-  Sparkles, 
-  CheckCircle2,
-  ArrowDown,
-  ArrowUp,
-  Layers,
-  ChevronRight,
-  ChevronDown,
-  Info,
-  ShieldCheck,
-  AlertCircle
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuroshio Express - Live Departure & Location Indicator</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & React DOM CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Babel Standalone for JSX compilation in browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-// VERIFIED STATIONS LIST - JR WEST KINOKUNI / HANWA LINE (SHIN-OSAKA TO SHINGU)
-const TRAIN_STATIONS = [
-  { id: 'st-1', name: 'Shin-Osaka', jp: '新大阪', km: 0.0, hub: 'Shinkansen Terminal', platformOut: 'Platform 3', platformIn: 'Platform 3' },
-  { id: 'st-2', name: 'Osaka', jp: '大阪 (うめきた)', km: 3.8, hub: 'Umekita Underground', platformOut: 'Platform 21', platformIn: 'Platform 24' },
-  { id: 'st-3', name: 'Tennoji', jp: '天王寺', km: 14.8, hub: 'Hanwa Line Junction', platformOut: 'Platform 1', platformIn: 'Platform 15' },
-  { id: 'st-3b', name: 'Hineno', jp: '日根野', km: 40.9, hub: 'Kansai Airport Line Branch', platformOut: 'Platform 1', platformIn: 'Platform 4' },
-  { id: 'st-4', name: 'Wakayama', jp: '和歌山', km: 68.1, hub: 'Wakayama Capital', platformOut: 'Platform 4', platformIn: 'Platform 2' },
-  { id: 'st-5', name: 'Kainan', jp: '海南', km: 81.8, hub: 'Wakayama Coastal', platformOut: 'Platform 2', platformIn: 'Platform 3' },
-  { id: 'st-6', name: 'Gobo', jp: '御坊', km: 122.9, hub: 'Mid-Wakayama', platformOut: 'Platform 1', platformIn: 'Platform 2' },
-  { id: 'st-7', name: 'Kii-Tanabe', jp: '紀伊田辺', km: 167.3, hub: 'Kumano Kodo Gateway', platformOut: 'Platform 2', platformIn: 'Platform 1' },
-  { id: 'st-8', name: 'Shirahama', jp: '白浜', km: 178.2, hub: 'Onsen & Resort Area', platformOut: 'Platform 1', platformIn: 'Platform 2' },
-  { id: 'st-9', name: 'Susami', jp: '周参見', km: 200.0, hub: 'South Coast', platformOut: 'Platform 1', platformIn: 'Platform 2' },
-  { id: 'st-10', name: 'Kushimoto', jp: '串本', km: 229.0, hub: 'Southernmost Honshu', platformOut: 'Platform 1', platformIn: 'Platform 2' },
-  { id: 'st-11', name: 'Kii-Katsuura', jp: '紀伊勝浦', km: 267.4, hub: 'Nachi & Tuna Market', platformOut: 'Platform 2', platformIn: 'Platform 1' },
-  { id: 'st-12', name: 'Shingu', jp: '新宮', km: 282.4, hub: 'Kumano Sanzan Terminal', platformOut: 'Platform 1', platformIn: 'Platform 1' }
-];
+  <!-- Google Font - Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-// MASTER KUROSHIO SCHEDULE PATTERN FOR ALL DAILY SERVICES
-const DAILY_SERVICES_OUTBOUND = [
-  { num: 1, depH: 7, depM: 33, term: 'Shirahama', type: '287 Series Standard', cars: 6 },
-  { num: 3, depH: 8, depM: 54, term: 'Shingu', type: '283 Series (Ocean Arrow)', cars: 6 },
-  { num: 5, depH: 9, depM: 3, term: 'Shirahama', type: '287 Series (Panda Livery)', cars: 6 },
-  { num: 7, depH: 10, depM: 15, term: 'Shirahama', type: '289 Series Standard', cars: 6 },
-  { num: 9, depH: 11, depM: 15, term: 'Shingu', type: '287 Series Standard', cars: 6 },
-  { num: 11, depH: 12, depM: 18, term: 'Shirahama', type: '287 Series (Panda Livery)', cars: 6 },
-  { num: 13, depH: 13, depM: 18, term: 'Shingu', type: '287 Series Standard', cars: 6 },
-  { num: 15, depH: 14, depM: 18, term: 'Shirahama', type: '283 Series (Ocean Arrow)', cars: 6 },
-  { num: 17, depH: 15, depM: 18, term: 'Shirahama', type: '289 Series Standard', cars: 6 },
-  { num: 19, depH: 16, depM: 18, term: 'Shingu', type: '287 Series (Panda Livery)', cars: 6 },
-  { num: 21, depH: 17, depM: 18, term: 'Shirahama', type: '287 Series Standard', cars: 6 },
-  { num: 23, depH: 18, depM: 18, term: 'Shirahama', type: '283 Series (Ocean Arrow)', cars: 6 },
-  { num: 25, depH: 19, depM: 18, term: 'Shirahama', type: '289 Series Standard', cars: 6 },
-  { num: 27, depH: 20, depM: 18, term: 'Shirahama', type: '287 Series Standard', cars: 6 },
-  { num: 29, depH: 21, depM: 18, term: 'Kii-Tanabe', type: '287 Series (Panda Livery)', cars: 6 },
-  { num: 31, depH: 22, depM: 15, term: 'Wakayama', type: '289 Series Standard', cars: 6 }
-];
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #020617;
+      color: #f8fafc;
+    }
+    
+    /* Custom Scrollbar Styling */
+    ::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased selection:bg-amber-500 selection:text-slate-900">
 
-const DAILY_SERVICES_INBOUND = [
-  { num: 2, depH: 6, depM: 20, orig: 'Wakayama', term: 'Shin-Osaka', type: '289 Series Standard', cars: 6 },
-  { num: 4, depH: 7, depM: 10, orig: 'Kii-Tanabe', term: 'Shin-Osaka', type: '287 Series Standard', cars: 6 },
-  { num: 6, depH: 8, depM: 15, orig: 'Shirahama', term: 'Shin-Osaka', type: '287 Series (Panda Livery)', cars: 6 },
-  { num: 8, depH: 9, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '283 Series (Ocean Arrow)', cars: 6 },
-  { num: 10, depH: 10, depM: 20, orig: 'Shingu', term: 'Shin-Osaka', type: '287 Series Standard', cars: 6 },
-  { num: 12, depH: 11, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '289 Series Standard', cars: 6 },
-  { num: 14, depH: 12, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '287 Series Standard', cars: 6 },
-  { num: 16, depH: 13, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '287 Series (Panda Livery)', cars: 6 },
-  { num: 18, depH: 14, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '287 Series Standard', cars: 6 },
-  { num: 20, depH: 15, depM: 10, orig: 'Shingu', term: 'Shin-Osaka', type: '287 Series (Panda Livery)', cars: 6 },
-  { num: 22, depH: 16, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '283 Series (Ocean Arrow)', cars: 6 },
-  { num: 24, depH: 17, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '289 Series Standard', cars: 6 },
-  { num: 26, depH: 18, depM: 20, orig: 'Shingu', term: 'Shin-Osaka', type: '287 Series Standard', cars: 6 },
-  { num: 28, depH: 19, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '287 Series (Panda Livery)', cars: 6 },
-  { num: 30, depH: 20, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '283 Series (Ocean Arrow)', cars: 6 }
-];
+  <div id="root"></div>
 
-function getStationOffsetMins(stationId) {
-  const offsets = {
-    'st-1': 0,
-    'st-2': 5,
-    'st-3': 20,
-    'st-3b': 42,
-    'st-4': 63,
-    'st-5': 73,
-    'st-6': 102,
-    'st-7': 131,
-    'st-8': 144,
-    'st-9': 170,
-    'st-10': 210,
-    'st-11': 242,
-    'st-12': 257
-  };
-  return offsets[stationId] ?? 0;
-}
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
 
-export default function App() {
-  const [selectedStationId, setSelectedStationId] = useState('st-1');
-  const [travelDirection, setTravelDirection] = useState('outbound');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [time, setTime] = useState(new Date());
-  const [expandedTrainId, setExpandedTrainId] = useState(null);
+    // VERIFIED STATIONS LIST - JR WEST KINOKUNI / HANWA LINE (SHIN-OSAKA TO SHINGU)
+    const TRAIN_STATIONS = [
+      { id: 'st-1', name: 'Shin-Osaka', jp: '新大阪', km: 0.0, hub: 'Shinkansen Terminal', platformOut: 'Platform 3', platformIn: 'Platform 3' },
+      { id: 'st-2', name: 'Osaka', jp: '大阪 (うめきた)', km: 3.8, hub: 'Umekita Underground', platformOut: 'Platform 21', platformIn: 'Platform 24' },
+      { id: 'st-3', name: 'Tennoji', jp: '天王寺', km: 14.8, hub: 'Hanwa Line Junction', platformOut: 'Platform 1', platformIn: 'Platform 15' },
+      { id: 'st-3b', name: 'Hineno', jp: '日根野', km: 40.9, hub: 'Kansai Airport Line Branch', platformOut: 'Platform 1', platformIn: 'Platform 4' },
+      { id: 'st-4', name: 'Wakayama', jp: '和歌山', km: 68.1, hub: 'Wakayama Capital', platformOut: 'Platform 4', platformIn: 'Platform 2' },
+      { id: 'st-5', name: 'Kainan', jp: '海南', km: 81.8, hub: 'Wakayama Coastal', platformOut: 'Platform 2', platformIn: 'Platform 3' },
+      { id: 'st-6', name: 'Gobo', jp: '御坊', km: 122.9, hub: 'Mid-Wakayama', platformOut: 'Platform 1', platformIn: 'Platform 2' },
+      { id: 'st-7', name: 'Kii-Tanabe', jp: '紀伊田辺', km: 167.3, hub: 'Kumano Kodo Gateway', platformOut: 'Platform 2', platformIn: 'Platform 1' },
+      { id: 'st-8', name: 'Shirahama', jp: '白浜', km: 178.2, hub: 'Onsen & Resort Area', platformOut: 'Platform 1', platformIn: 'Platform 2' },
+      { id: 'st-9', name: 'Susami', jp: '周参見', km: 200.0, hub: 'South Coast', platformOut: 'Platform 1', platformIn: 'Platform 2' },
+      { id: 'st-10', name: 'Kushimoto', jp: '串本', km: 229.0, hub: 'Southernmost Honshu', platformOut: 'Platform 1', platformIn: 'Platform 2' },
+      { id: 'st-11', name: 'Kii-Katsuura', jp: '紀伊勝浦', km: 267.4, hub: 'Nachi & Tuna Market', platformOut: 'Platform 2', platformIn: 'Platform 1' },
+      { id: 'st-12', name: 'Shingu', jp: '新宮', km: 282.4, hub: 'Kumano Sanzan Terminal', platformOut: 'Platform 1', platformIn: 'Platform 1' }
+    ];
 
-  // Keep live time updated every second
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+    // MASTER KUROSHIO SCHEDULE PATTERN FOR ALL DAILY SERVICES
+    const DAILY_SERVICES_OUTBOUND = [
+      { num: 1, depH: 7, depM: 33, term: 'Shirahama', type: '287 Series Standard', cars: 6 },
+      { num: 3, depH: 8, depM: 54, term: 'Shingu', type: '283 Series (Ocean Arrow)', cars: 6 },
+      { num: 5, depH: 9, depM: 3, term: 'Shirahama', type: '287 Series (Panda Livery)', cars: 6 },
+      { num: 7, depH: 10, depM: 15, term: 'Shirahama', type: '289 Series Standard', cars: 6 },
+      { num: 9, depH: 11, depM: 15, term: 'Shingu', type: '287 Series Standard', cars: 6 },
+      { num: 11, depH: 12, depM: 18, term: 'Shirahama', type: '287 Series (Panda Livery)', cars: 6 },
+      { num: 13, depH: 13, depM: 18, term: 'Shingu', type: '287 Series Standard', cars: 6 },
+      { num: 15, depH: 14, depM: 18, term: 'Shirahama', type: '283 Series (Ocean Arrow)', cars: 6 },
+      { num: 17, depH: 15, depM: 18, term: 'Shirahama', type: '289 Series Standard', cars: 6 },
+      { num: 19, depH: 16, depM: 18, term: 'Shingu', type: '287 Series (Panda Livery)', cars: 6 },
+      { num: 21, depH: 17, depM: 18, term: 'Shirahama', type: '287 Series Standard', cars: 6 },
+      { num: 23, depH: 18, depM: 18, term: 'Shirahama', type: '283 Series (Ocean Arrow)', cars: 6 },
+      { num: 25, depH: 19, depM: 18, term: 'Shirahama', type: '289 Series Standard', cars: 6 },
+      { num: 27, depH: 20, depM: 18, term: 'Shirahama', type: '287 Series Standard', cars: 6 },
+      { num: 29, depH: 21, depM: 18, term: 'Kii-Tanabe', type: '287 Series (Panda Livery)', cars: 6 },
+      { num: 31, depH: 22, depM: 15, term: 'Wakayama', type: '289 Series Standard', cars: 6 }
+    ];
 
-  const selectedStation = useMemo(() => {
-    return TRAIN_STATIONS.find((s) => s.id === selectedStationId) || TRAIN_STATIONS[0];
-  }, [selectedStationId]);
+    const DAILY_SERVICES_INBOUND = [
+      { num: 2, depH: 6, depM: 20, orig: 'Wakayama', term: 'Shin-Osaka', type: '289 Series Standard', cars: 6 },
+      { num: 4, depH: 7, depM: 10, orig: 'Kii-Tanabe', term: 'Shin-Osaka', type: '287 Series Standard', cars: 6 },
+      { num: 6, depH: 8, depM: 15, orig: 'Shirahama', term: 'Shin-Osaka', type: '287 Series (Panda Livery)', cars: 6 },
+      { num: 8, depH: 9, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '283 Series (Ocean Arrow)', cars: 6 },
+      { num: 10, depH: 10, depM: 20, orig: 'Shingu', term: 'Shin-Osaka', type: '287 Series Standard', cars: 6 },
+      { num: 12, depH: 11, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '289 Series Standard', cars: 6 },
+      { num: 14, depH: 12, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '287 Series Standard', cars: 6 },
+      { num: 16, depH: 13, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '287 Series (Panda Livery)', cars: 6 },
+      { num: 18, depH: 14, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '287 Series Standard', cars: 6 },
+      { num: 20, depH: 15, depM: 10, orig: 'Shingu', term: 'Shin-Osaka', type: '287 Series (Panda Livery)', cars: 6 },
+      { num: 22, depH: 16, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '283 Series (Ocean Arrow)', cars: 6 },
+      { num: 24, depH: 17, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '289 Series Standard', cars: 6 },
+      { num: 26, depH: 18, depM: 20, orig: 'Shingu', term: 'Shin-Osaka', type: '287 Series Standard', cars: 6 },
+      { num: 28, depH: 19, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '287 Series (Panda Livery)', cars: 6 },
+      { num: 30, depH: 20, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', type: '283 Series (Ocean Arrow)', cars: 6 }
+    ];
 
-  const filteredStations = useMemo(() => {
-    if (!searchQuery.trim()) return TRAIN_STATIONS;
-    const q = searchQuery.toLowerCase();
-    return TRAIN_STATIONS.filter(
-      (st) => st.name.toLowerCase().includes(q) || st.jp.includes(q)
-    );
-  }, [searchQuery]);
-
-  const trainSequence = useMemo(() => {
-    const list = [];
-    const now = new Date(time);
-    const currentHour = now.getHours();
-    const currentMin = now.getMinutes();
-    const currentMinsFromMidnight = currentHour * 60 + currentMin;
-
-    if (travelDirection === 'outbound') {
-      DAILY_SERVICES_OUTBOUND.forEach((srv) => {
-        const originDepMins = srv.depH * 60 + srv.depM;
-        const stationOffset = getStationOffsetMins(selectedStationId);
-        
-        // Check if train stops at selected station based on destination
-        const destOffset = getStationOffsetMins(
-          TRAIN_STATIONS.find((st) => st.name === srv.term)?.id || 'st-8'
-        );
-
-        if (stationOffset <= destOffset) {
-          let depMins = originDepMins + stationOffset;
-          let diffMins = depMins - currentMinsFromMidnight;
-
-          // If train has passed today, evaluate for tomorrow's schedule
-          if (diffMins < -2) {
-            diffMins += 24 * 60;
-          }
-
-          const depTimeObj = new Date(now.getTime() + diffMins * 60000);
-          const timeFormatted = depTimeObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-          // Calculate stops list for this train
-          const trainStops = TRAIN_STATIONS.filter(st => st.km <= TRAIN_STATIONS.find(s => s.name === srv.term).km).map(st => {
-            const stOffset = getStationOffsetMins(st.id);
-            const stDepTime = new Date(now.getTime() + (originDepMins + stOffset - currentMinsFromMidnight) * 60000);
-            return {
-              stationId: st.id,
-              stationName: st.name,
-              jp: st.jp,
-              time: stDepTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              platform: st.platformOut
-            };
-          });
-
-          // Determine current position of the train
-          let currentPos = 'In Depot / Yard';
-          const trainElapsed = currentMinsFromMidnight - originDepMins;
-          if (trainElapsed >= 0 && trainElapsed <= destOffset) {
-            const currentStation = TRAIN_STATIONS.slice().reverse().find(s => trainElapsed >= getStationOffsetMins(s.id));
-            currentPos = currentStation ? `En route near ${currentStation.name}` : 'Departed Terminal';
-          } else if (trainElapsed > destOffset) {
-            currentPos = `Arrived at ${srv.term}`;
-          } else if (trainElapsed >= -15) {
-            currentPos = 'Boarding at Shin-Osaka';
-          }
-
-          list.push({
-            id: `kuroshio-out-${srv.num}`,
-            trainNumber: `Kuroshio ${srv.num}`,
-            direction: 'outbound',
-            type: srv.type,
-            boundFor: srv.term,
-            origin: 'Shin-Osaka',
-            cars: srv.cars,
-            minsRemaining: diffMins,
-            timeFormatted,
-            platform: selectedStation.platformOut,
-            currentLocation: currentPos,
-            stops: trainStops
-          });
-        }
-      });
-    } else {
-      // INBOUND (NORTHBOUND TOWARDS SHIN-OSAKA)
-      DAILY_SERVICES_INBOUND.forEach((srv) => {
-        const origStationId = TRAIN_STATIONS.find((st) => st.name === (srv.orig || 'Shirahama'))?.id || 'st-8';
-        const origOffset = getStationOffsetMins(origStationId);
-        const originDepMins = srv.depH * 60 + srv.depM;
-        const stationOffset = getStationOffsetMins(selectedStationId);
-
-        // Inbound moves from higher km (Shingu/Shirahama) to lower km (Shin-Osaka)
-        if (stationOffset <= origOffset) {
-          const travelTimeFromOrig = origOffset - stationOffset;
-          let depMins = originDepMins + travelTimeFromOrig;
-          let diffMins = depMins - currentMinsFromMidnight;
-
-          if (diffMins < -2) {
-            diffMins += 24 * 60;
-          }
-
-          const depTimeObj = new Date(now.getTime() + diffMins * 60000);
-          const timeFormatted = depTimeObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-          const trainStops = TRAIN_STATIONS.filter(st => st.km <= TRAIN_STATIONS.find(s => s.name === (srv.orig || 'Shirahama')).km).reverse().map(st => {
-            const stTravel = origOffset - getStationOffsetMins(st.id);
-            const stDepTime = new Date(now.getTime() + (originDepMins + stTravel - currentMinsFromMidnight) * 60000);
-            return {
-              stationId: st.id,
-              stationName: st.name,
-              jp: st.jp,
-              time: stDepTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              platform: st.platformIn
-            };
-          });
-
-          let currentPos = 'In Depot / Yard';
-          const trainElapsed = currentMinsFromMidnight - originDepMins;
-          if (trainElapsed >= 0 && trainElapsed <= origOffset) {
-            currentPos = `En route towards Shin-Osaka`;
-          } else if (trainElapsed > origOffset) {
-            currentPos = 'Arrived at Shin-Osaka';
-          } else if (trainElapsed >= -15) {
-            currentPos = `Boarding at ${srv.orig || 'Shirahama'}`;
-          }
-
-          list.push({
-            id: `kuroshio-in-${srv.num}`,
-            trainNumber: `Kuroshio ${srv.num}`,
-            direction: 'inbound',
-            type: srv.type,
-            boundFor: 'Shin-Osaka',
-            origin: srv.orig || 'Shirahama',
-            cars: srv.cars,
-            minsRemaining: diffMins,
-            timeFormatted,
-            platform: selectedStation.platformIn,
-            currentLocation: currentPos,
-            stops: trainStops
-          });
-        }
-      });
+    function getStationOffsetMins(stationId) {
+      const offsets = {
+        'st-1': 0,
+        'st-2': 5,
+        'st-3': 20,
+        'st-3b': 42,
+        'st-4': 63,
+        'st-5': 73,
+        'st-6': 102,
+        'st-7': 131,
+        'st-8': 144,
+        'st-9': 170,
+        'st-10': 210,
+        'st-11': 242,
+        'st-12': 257
+      };
+      return offsets[stationId] ?? 0;
     }
 
-    list.sort((a, b) => a.minsRemaining - b.minsRemaining);
+    const TrainIcon = ({ className = "w-5 h-5" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>
+    );
 
-    return {
-      nextTrain: list[0] || null,
-      secondTrain: list[1] || null,
-      thirdTrain: list[2] || null,
-      totalUpcoming: list.length
-    };
-  }, [selectedStationId, travelDirection, time]);
+    const ClockIcon = ({ className = "w-4 h-4" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    );
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-amber-500 selection:text-slate-900">
-      
-      {/* HEADER */}
-      <header className="border-b border-slate-800 bg-slate-900/95 sticky top-0 z-30 backdrop-blur-md">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-tr from-amber-500 to-amber-600 p-2.5 rounded-xl shadow-md shadow-amber-500/20">
-              <Train className="w-5 h-5 text-slate-950" />
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <h1 className="font-extrabold text-base sm:text-lg text-white tracking-tight">
-                  KUROSHIO EXPRESS
-                </h1>
-                <span className="inline-flex items-center space-x-1 text-[10px] font-mono bg-emerald-950 text-emerald-400 border border-emerald-800/80 px-2 py-0.5 rounded-full font-semibold">
-                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                  <span>JR-WEST VERIFIED</span>
-                </span>
-              </div>
-              <p className="text-xs text-slate-400 hidden sm:block">
-                Kinokuni & Hanwa Line • Live Departure Sequence
-              </p>
-            </div>
-          </div>
+    const MapPinIcon = ({ className = "w-3.5 h-3.5" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+    );
 
-          <div className="flex items-center space-x-3 text-right">
-            <div className="flex flex-col items-end text-xs font-mono">
-              <span className="text-slate-500 text-[10px] uppercase tracking-wider">Current Time (JST)</span>
-              <span className="text-amber-400 font-bold text-sm">{time.toLocaleTimeString()}</span>
-            </div>
-          </div>
-        </div>
-      </header>
+    const SearchIcon = ({ className = "w-3.5 h-3.5" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    );
 
-      {/* MAIN CONTAINER */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    const SparklesIcon = ({ className = "w-3 h-3" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+    );
 
-        {/* STEP 1: SELECT YOUR STATION */}
-        {}
-        <section className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center space-x-2.5">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black text-xs">
-                1
-              </span>
-              <h2 className="font-bold text-slate-100 text-sm sm:text-base">
-                Select Your Departure Station
-              </h2>
-            </div>
+    const CheckCircleIcon = ({ className = "w-5 h-5" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    );
 
-            <div className="relative w-full sm:w-56">
-              <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search station..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-500 transition"
-              />
-            </div>
-          </div>
+    const ArrowDownIcon = ({ className = "w-5 h-5" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+    );
 
-          <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-700">
-            {filteredStations.map((st) => {
-              const isSelected = st.id === selectedStationId;
-              return (
-                <button
-                  key={st.id}
-                  onClick={() => setSelectedStationId(st.id)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all border flex items-center space-x-1.5 shrink-0 ${
-                    isSelected
-                      ? 'bg-amber-500 text-slate-950 border-amber-400 font-bold shadow-md shadow-amber-500/20 scale-105'
-                      : 'bg-slate-950 text-slate-300 border-slate-800 hover:bg-slate-800 hover:border-slate-700'
-                  }`}
-                >
-                  <MapPin className={`w-3.5 h-3.5 ${isSelected ? 'text-slate-950' : 'text-amber-400'}`} />
-                  <span>{st.name}</span>
-                  <span className={`text-[10px] ${isSelected ? 'text-slate-900 font-medium' : 'text-slate-500'}`}>
-                    ({st.jp})
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
+    const ArrowUpIcon = ({ className = "w-5 h-5" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+    );
 
-        {/* STEP 2: SELECT TRAVEL DIRECTION */}
-        {}
-        <section className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg space-y-3">
-          <div className="flex items-center space-x-2.5">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black text-xs">
-              2
-            </span>
-            <h2 className="font-bold text-slate-100 text-sm sm:text-base">
-              Select Travel Direction
-            </h2>
-          </div>
+    const LayersIcon = ({ className = "w-3.5 h-3.5" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 12.5-8.58 3.91a2 2 0 0 1-1.66 0L2 12.5"/><path d="m22 17.5-8.58 3.91a2 2 0 0 1-1.66 0L2 17.5"/></svg>
+    );
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <button
-              onClick={() => setTravelDirection('outbound')}
-              className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
-                travelDirection === 'outbound'
-                  ? 'bg-gradient-to-r from-amber-500/20 via-slate-900 to-slate-900 border-amber-500 text-white ring-2 ring-amber-500/30'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200'
-              }`}
-            >
+    const ChevronDownIcon = ({ className = "w-4 h-4" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+    );
+
+    const ShieldCheckIcon = ({ className = "w-3 h-3" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+    );
+
+    const AlertCircleIcon = ({ className = "w-8 h-8" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+    );
+
+    function App() {
+      const [selectedStationId, setSelectedStationId] = useState('st-1');
+      const [travelDirection, setTravelDirection] = useState('outbound');
+      const [searchQuery, setSearchQuery] = useState('');
+      const [time, setTime] = useState(new Date());
+      const [expandedTrainId, setExpandedTrainId] = useState(null);
+
+      // Keep live time updated every second
+      useEffect(() => {
+        const timer = setInterval(() => setTime(new Date()), 1000);
+        return () => clearInterval(timer);
+      }, []);
+
+      const selectedStation = useMemo(() => {
+        return TRAIN_STATIONS.find((s) => s.id === selectedStationId) || TRAIN_STATIONS[0];
+      }, [selectedStationId]);
+
+      const filteredStations = useMemo(() => {
+        if (!searchQuery.trim()) return TRAIN_STATIONS;
+        const q = searchQuery.toLowerCase();
+        return TRAIN_STATIONS.filter(
+          (st) => st.name.toLowerCase().includes(q) || st.jp.includes(q)
+        );
+      }, [searchQuery]);
+
+      const trainSequence = useMemo(() => {
+        const list = [];
+        const now = new Date(time);
+        const currentHour = now.getHours();
+        const currentMin = now.getMinutes();
+        const currentMinsFromMidnight = currentHour * 60 + currentMin;
+
+        if (travelDirection === 'outbound') {
+          DAILY_SERVICES_OUTBOUND.forEach((srv) => {
+            const originDepMins = srv.depH * 60 + srv.depM;
+            const stationOffset = getStationOffsetMins(selectedStationId);
+            
+            const destOffset = getStationOffsetMins(
+              TRAIN_STATIONS.find((st) => st.name === srv.term)?.id || 'st-8'
+            );
+
+            if (stationOffset <= destOffset) {
+              let depMins = originDepMins + stationOffset;
+              let diffMins = depMins - currentMinsFromMidnight;
+
+              // If train has passed today, evaluate for tomorrow's schedule
+              if (diffMins < -2) {
+                diffMins += 24 * 60;
+              }
+
+              const depTimeObj = new Date(now.getTime() + diffMins * 60000);
+              const timeFormatted = depTimeObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+              const trainStops = TRAIN_STATIONS.filter(st => st.km <= TRAIN_STATIONS.find(s => s.name === srv.term).km).map(st => {
+                const stOffset = getStationOffsetMins(st.id);
+                const stDepTime = new Date(now.getTime() + (originDepMins + stOffset - currentMinsFromMidnight) * 60000);
+                return {
+                  stationId: st.id,
+                  stationName: st.name,
+                  jp: st.jp,
+                  time: stDepTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  platform: st.platformOut
+                };
+              });
+
+              let currentPos = 'In Depot / Yard';
+              const trainElapsed = currentMinsFromMidnight - originDepMins;
+              if (trainElapsed >= 0 && trainElapsed <= destOffset) {
+                const currentStation = TRAIN_STATIONS.slice().reverse().find(s => trainElapsed >= getStationOffsetMins(s.id));
+                currentPos = currentStation ? `En route near ${currentStation.name}` : 'Departed Terminal';
+              } else if (trainElapsed > destOffset) {
+                currentPos = `Arrived at ${srv.term}`;
+              } else if (trainElapsed >= -15) {
+                currentPos = 'Boarding at Shin-Osaka';
+              }
+
+              list.push({
+                id: `kuroshio-out-${srv.num}`,
+                trainNumber: `Kuroshio ${srv.num}`,
+                direction: 'outbound',
+                type: srv.type,
+                boundFor: srv.term,
+                origin: 'Shin-Osaka',
+                cars: srv.cars,
+                minsRemaining: diffMins,
+                timeFormatted,
+                platform: selectedStation.platformOut,
+                currentLocation: currentPos,
+                stops: trainStops
+              });
+            }
+          });
+        } else {
+          // INBOUND (NORTHBOUND TOWARDS SHIN-OSAKA)
+          DAILY_SERVICES_INBOUND.forEach((srv) => {
+            const origStationId = TRAIN_STATIONS.find((st) => st.name === (srv.orig || 'Shirahama'))?.id || 'st-8';
+            const origOffset = getStationOffsetMins(origStationId);
+            const originDepMins = srv.depH * 60 + srv.depM;
+            const stationOffset = getStationOffsetMins(selectedStationId);
+
+            if (stationOffset <= origOffset) {
+              const travelTimeFromOrig = origOffset - stationOffset;
+              let depMins = originDepMins + travelTimeFromOrig;
+              let diffMins = depMins - currentMinsFromMidnight;
+
+              if (diffMins < -2) {
+                diffMins += 24 * 60;
+              }
+
+              const depTimeObj = new Date(now.getTime() + diffMins * 60000);
+              const timeFormatted = depTimeObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+              const trainStops = TRAIN_STATIONS.filter(st => st.km <= TRAIN_STATIONS.find(s => s.name === (srv.orig || 'Shirahama')).km).reverse().map(st => {
+                const stTravel = origOffset - getStationOffsetMins(st.id);
+                const stDepTime = new Date(now.getTime() + (originDepMins + stTravel - currentMinsFromMidnight) * 60000);
+                return {
+                  stationId: st.id,
+                  stationName: st.name,
+                  jp: st.jp,
+                  time: stDepTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  platform: st.platformIn
+                };
+              });
+
+              let currentPos = 'In Depot / Yard';
+              const trainElapsed = currentMinsFromMidnight - originDepMins;
+              if (trainElapsed >= 0 && trainElapsed <= origOffset) {
+                currentPos = `En route towards Shin-Osaka`;
+              } else if (trainElapsed > origOffset) {
+                currentPos = 'Arrived at Shin-Osaka';
+              } else if (trainElapsed >= -15) {
+                currentPos = `Boarding at ${srv.orig || 'Shirahama'}`;
+              }
+
+              list.push({
+                id: `kuroshio-in-${srv.num}`,
+                trainNumber: `Kuroshio ${srv.num}`,
+                direction: 'inbound',
+                type: srv.type,
+                boundFor: 'Shin-Osaka',
+                origin: srv.orig || 'Shirahama',
+                cars: srv.cars,
+                minsRemaining: diffMins,
+                timeFormatted,
+                platform: selectedStation.platformIn,
+                currentLocation: currentPos,
+                stops: trainStops
+              });
+            }
+          });
+        }
+
+        list.sort((a, b) => a.minsRemaining - b.minsRemaining);
+
+        return {
+          nextTrain: list[0] || null,
+          secondTrain: list[1] || null,
+          thirdTrain: list[2] || null,
+          totalUpcoming: list.length
+        };
+      }, [selectedStationId, travelDirection, time]);
+
+      return (
+        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-amber-500 selection:text-slate-900 pb-12">
+          
+          {}
+          <header className="border-b border-slate-800 bg-slate-900/95 sticky top-0 z-30 backdrop-blur-md">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className={`p-2.5 rounded-lg ${travelDirection === 'outbound' ? 'bg-amber-500 text-slate-950' : 'bg-slate-900 text-slate-500'}`}>
-                  <ArrowDown className="w-5 h-5" />
+                <div className="bg-gradient-to-tr from-amber-500 to-amber-600 p-2.5 rounded-xl shadow-md shadow-amber-500/20">
+                  <TrainIcon className="w-5 h-5 text-slate-950" />
                 </div>
                 <div>
-                  <p className="font-extrabold text-xs uppercase tracking-wider text-amber-400">Southbound (下り)</p>
-                  <p className="text-sm font-bold text-slate-100 mt-0.5">Shirahama & Shingu</p>
-                  <p className="text-[11px] text-slate-400">Resort & Kii Peninsula coast</p>
-                </div>
-              </div>
-              {travelDirection === 'outbound' && <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0 ml-2" />}
-            </button>
-
-            <button
-              onClick={() => setTravelDirection('inbound')}
-              className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
-                travelDirection === 'inbound'
-                  ? 'bg-gradient-to-r from-cyan-500/20 via-slate-900 to-slate-900 border-cyan-500 text-white ring-2 ring-cyan-500/30'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200'
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                <div className={`p-2.5 rounded-lg ${travelDirection === 'inbound' ? 'bg-cyan-500 text-slate-950' : 'bg-slate-900 text-slate-500'}`}>
-                  <ArrowUp className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="font-extrabold text-xs uppercase tracking-wider text-cyan-400">Northbound (上り)</p>
-                  <p className="text-sm font-bold text-slate-100 mt-0.5">Tennoji & Shin-Osaka</p>
-                  <p className="text-[11px] text-slate-400">Towards Osaka & Shinkansen</p>
-                </div>
-              </div>
-              {travelDirection === 'inbound' && <CheckCircle2 className="w-5 h-5 text-cyan-400 shrink-0 ml-2" />}
-            </button>
-          </div>
-        </section>
-
-        {/* STEP 3: LIVE DEPARTURE BOARD - NEXT TRAIN & 2 TRAINS BEHIND */}
-        {}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center space-x-2.5">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black text-xs">
-                3
-              </span>
-              <h2 className="font-bold text-slate-100 text-sm sm:text-base">
-                Live Departures for <span className="text-amber-400 font-extrabold">{selectedStation.name}</span>
-              </h2>
-            </div>
-
-            <span className="text-xs text-slate-400 font-mono bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
-              {travelDirection === 'outbound' ? 'Southbound (下り)' : 'Northbound (上り)'}
-            </span>
-          </div>
-
-          {/* HERO CARD: UPCOMING NEXT TRAIN (#1) */}
-          {trainSequence.nextTrain ? (
-            <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/30 border-2 border-amber-500/80 rounded-2xl p-5 sm:p-6 shadow-2xl relative overflow-hidden space-y-4">
-              <div className="absolute top-0 right-0 bg-amber-500 text-slate-950 font-black text-[10px] uppercase tracking-wider px-3.5 py-1 rounded-bl-xl shadow-md flex items-center space-x-1">
-                <Sparkles className="w-3 h-3 fill-slate-950" />
-                <span>NEXT TRAIN (#1)</span>
-              </div>
-
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-2">
-                <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <span className="bg-amber-950 text-amber-300 border border-amber-700/80 text-[11px] px-2.5 py-0.5 rounded-md font-mono font-bold">
-                      {trainSequence.nextTrain.minsRemaining <= 2 ? 'BOARDING / AT PLATFORM' : 'ON SCHEDULE'}
-                    </span>
-                    <span className="text-xs text-slate-300 font-mono bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">
-                      {trainSequence.nextTrain.platform}
+                    <h1 className="font-extrabold text-base sm:text-lg text-white tracking-tight">
+                      KUROSHIO EXPRESS
+                    </h1>
+                    <span className="inline-flex items-center space-x-1 text-[10px] font-mono bg-emerald-950 text-emerald-400 border border-emerald-800/80 px-2 py-0.5 rounded-full font-semibold">
+                      <ShieldCheckIcon className="w-3 h-3 text-emerald-400" />
+                      <span>JR-WEST VERIFIED</span>
                     </span>
                   </div>
-
-                  <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                    {trainSequence.nextTrain.trainNumber}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-slate-300">
-                    Bound for <strong className="text-amber-400 font-bold">{trainSequence.nextTrain.boundFor}</strong> • <span className="text-slate-400">{trainSequence.nextTrain.type}</span>
+                  <p className="text-xs text-slate-400 hidden sm:block">
+                    Kinokuni & Hanwa Line • Live Departure Sequence
                   </p>
                 </div>
+              </div>
 
-                <div className="bg-slate-950 border border-amber-500/40 p-4 rounded-xl flex items-center space-x-5 shadow-inner shrink-0">
-                  <div>
-                    <p className="text-[10px] text-slate-400 uppercase font-semibold">Scheduled Departure</p>
-                    <p className="text-2xl font-black font-mono text-amber-400 mt-0.5">
-                      {trainSequence.nextTrain.timeFormatted}
-                    </p>
-                  </div>
+              <div className="flex items-center space-x-3 text-right">
+                <div className="flex flex-col items-end text-xs font-mono">
+                  <span className="text-slate-500 text-[10px] uppercase tracking-wider">Current Time</span>
+                  <span className="text-amber-400 font-bold text-sm">{time.toLocaleTimeString()}</span>
+                </div>
+              </div>
+            </div>
+          </header>
 
-                  <div className="border-l border-slate-800 pl-5">
-                    <p className="text-[10px] text-slate-400 uppercase font-semibold">Wait Time</p>
-                    <p className="text-xl font-bold font-mono text-emerald-400 mt-0.5 flex items-center">
-                      <Clock className="w-4 h-4 mr-1.5 animate-spin text-emerald-400" />
-                      {trainSequence.nextTrain.minsRemaining <= 0 ? 'NOW' : `in ${trainSequence.nextTrain.minsRemaining} min`}
-                    </p>
+          {/* MAIN CONTAINER */}
+          <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+            {}
+            <section className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center space-x-2.5">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black text-xs">
+                    1
+                  </span>
+                  <h2 className="font-bold text-slate-100 text-sm sm:text-base">
+                    Select Your Departure Station
+                  </h2>
+                </div>
+
+                <div className="relative w-full sm:w-56">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+                    <SearchIcon className="w-3.5 h-3.5" />
                   </div>
+                  <input
+                    type="text"
+                    placeholder="Search station..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-500 transition"
+                  />
                 </div>
               </div>
 
-              {/* TRAIN LOCATION STATUS BAR */}
-              <div className="pt-3 border-t border-slate-800 space-y-2">
-                <div className="flex items-center justify-between text-xs text-slate-400">
-                  <span className="flex items-center space-x-1.5">
-                    <Train className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Live Position: <strong className="text-slate-200">{trainSequence.nextTrain.currentLocation}</strong></span>
-                  </span>
-                  <span className="font-mono text-cyan-400 text-[11px] hidden sm:inline">
-                    Composition: {trainSequence.nextTrain.cars} Cars
-                  </span>
-                </div>
+              <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-700">
+                {filteredStations.map((st) => {
+                  const isSelected = st.id === selectedStationId;
+                  return (
+                    <button
+                      key={st.id}
+                      onClick={() => setSelectedStationId(st.id)}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all border flex items-center space-x-1.5 shrink-0 ${
+                        isSelected
+                          ? 'bg-amber-500 text-slate-950 border-amber-400 font-bold shadow-md shadow-amber-500/20 scale-105'
+                          : 'bg-slate-950 text-slate-300 border-slate-800 hover:bg-slate-800 hover:border-slate-700'
+                      }`}
+                    >
+                      <MapPinIcon className={`w-3.5 h-3.5 ${isSelected ? 'text-slate-950' : 'text-amber-400'}`} />
+                      <span>{st.name}</span>
+                      <span className={`text-[10px] ${isSelected ? 'text-slate-900 font-medium' : 'text-slate-500'}`}>
+                        ({st.jp})
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
-                {/* EXPANDABLE STOPS TIMETABLE BUTTON */}
+            {}
+            <section className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg space-y-3">
+              <div className="flex items-center space-x-2.5">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black text-xs">
+                  2
+                </span>
+                <h2 className="font-bold text-slate-100 text-sm sm:text-base">
+                  Select Travel Direction
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
-                  onClick={() => setExpandedTrainId(expandedTrainId === trainSequence.nextTrain.id ? null : trainSequence.nextTrain.id)}
-                  className="w-full text-left bg-slate-950/80 hover:bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-300 flex items-center justify-between transition"
+                  onClick={() => setTravelDirection('outbound')}
+                  className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
+                    travelDirection === 'outbound'
+                      ? 'bg-gradient-to-r from-amber-500/20 via-slate-900 to-slate-900 border-amber-500 text-white ring-2 ring-amber-500/30'
+                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200'
+                  }`}
                 >
-                  <span className="font-medium text-slate-300">View Full Station Route Timetable</span>
-                  <ChevronDown className={`w-4 h-4 text-amber-400 transition-transform ${expandedTrainId === trainSequence.nextTrain.id ? 'rotate-180' : ''}`} />
+                  <div className="flex items-center space-x-3">
+                    <div className={`p-2.5 rounded-lg ${travelDirection === 'outbound' ? 'bg-amber-500 text-slate-950' : 'bg-slate-900 text-slate-500'}`}>
+                      <ArrowDownIcon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-extrabold text-xs uppercase tracking-wider text-amber-400">Southbound (下り)</p>
+                      <p className="text-sm font-bold text-slate-100 mt-0.5">Shirahama & Shingu</p>
+                      <p className="text-[11px] text-slate-400">Resort & Kii Peninsula coast</p>
+                    </div>
+                  </div>
+                  {travelDirection === 'outbound' && <CheckCircleIcon className="w-5 h-5 text-amber-400 shrink-0 ml-2" />}
                 </button>
 
-                {expandedTrainId === trainSequence.nextTrain.id && (
-                  <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-1.5 text-xs font-mono">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2 font-sans font-bold">Calling Pattern & Scheduled Arrival Times</p>
-                    {trainSequence.nextTrain.stops.map((st, idx) => (
-                      <div 
-                        key={idx} 
-                        className={`flex items-center justify-between py-1 px-2 rounded ${st.stationId === selectedStationId ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold' : 'text-slate-400 hover:bg-slate-900'}`}
-                      >
-                        <span className="flex items-center space-x-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                          <span>{st.stationName} ({st.jp})</span>
+                <button
+                  onClick={() => setTravelDirection('inbound')}
+                  className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
+                    travelDirection === 'inbound'
+                      ? 'bg-gradient-to-r from-cyan-500/20 via-slate-900 to-slate-900 border-cyan-500 text-white ring-2 ring-cyan-500/30'
+                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className={`p-2.5 rounded-lg ${travelDirection === 'inbound' ? 'bg-cyan-500 text-slate-950' : 'bg-slate-900 text-slate-500'}`}>
+                      <ArrowUpIcon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-extrabold text-xs uppercase tracking-wider text-cyan-400">Northbound (上り)</p>
+                      <p className="text-sm font-bold text-slate-100 mt-0.5">Tennoji & Shin-Osaka</p>
+                      <p className="text-[11px] text-slate-400">Towards Osaka & Shinkansen</p>
+                    </div>
+                  </div>
+                  {travelDirection === 'inbound' && <CheckCircleIcon className="w-5 h-5 text-cyan-400 shrink-0 ml-2" />}
+                </button>
+              </div>
+            </section>
+
+            {}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center space-x-2.5">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black text-xs">
+                    3
+                  </span>
+                  <h2 className="font-bold text-slate-100 text-sm sm:text-base">
+                    Live Departures for <span className="text-amber-400 font-extrabold">{selectedStation.name}</span>
+                  </h2>
+                </div>
+
+                <span className="text-xs text-slate-400 font-mono bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
+                  {travelDirection === 'outbound' ? 'Southbound (下り)' : 'Northbound (上り)'}
+                </span>
+              </div>
+
+              {/* HERO CARD: UPCOMING NEXT TRAIN (#1) */}
+              {trainSequence.nextTrain ? (
+                <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/30 border-2 border-amber-500/80 rounded-2xl p-5 sm:p-6 shadow-2xl relative overflow-hidden space-y-4">
+                  <div className="absolute top-0 right-0 bg-amber-500 text-slate-950 font-black text-[10px] uppercase tracking-wider px-3.5 py-1 rounded-bl-xl shadow-md flex items-center space-x-1">
+                    <SparklesIcon className="w-3 h-3 fill-slate-950" />
+                    <span>NEXT TRAIN (#1)</span>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-2">
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="bg-amber-950 text-amber-300 border border-amber-700/80 text-[11px] px-2.5 py-0.5 rounded-md font-mono font-bold">
+                          {trainSequence.nextTrain.minsRemaining <= 2 ? 'BOARDING / AT PLATFORM' : 'ON SCHEDULE'}
                         </span>
-                        <div className="flex items-center space-x-3">
-                          <span className="text-[10px] text-slate-500 font-sans">{st.platform}</span>
-                          <span className="text-amber-400 font-bold">{st.time}</span>
+                        <span className="text-xs text-slate-300 font-mono bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">
+                          {trainSequence.nextTrain.platform}
+                        </span>
+                      </div>
+
+                      <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                        {trainSequence.nextTrain.trainNumber}
+                      </h3>
+
+                      <p className="text-xs sm:text-sm text-slate-300">
+                        Bound for <strong className="text-amber-400 font-bold">{trainSequence.nextTrain.boundFor}</strong> • <span className="text-slate-400">{trainSequence.nextTrain.type}</span>
+                      </p>
+                    </div>
+
+                    <div className="bg-slate-950 border border-amber-500/40 p-4 rounded-xl flex items-center space-x-5 shadow-inner shrink-0">
+                      <div>
+                        <p className="text-[10px] text-slate-400 uppercase font-semibold">Scheduled Departure</p>
+                        <p className="text-2xl font-black font-mono text-amber-400 mt-0.5">
+                          {trainSequence.nextTrain.timeFormatted}
+                        </p>
+                      </div>
+
+                      <div className="border-l border-slate-800 pl-5">
+                        <p className="text-[10px] text-slate-400 uppercase font-semibold">Wait Time</p>
+                        <p className="text-xl font-bold font-mono text-emerald-400 mt-0.5 flex items-center">
+                          <ClockIcon className="w-4 h-4 mr-1.5 text-emerald-400 animate-spin" />
+                          {trainSequence.nextTrain.minsRemaining <= 0 ? 'NOW' : `in ${trainSequence.nextTrain.minsRemaining} min`}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* TRAIN LOCATION STATUS BAR */}
+                  <div className="pt-3 border-t border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between text-xs text-slate-400">
+                      <span className="flex items-center space-x-1.5">
+                        <TrainIcon className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Live Position: <strong className="text-slate-200">{trainSequence.nextTrain.currentLocation}</strong></span>
+                      </span>
+                      <span className="font-mono text-cyan-400 text-[11px] hidden sm:inline">
+                        Composition: {trainSequence.nextTrain.cars} Cars
+                      </span>
+                    </div>
+
+                    {/* EXPANDABLE STOPS TIMETABLE BUTTON */}
+                    <button
+                      onClick={() => setExpandedTrainId(expandedTrainId === trainSequence.nextTrain.id ? null : trainSequence.nextTrain.id)}
+                      className="w-full text-left bg-slate-950/80 hover:bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-300 flex items-center justify-between transition"
+                    >
+                      <span className="font-medium text-slate-300">View Full Station Route Timetable</span>
+                      <ChevronDownIcon className={`w-4 h-4 text-amber-400 transition-transform ${expandedTrainId === trainSequence.nextTrain.id ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {expandedTrainId === trainSequence.nextTrain.id && (
+                      <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-1.5 text-xs font-mono">
+                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2 font-sans font-bold">Calling Pattern & Scheduled Arrival Times</p>
+                        {trainSequence.nextTrain.stops.map((st, idx) => (
+                          <div 
+                            key={idx} 
+                            className={`flex items-center justify-between py-1 px-2 rounded ${st.stationId === selectedStationId ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold' : 'text-slate-400 hover:bg-slate-900'}`}
+                          >
+                            <span className="flex items-center space-x-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                              <span>{st.stationName} ({st.jp})</span>
+                            </span>
+                            <div className="flex items-center space-x-3">
+                              <span className="text-[10px] text-slate-500 font-sans">{st.platform}</span>
+                              <span className="text-amber-400 font-bold">{st.time}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center space-y-2">
+                  <AlertCircleIcon className="w-8 h-8 text-amber-400 mx-auto" />
+                  <h3 className="text-sm font-bold text-slate-300">No Immediate Services</h3>
+                  <p className="text-xs text-slate-500">
+                    No direct Kuroshio express departures scheduled right now for {selectedStation.name} in this direction.
+                  </p>
+                </div>
+              )}
+
+              {}
+              <div className="pt-2 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                    <LayersIcon className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>2 More Trains Behind (#2 & #3)</span>
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* TRAIN #2 BEHIND */}
+                  {trainSequence.secondTrain ? (
+                    <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3 relative shadow-md hover:border-slate-700 transition">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono font-bold bg-slate-800 text-cyan-400 px-2 py-0.5 rounded border border-slate-700">
+                          2ND TRAIN (#2 BEHIND)
+                        </span>
+                        <span className="text-xs font-mono font-bold text-amber-400">
+                          {trainSequence.secondTrain.timeFormatted}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <div>
+                          <h4 className="font-extrabold text-base text-white">
+                            {trainSequence.secondTrain.trainNumber}
+                          </h4>
+                          <p className="text-xs text-slate-400">
+                            Bound for <strong className="text-slate-200">{trainSequence.secondTrain.boundFor}</strong>
+                          </p>
+                        </div>
+
+                        <div className="text-right font-mono">
+                          <p className="text-[10px] text-slate-500">Wait</p>
+                          <p className="text-sm font-bold text-emerald-400">
+                            in {trainSequence.secondTrain.minsRemaining} mins
+                          </p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
+
+                      <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                        <span className="truncate pr-2">{trainSequence.secondTrain.type}</span>
+                        <span className="font-mono text-slate-300 shrink-0">{trainSequence.secondTrain.platform}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-slate-950 border border-dashed border-slate-800 p-4 rounded-xl text-center text-xs text-slate-500 flex items-center justify-center">
+                      No 2nd train scheduled for today
+                    </div>
+                  )}
+
+                  {/* TRAIN #3 BEHIND */}
+                  {trainSequence.thirdTrain ? (
+                    <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3 relative shadow-md hover:border-slate-700 transition">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono font-bold bg-slate-800 text-cyan-400 px-2 py-0.5 rounded border border-slate-700">
+                          3RD TRAIN (#3 BEHIND)
+                        </span>
+                        <span className="text-xs font-mono font-bold text-amber-400">
+                          {trainSequence.thirdTrain.timeFormatted}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <div>
+                          <h4 className="font-extrabold text-base text-white">
+                            {trainSequence.thirdTrain.trainNumber}
+                          </h4>
+                          <p className="text-xs text-slate-400">
+                            Bound for <strong className="text-slate-200">{trainSequence.thirdTrain.boundFor}</strong>
+                          </p>
+                        </div>
+
+                        <div className="text-right font-mono">
+                          <p className="text-[10px] text-slate-500">Wait</p>
+                          <p className="text-sm font-bold text-emerald-400">
+                            in {trainSequence.thirdTrain.minsRemaining} mins
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                        <span className="truncate pr-2">{trainSequence.thirdTrain.type}</span>
+                        <span className="font-mono text-slate-300 shrink-0">{trainSequence.thirdTrain.platform}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-slate-950 border border-dashed border-slate-800 p-4 rounded-xl text-center text-xs text-slate-500 flex items-center justify-center">
+                      No 3rd train scheduled for today
+                    </div>
+                  )}
+                </div>
               </div>
+            </section>
+
+          </main>
+
+          {/* FOOTER */}
+          <footer className="border-t border-slate-800 bg-slate-900/50 mt-12 py-6">
+            <div className="max-w-4xl mx-auto px-4 text-center text-xs text-slate-500 space-y-1">
+              <p>JR West Kuroshio Limited Express Live Departure Board</p>
+              <p className="text-[10px] text-slate-600">Verified against JR West Kinokuni Line & Osaka Umekita timetable specifications</p>
             </div>
-          ) : (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center space-y-2">
-              <AlertCircle className="w-8 h-8 text-amber-400 mx-auto" />
-              <h3 className="text-sm font-bold text-slate-300">No Immediate Services</h3>
-              <p className="text-xs text-slate-500">
-                No direct Kuroshio express departures scheduled right now for {selectedStation.name} in this direction.
-              </p>
-            </div>
-          )}
+          </footer>
 
-          {/* SECONDARY CARDS: 2 MORE TRAINS BEHIND (#2 & #3) */}
-          {}
-          <div className="pt-2 space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
-                <Layers className="w-3.5 h-3.5 text-cyan-400" />
-                <span>2 More Trains Behind (#2 & #3)</span>
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* TRAIN #2 BEHIND */}
-              {trainSequence.secondTrain ? (
-                <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3 relative shadow-md hover:border-slate-700 transition">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold bg-slate-800 text-cyan-400 px-2 py-0.5 rounded border border-slate-700">
-                      2ND TRAIN (#2 BEHIND)
-                    </span>
-                    <span className="text-xs font-mono font-bold text-amber-400">
-                      {trainSequence.secondTrain.timeFormatted}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-1">
-                    <div>
-                      <h4 className="font-extrabold text-base text-white">
-                        {trainSequence.secondTrain.trainNumber}
-                      </h4>
-                      <p className="text-xs text-slate-400">
-                        Bound for <strong className="text-slate-200">{trainSequence.secondTrain.boundFor}</strong>
-                      </p>
-                    </div>
-
-                    <div className="text-right font-mono">
-                      <p className="text-[10px] text-slate-500">Wait</p>
-                      <p className="text-sm font-bold text-emerald-400">
-                        in {trainSequence.secondTrain.minsRemaining} mins
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-                    <span className="truncate pr-2">{trainSequence.secondTrain.type}</span>
-                    <span className="font-mono text-slate-300 shrink-0">{trainSequence.secondTrain.platform}</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-slate-950 border border-dashed border-slate-800 p-4 rounded-xl text-center text-xs text-slate-500 flex items-center justify-center">
-                  No 2nd train scheduled for today
-                </div>
-              )}
-
-              {/* TRAIN #3 BEHIND */}
-              {trainSequence.thirdTrain ? (
-                <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3 relative shadow-md hover:border-slate-700 transition">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold bg-slate-800 text-cyan-400 px-2 py-0.5 rounded border border-slate-700">
-                      3RD TRAIN (#3 BEHIND)
-                    </span>
-                    <span className="text-xs font-mono font-bold text-amber-400">
-                      {trainSequence.thirdTrain.timeFormatted}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-1">
-                    <div>
-                      <h4 className="font-extrabold text-base text-white">
-                        {trainSequence.thirdTrain.trainNumber}
-                      </h4>
-                      <p className="text-xs text-slate-400">
-                        Bound for <strong className="text-slate-200">{trainSequence.thirdTrain.boundFor}</strong>
-                      </p>
-                    </div>
-
-                    <div className="text-right font-mono">
-                      <p className="text-[10px] text-slate-500">Wait</p>
-                      <p className="text-sm font-bold text-emerald-400">
-                        in {trainSequence.thirdTrain.minsRemaining} mins
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-                    <span className="truncate pr-2">{trainSequence.thirdTrain.type}</span>
-                    <span className="font-mono text-slate-300 shrink-0">{trainSequence.thirdTrain.platform}</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-slate-950 border border-dashed border-slate-800 p-4 rounded-xl text-center text-xs text-slate-500 flex items-center justify-center">
-                  No 3rd train scheduled for today
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-
-      </main>
-
-      {/* FOOTER */}
-      <footer className="border-t border-slate-800 bg-slate-900/50 mt-12 py-6">
-        <div className="max-w-4xl mx-auto px-4 text-center text-xs text-slate-500 space-y-1">
-          <p>JR West Kuroshio Limited Express Live Departure Board</p>
-          <p className="text-[10px] text-slate-600">Verified against JR West Kinokuni Line & Osaka Umekita timetable specifications</p>
         </div>
-      </footer>
+      );
+    }
 
-    </div>
-  );
-}
+    const rootElement = document.getElementById('root');
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(<App />);
+  </script>
+</body>
+</html>
