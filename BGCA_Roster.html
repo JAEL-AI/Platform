@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在校課後託管導師報更及課室分配</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS (xlsx) for Excel export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-500 p-2.5 rounded-xl shadow-inner">
+                    <i class="fa-solid fa-calendar-days text-2xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">在校課後託管導師報更及課室分配</h1>
+                    <p class="text-indigo-200 text-sm">2025年10月 (1/10 - 31/10)</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 flex-wrap">
+                <!-- CSV Import Button -->
+                <label class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-medium transition shadow-sm flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-file-arrow-up"></i> 匯入 CSV 報更表
+                    <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCsvImport(event)">
+                </label>
+                <!-- Room Assignment Button -->
+                <button onclick="openRoomAssignmentModal()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 rounded-lg text-sm font-medium transition shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-door-open"></i> 課室分配矩陣
+                </button>
+                <button id="viewCalendarBtn" onclick="switchView('calendar')" class="px-3.5 py-2 bg-indigo-700 hover:bg-indigo-800 rounded-lg text-sm font-medium transition shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-calendar"></i> 月曆檢視
+                </button>
+                <button id="viewTutorBtn" onclick="switchView('tutor')" class="px-3.5 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-lg text-sm font-medium transition shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-user-graduate"></i> 導師檢視
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-grow w-full">
+        <!-- Controls & Filters Bar -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3 w-full md:w-auto flex-wrap">
+                <div class="relative w-full md:w-80">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" oninput="filterData()" placeholder="搜尋導師姓名..." 
+                        class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+                </div>
+                <select id="shiftFilter" onchange="filterData()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="all">所有更次類型 (全 / 功)</option>
+                    <option value="full">全節 (15:00-18:00)</option>
+                    <option value="homework">功課節 (15:30-17:00)</option>
+                </select>
+                <span id="dataSourceBadge" class="text-xs px-3 py-1 bg-slate-100 text-slate-600 rounded-lg font-medium">使用預設數據</span>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-medium text-slate-600">
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> 全節 (15:00-18:00)</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> 功課節 (15:30-17:00)</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-slate-300 inline-block"></span> 假期/停課</span>
+            </div>
+        </div>
+
+        <!-- Calendar View Container (Monday start: Mon, Tue, Wed, Thu, Fri, Sat, Sun) -->
+        <div id="calendarView" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-7 gap-3 text-center font-semibold text-slate-500 text-sm hidden md:grid">
+                <div class="py-2">星期一</div>
+                <div class="py-2">星期二</div>
+                <div class="py-2">星期三</div>
+                <div class="py-2">星期四</div>
+                <div class="py-2">星期五</div>
+                <div class="py-2">星期六</div>
+                <div class="py-2">星期日</div>
+            </div>
+            <!-- Calendar Grid -->
+            <div id="calendarGrid" class="grid grid-cols-1 md:grid-cols-7 gap-4">
+                <!-- Dynamically injected by JS -->
+            </div>
+        </div>
+
+        <!-- Tutor View Container -->
+        <div id="tutorView" class="hidden space-y-6">
+            <div id="tutorListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically injected by JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal for Day Details -->
+    <div id="dayModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden transform transition-all">
+            <div class="bg-indigo-600 text-white px-6 py-4 flex justify-between items-center">
+                <h3 id="modalTitle" class="text-lg font-bold">日期詳情</h3>
+                <button onclick="closeModal()" class="text-indigo-200 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <div id="modalBody" class="p-6 max-h-[70vh] overflow-y-auto space-y-4">
+                <!-- Modal content -->
+            </div>
+            <div class="bg-slate-50 px-6 py-3 flex justify-end">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-sm font-medium transition">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="roomAssignmentModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-7xl w-full overflow-hidden transform transition-all flex flex-col h-[90vh]">
+            <div class="bg-amber-600 text-white px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="bg-amber-500 p-2.5 rounded-xl shadow-inner">
+                        <i class="fa-solid fa-door-open text-xl text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold">在校課後託管導師報更及課室分配矩陣管理</h3>
+                        <p class="text-amber-100 text-xs">管理每週導師於不同課室的當值分配（每位導師每日限配一室，並可設定全節或功課節）</p>
+                    </div>
+                </div>
+                <!-- Week selector & Add room controls -->
+                <div class="flex items-center gap-2 flex-wrap">
+                    <select id="matrixWeekSelect" onchange="renderRoomMatrix()" class="px-3 py-2 bg-amber-700 text-white border border-amber-500 rounded-xl text-xs font-medium focus:outline-none">
+                        <!-- Weeks options injected dynamically -->
+                    </select>
+                    <div class="flex items-center bg-white rounded-xl overflow-hidden border border-amber-500">
+                        <input type="text" id="newRoomInput" placeholder="新課室名稱..." class="px-3 py-1.5 text-xs text-slate-800 focus:outline-none w-32 sm:w-40">
+                        <button onclick="addRoom()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> 新增課室
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matrix Table Container with flex-grow & proper scrolling -->
+            <div class="p-6 bg-slate-50 flex-grow overflow-hidden flex flex-col">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex-grow flex flex-col">
+                    <div class="overflow-auto flex-grow" id="matrixTableContainer">
+                        <!-- Injected Matrix Table -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-slate-200 shrink-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button onclick="autoAssignMatrixWeek()" class="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> 自動隨機分配本週
+                    </button>
+                    <button onclick="checkUnassignedRooms()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation"></i> 檢查未分配課室
+                    </button>
+                    <button onclick="exportRoomAssignmentExcel()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold transition shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-excel"></i> 匯出 Excel (月曆格式總表)
+                    </button>
+                    <button onclick="exportDataBackup()" class="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-xs font-semibold transition shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> 備份數據 (JSON)
+                    </button>
+                    <label class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> 還原備份
+                        <input type="file" id="importJsonInput" accept=".json" class="hidden" onchange="importDataBackup(event)">
+                    </label>
+                </div>
+                <button onclick="closeRoomAssignmentModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-medium transition">完成並關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg z-50 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 text-sm">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastMessage">提示訊息</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            在校課後託管導師報更及課室分配管理系統 &copy; 2025
+        </div>
+    </footer>
+
+    <script>
+        let rawData = [
+            { id: 1, name: "吳健宇", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "全節 (15:00-18:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "全節 (15:00-18:00)", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "不能出席", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "全節 (15:00-18:00)", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "全節 (15:00-18:00)", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "全節 (15:00-18:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
+            { id: 2, name: "陳培津", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "全節 (15:00-18:00)", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "全節 (15:00-18:00)", "15/10/2025 (三)": "全節 (15:00-18:00)", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "全節 (15:00-18:00)", "22/10/2025 (三)": "全節 (15:00-18:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "不能出席", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "全節 (15:00-18:00)", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
+            { id: 3, name: "郭嘉兒", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "功課節 (15:30-17:00)", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "功課節 (15:30-17:00)", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "全節 (15:00-18:00)", "14/10/2025 (二)": "全節 (15:00-18:00)", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "功課節 (15:30-17:00)", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "全節 (15:00-18:00)", "22/10/2025 (三)": "功課節 (15:30-17:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "全節 (15:00-18:00)", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "功課節 (15:30-17:00)", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
+            { id: 4, name: "林懿澄", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "功課節 (15:30-17:00)", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "功課節 (15:30-17:00)", "15/10/2025 (三)": "功課節 (15:30-17:00)", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "功課節 (15:30-17:00)", "22/10/2025 (三)": "功課節 (15:30-17:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "不能出席", "28/10/2025 (二)": "功課節 (15:30-17:00)", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
+            { id: 5, name: "方嘉瑩", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "全節 (15:00-18:00)", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "功課節 (15:30-17:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "功課節 (15:30-17:00)", "9/10/2025 (四)": "全節 (15:00-18:00)", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "功課節 (15:30-17:00)", "14/10/2025 (二)": "全節 (15:00-18:00)", "15/10/2025 (三)": "功課節 (15:30-17:00)", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "功課節 (15:30-17:00)", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "功課節 (15:30-17:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
+            { id: 6, name: "袁珞桐", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "全節 (15:00-18:00)", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "全節 (15:00-18:00)", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "全節 (15:00-18:00)", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "全節 (15:00-18:00)", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "不能出席", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "不能出席", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "全節 (15:00-18:00)", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
+            { id: 7, name: "Lam Ching Hei", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "全節 (15:00-18:00)", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "全節 (15:00-18:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "全節 (15:00-18:00)", "9/10/2025 (四)": "全節 (15:00-18:00)", "10/10/2025 (五)": "不能出席", "13/10/2025 (一)": "全節 (15:00-18:00)", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "全節 (15:00-18:00)", "16/10/2025 (四)": "全節 (15:00-18:00)", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "全節 (15:00-18:00)", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "全節 (15:00-18:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "全節 (15:00-18:00)", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "全節 (15:00-18:00)", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
+            { id: 8, name: "吳海藍", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "全節 (15:00-18:00)", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "全節 (15:00-18:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "全節 (15:00-18:00)", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "全節 (15:00-18:00)", "14/10/2025 (二)": "功課節 (15:30-17:00)", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "全節 (15:00-18:00)", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "全節 (15:00-18:00)", "21/10/2025 (二)": "功課節 (15:30-17:00)", "22/10/2025 (三)": "不能出席", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "功課節 (15:30-17:00)", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
+            { id: 9, name: "Chan hiu nam", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "全節 (15:00-18:00)", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "全節 (15:00-18:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "全節 (15:00-18:00)", "9/10/2025 (四)": "全節 (15:00-18:00)", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "全節 (15:00-18:00)", "14/10/2025 (二)": "全節 (15:00-18:00)", "15/10/2025 (三)": "全節 (15:00-18:00)", "16/10/2025 (四)": "全節 (15:00-18:00)", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "全節 (15:00-18:00)", "21/10/2025 (二)": "全節 (15:00-18:00)", "22/10/2025 (三)": "全節 (15:00-18:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "全節 (15:00-18:00)", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "全節 (15:00-18:00)", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
+            { id: 10, name: "黃倩心", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "不能出席", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "全節 (15:00-18:00)", "22/10/2025 (三)": "不能出席", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "不能出席", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
+            { id: 11, name: "洪煒彤", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "全節 (15:00-18:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "不能出席", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "全節 (15:00-18:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "不能出席", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
+            { id: 12, name: "譚學斌", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "不能出席", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
+            { id: 13, name: "Lee Yat Ho", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "功課節 (15:30-17:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "功課節 (15:30-17:00)", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "不能出席", "13/10/2025 (一)": "功課節 (15:30-17:00)", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "功課節 (15:30-17:00)", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "功課節 (15:30-17:00)", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "功課節 (15:30-17:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "功課節 (15:30-17:00)", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
+            { id: 14, name: "莊家銘", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "全節 (15:00-18:00)", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "全節 (15:00-18:00)", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "全節 (15:00-18:00)", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "全節 (15:00-18:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
+            { id: 15, name: "甘詠恩", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "功課節 (15:30-17:00)", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "功課節 (15:30-17:00)", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "功課節 (15:30-17:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "不能出席", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} }
+        ];
+
+        let activeDateKeys = [
+            "1/10/25 (HOLIDAY)", "2/10/2025 (四)", "3/10/2025 (五)", "6/10/2025 (一)", "7/10/2025 (HOLIDAY)", 
+            "8/10/2025 (三)", "9/10/2025 (四)", "10/10/2025 (五)", "13/10/2025 (一)", "14/10/2025 (二)", 
+            "15/10/2025 (三)", "16/10/2025 (四)", "17/10/2025 (五)", "20/10/2025 (一)", "21/10/2025 (二)", 
+            "22/10/2025 (三)", "23/10/2025 (四) (學校旅行日)", "24/10/2025 (五) 旅行日翌日, 學校假期", "27/10/2025 (一)", 
+            "28/10/2025 (二)", "29/10/2025 (HOLIDAY)", "30/10/2025 (三`)", "31/10/2025 (五)"
+        ];
+
+        let octoberWeeks = [];
+        let roomList = ["室內活動室 (Activity Room)", "導管室 A (Room A)", "導管室 B (Room B)", "電腦室 (Computer Room)"];
+        let roomAssignments = {}; // Format: { "dateKey": { "Room Name": [{ name: "Tutor 1", slot: "全" }, ...] } }
+
+        function buildCalendarStructure() {
+            octoberWeeks = [
+                {
+                    title: "第 1 週 (29/9 - 5/10)",
+                    days: [
+                        { dayNum: null, dateStr: null, isSpacer: true },
+                        { dayNum: null, dateStr: null, isSpacer: true },
+                        { dayNum: 1, dateStr: activeDateKeys.find(k => k.startsWith("1/10")), dayOfWeek: 3, isHolidayOrSpecial: true },
+                        { dayNum: 2, dateStr: activeDateKeys.find(k => k.startsWith("2/10")), dayOfWeek: 4, isHolidayOrSpecial: false },
+                        { dayNum: 3, dateStr: activeDateKeys.find(k => k.startsWith("3/10")), dayOfWeek: 5, isHolidayOrSpecial: false },
+                        { dayNum: 4, dateStr: null, dayOfWeek: 6, isHolidayOrSpecial: true },
+                        { dayNum: 5, dateStr: null, dayOfWeek: 0, isHolidayOrSpecial: true }
+                    ]
+                },
+                {
+                    title: "第 2 週 (6/10 - 12/10)",
+                    days: [
+                        { dayNum: 6, dateStr: activeDateKeys.find(k => k.startsWith("6/10")), dayOfWeek: 1, isHolidayOrSpecial: false },
+                        { dayNum: 7, dateStr: activeDateKeys.find(k => k.startsWith("7/10")), dayOfWeek: 2, isHolidayOrSpecial: true },
+                        { dayNum: 8, dateStr: activeDateKeys.find(k => k.startsWith("8/10")), dayOfWeek: 3, isHolidayOrSpecial: false },
+                        { dayNum: 9, dateStr: activeDateKeys.find(k => k.startsWith("9/10")), dayOfWeek: 4, isHolidayOrSpecial: false },
+                        { dayNum: 10, dateStr: activeDateKeys.find(k => k.startsWith("10/10")), dayOfWeek: 5, isHolidayOrSpecial: false },
+                        { dayNum: 11, dateStr: null, dayOfWeek: 6, isHolidayOrSpecial: true },
+                        { dayNum: 12, dateStr: null, dayOfWeek: 0, isHolidayOrSpecial: true }
+                    ]
+                },
+                {
+                    title: "第 3 週 (13/10 - 19/10)",
+                    days: [
+                        { dayNum: 13, dateStr: activeDateKeys.find(k => k.startsWith("13/10")), dayOfWeek: 1, isHolidayOrSpecial: false },
+                        { dayNum: 14, dateStr: activeDateKeys.find(k => k.startsWith("14/10")), dayOfWeek: 2, isHolidayOrSpecial: false },
+                        { dayNum: 15, dateStr: activeDateKeys.find(k => k.startsWith("15/10")), dayOfWeek: 3, isHolidayOrSpecial: false },
+                        { dayNum: 16, dateStr: activeDateKeys.find(k => k.startsWith("16/10")), dayOfWeek: 4, isHolidayOrSpecial: false },
+                        { dayNum: 17, dateStr: activeDateKeys.find(k => k.startsWith("17/10")), dayOfWeek: 5, isHolidayOrSpecial: false },
+                        { dayNum: 18, dateStr: null, dayOfWeek: 6, isHolidayOrSpecial: true },
+                        { dayNum: 19, dateStr: null, dayOfWeek: 0, isHolidayOrSpecial: true }
+                    ]
+                },
+                {
+                    title: "第 4 週 (20/10 - 26/10)",
+                    days: [
+                        { dayNum: 20, dateStr: activeDateKeys.find(k => k.startsWith("20/10")), dayOfWeek: 1, isHolidayOrSpecial: false },
+                        { dayNum: 21, dateStr: activeDateKeys.find(k => k.startsWith("21/10")), dayOfWeek: 2, isHolidayOrSpecial: false },
+                        { dayNum: 22, dateStr: activeDateKeys.find(k => k.startsWith("22/10")), dayOfWeek: 3, isHolidayOrSpecial: false },
+                        { dayNum: 23, dateStr: activeDateKeys.find(k => k.startsWith("23/10")), dayOfWeek: 4, isHolidayOrSpecial: true },
+                        { dayNum: 24, dateStr: activeDateKeys.find(k => k.startsWith("24/10")), dayOfWeek: 5, isHolidayOrSpecial: true },
+                        { dayNum: 25, dateStr: null, dayOfWeek: 6, isHolidayOrSpecial: true },
+                        { dayNum: 26, dateStr: null, dayOfWeek: 0, isHolidayOrSpecial: true }
+                    ]
+                },
+                {
+                    title: "第 5 週 (27/10 - 2/11)",
+                    days: [
+                        { dayNum: 27, dateStr: activeDateKeys.find(k => k.startsWith("27/10")), dayOfWeek: 1, isHolidayOrSpecial: false },
+                        { dayNum: 28, dateStr: activeDateKeys.find(k => k.startsWith("28/10")), dayOfWeek: 2, isHolidayOrSpecial: false },
+                        { dayNum: 29, dateStr: activeDateKeys.find(k => k.startsWith("29/10")), dayOfWeek: 3, isHolidayOrSpecial: true },
+                        { dayNum: 30, dateStr: activeDateKeys.find(k => k.startsWith("30/10")), dayOfWeek: 4, isHolidayOrSpecial: false },
+                        { dayNum: 31, dateStr: activeDateKeys.find(k => k.startsWith("31/10")), dayOfWeek: 5, isHolidayOrSpecial: false },
+                        { dayNum: null, dateStr: null, isSpacer: true },
+                        { dayNum: null, dateStr: null, isSpacer: true }
+                    ]
+                }
+            ];
+        }
+
+        let currentView = 'calendar';
+
+        function switchView(view) {
+            currentView = view;
+            const calBtn = document.getElementById('viewCalendarBtn');
+            const tutBtn = document.getElementById('viewTutorBtn');
+            const calView = document.getElementById('calendarView');
+            const tutView = document.getElementById('tutorView');
+
+            if (view === 'calendar') {
+                calBtn.className = "px-3.5 py-2 bg-indigo-700 hover:bg-indigo-800 rounded-lg text-sm font-medium transition shadow-sm flex items-center gap-2";
+                tutBtn.className = "px-3.5 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-lg text-sm font-medium transition shadow-sm flex items-center gap-2";
+                calView.classList.remove('hidden');
+                tutView.classList.add('hidden');
+            } else {
+                tutBtn.className = "px-3.5 py-2 bg-indigo-700 hover:bg-indigo-800 rounded-lg text-sm font-medium transition shadow-sm flex items-center gap-2";
+                calBtn.className = "px-3.5 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-lg text-sm font-medium transition shadow-sm flex items-center gap-2";
+                tutView.classList.remove('hidden');
+                calView.classList.add('hidden');
+            }
+            renderViews();
+        }
+
+        function filterData() {
+            renderViews();
+        }
+
+        function renderViews() {
+            const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+            const shiftVal = document.getElementById('shiftFilter').value;
+
+            renderCalendar(searchVal, shiftVal);
+            renderTutors(searchVal, shiftVal);
+        }
+
+        function renderCalendar(searchQuery, shiftFilter) {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+
+            octoberWeeks.forEach(week => {
+                week.days.forEach(item => {
+                    if (item.isSpacer) {
+                        const spacer = document.createElement('div');
+                        spacer.className = "hidden md:block bg-slate-100/50 rounded-2xl min-h-[140px] border border-dashed border-slate-200";
+                        grid.appendChild(spacer);
+                        return;
+                    }
+
+                    const card = document.createElement('div');
+                    let isWeekend = (item.dayOfWeek === 0 || item.dayOfWeek === 6);
+                    
+                    let activeTutors = [];
+                    if (item.dateStr) {
+                        rawData.forEach(tutor => {
+                            if (searchQuery && !tutor.name.toLowerCase().includes(searchQuery)) return;
+                            let shift = tutor.shifts[item.dateStr];
+                            if (shift && shift !== "不能出席" && shift.trim() !== "") {
+                                if (shiftFilter === 'all' || 
+                                   (shiftFilter === 'full' && (shift.includes("全節") || shift.includes("15:00"))) ||
+                                   (shiftFilter === 'homework' && (shift.includes("功課節") || shift.includes("15:30")))) {
+                                    activeTutors.push({ name: tutor.name, shift: shift });
+                                }
+                            }
+                        });
+                    }
+
+                    let bgClass = "bg-white";
+                    let borderClass = "border-slate-200";
+                    if (item.isHolidayOrSpecial) {
+                        bgClass = "bg-slate-50";
+                        borderClass = "border-slate-200/60";
+                    }
+
+                    card.className = `${bgClass} border ${borderClass} rounded-2xl p-3.5 flex flex-col justify-between shadow-sm hover:shadow-md transition min-h-[160px] relative overflow-hidden`;
+                    
+                    let dayNames = ['日','一','二','三','四','五','六'];
+                    let headerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="font-bold text-slate-700 text-base">10/${item.dayNum}</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full font-medium ${isWeekend ? 'bg-rose-100 text-rose-600' : 'bg-slate-100 text-slate-500'}">
+                                ${dayNames[item.dayOfWeek]}
+                            </span>
+                        </div>
+                    `;
+
+                    let bodyHTML = '';
+                    if (item.isHolidayOrSpecial) {
+                        let reason = "假期 / 停課";
+                        if (item.dateStr && (item.dateStr.includes("旅行日") || item.dateStr.includes("學校"))) reason = "學校假期/活動";
+                        else if (isWeekend) reason = "週末假期";
+                        
+                        bodyHTML = `
+                            <div class="flex-grow flex items-center justify-center text-center py-4">
+                                <span class="text-xs text-slate-400 font-medium bg-slate-200/60 px-2.5 py-1 rounded-lg">${reason}</span>
+                            </div>
+                        `;
+                    } else {
+                        let roomSummaryHTML = '';
+                        if (item.dateStr && roomAssignments[item.dateStr]) {
+                            let assignedCount = Object.values(roomAssignments[item.dateStr]).reduce((acc, tArr) => acc + tArr.length, 0);
+                            if (assignedCount > 0) {
+                                roomSummaryHTML = `<div class="mb-1 text-[11px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-200 font-medium flex items-center gap-1">
+                                    <i class="fa-solid fa-door-open"></i> 已分配 ${assignedCount} 位導師至課室
+                                </div>`;
+                            }
+                        }
+
+                        if (activeTutors.length === 0) {
+                            bodyHTML = `
+                                <div class="flex-grow flex items-center justify-center text-center py-4">
+                                    <span class="text-xs text-slate-400 italic">無符合導師更次</span>
+                                </div>
+                            `;
+                        } else {
+                            let maxDisplay = 2;
+                            let displayed = activeTutors.slice(0, maxDisplay);
+                            let remaining = activeTutors.length - maxDisplay;
+
+                            let badges = displayed.map(t => {
+                                let isFull = t.shift.includes("全節") || t.shift.includes("15:00-18:00");
+                                let badgeColor = isFull ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200";
+                                let dotColor = isFull ? "bg-emerald-500" : "bg-amber-500";
+                                return `<div class="text-xs px-2 py-1 rounded-lg border ${badgeColor} flex items-center justify-between gap-1 mb-1 truncate">
+                                    <span class="font-medium truncate"><span class="w-1.5 h-1.5 rounded-full ${dotColor} inline-block mr-1"></span>${t.name}</span>
+                                    <span class="text-[10px] opacity-75">${isFull ? "全" : "功"}</span>
+                                </div>`;
+                            }).join('');
+
+                            if (remaining > 0) {
+                                badges += `<button onclick='openDayModal(${item.dayNum}, ${JSON.stringify(activeTutors)})' class="w-full text-center text-xs text-indigo-600 hover:text-indigo-800 font-medium py-1 bg-indigo-50/50 hover:bg-indigo-50 rounded-lg transition">還有 +${remaining} 位...</button>`;
+                            }
+
+                            bodyHTML = `<div class="flex-grow space-y-1">${roomSummaryHTML}${badges}</div>`;
+                        }
+                    }
+
+                    let footerHTML = `
+                        <div class="mt-2 pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
+                            <span class="text-slate-400 font-medium">${item.isHolidayOrSpecial ? '0 更次' : activeTutors.length + ' 位導師'}</span>
+                            ${!item.isHolidayOrSpecial ? `<button onclick='openDayModal(${item.dayNum}, ${JSON.stringify(activeTutors)})' class="text-indigo-600 hover:text-indigo-700 font-semibold"><i class="fa-solid fa-eye"></i> 詳情</button>` : ''}
+                        </div>
+                    `;
+
+                    card.innerHTML = headerHTML + bodyHTML + footerHTML;
+                    grid.appendChild(card);
+                });
+            });
+        }
+
+        function renderTutors(searchQuery, shiftFilter) {
+            const container = document.getElementById('tutorListContainer');
+            container.innerHTML = '';
+
+            rawData.forEach(tutor => {
+                if (searchQuery && !tutor.name.toLowerCase().includes(searchQuery)) return;
+
+                let fullCount = 0;
+                let hwCount = 0;
+                let shiftsList = [];
+
+                for (let [dateKey, shiftVal] of Object.entries(tutor.shifts)) {
+                    if (shiftVal && shiftVal !== "不能出席" && shiftVal.trim() !== "") {
+                        let isFull = shiftVal.includes("全節") || shiftVal.includes("15:00-18:00");
+                        if (isFull) fullCount++;
+                        else hwCount++;
+                        shiftsList.push({ date: dateKey.split(' ')[0], shift: shiftVal, isFull: isFull });
+                    }
+                }
+
+                if (shiftFilter === 'full' && fullCount === 0) return;
+                if (shiftFilter === 'homework' && hwCount === 0) return;
+
+                let card = document.createElement('div');
+                card.className = "bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between";
+
+                let shiftsBadges = shiftsList.map(s => {
+                    let badgeColor = s.isFull ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200";
+                    return `<span class="inline-flex items-center text-xs px-2.5 py-1 rounded-lg border ${badgeColor} font-medium">
+                        ${s.date} (${s.isFull ? '全節' : '功課'})
+                    </span>`;
+                }).join('');
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">${tutor.name}</h3>
+                                <p class="text-xs text-slate-500 mt-0.5">總可用更次: <span class="font-semibold text-indigo-600">${fullCount + hwCount}</span></p>
+                            </div>
+                            <div class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                全:${fullCount} | 功:${hwCount}
+                            </div>
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">已報更日子:</p>
+                            <div class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
+                                ${shiftsList.length > 0 ? shiftsBadges : '<span class="text-xs text-slate-400 italic">無有效更次</span>'}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex justify-between items-center text-xs text-slate-400">
+                        <span>導師 ID: #${tutor.id}</span>
+                        <span class="font-medium text-slate-600">十月份報更表</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openDayModal(dayNum, tutors) {
+            const modal = document.getElementById('dayModal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            title.innerText = `10月${dayNum}日 託管導師當值名單 (${tutors.length}位)`;
+
+            if (tutors.length === 0) {
+                body.innerHTML = `<p class="text-center text-slate-400 py-6">此日無導師當值</p>`;
+            } else {
+                body.innerHTML = `
+                    <div class="space-y-2">
+                        ${tutors.map(t => {
+                            let isFull = t.shift.includes("全節") || t.shift.includes("15:00-18:00");
+                            return `
+                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full ${isFull ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'} flex items-center justify-center font-bold text-sm">
+                                            ${t.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <span class="font-semibold text-slate-700 text-sm">${t.name}</span>
+                                    </div>
+                                    <span class="text-xs px-3 py-1 rounded-full font-medium ${isFull ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                                        ${t.shift}
+                                    </span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('dayModal').classList.add('hidden');
+        }
+
+        // --- Matrix Room Assignment Functions ---
+        function openRoomAssignmentModal() {
+            const select = document.getElementById('matrixWeekSelect');
+            select.innerHTML = '';
+
+            octoberWeeks.forEach((week, idx) => {
+                let opt = document.createElement('option');
+                opt.value = idx;
+                opt.innerText = week.title;
+                select.appendChild(opt);
+            });
+
+            document.getElementById('roomAssignmentModal').classList.remove('hidden');
+            renderRoomMatrix();
+        }
+
+        function closeRoomAssignmentModal() {
+            document.getElementById('roomAssignmentModal').classList.add('hidden');
+            renderViews();
+        }
+
+        function renderRoomMatrix() {
+            const weekIndex = parseInt(document.getElementById('matrixWeekSelect').value || 0);
+            const weekObj = octoberWeeks[weekIndex];
+            const container = document.getElementById('matrixTableContainer');
+
+            let schoolDays = weekObj.days.filter(d => !d.isSpacer && d.dateStr && !d.isHolidayOrSpecial);
+
+            if (schoolDays.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center text-slate-400">本週沒有上課日或均為假期。</div>`;
+                return;
+            }
+
+            let tableHTML = `
+                <table class="w-full border-collapse text-left text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                            <th class="p-3 font-semibold w-48 border-r border-slate-200 sticky left-0 bg-slate-100 z-10">課室 \\ 日期</th>
+            `;
+
+            let dayNames = ['日','一','二','三','四','五','六'];
+            schoolDays.forEach(d => {
+                tableHTML += `<th class="p-3 font-semibold text-center border-r border-slate-200 min-w-[200px]">10/${d.dayNum} (${dayNames[d.dayOfWeek]})</th>`;
+            });
+            tableHTML += `</tr></thead><tbody class="divide-y divide-slate-200">`;
+
+            roomList.forEach(room => {
+                tableHTML += `
+                    <tr class="hover:bg-slate-50/50">
+                        <td class="p-3 font-bold text-slate-800 border-r border-slate-200 bg-white sticky left-0 z-10 flex items-center justify-between">
+                            <span><i class="fa-solid fa-door-open text-amber-500 mr-2"></i>${room}</span>
+                            <button onclick="deleteRoom('${room}')" class="text-rose-400 hover:text-rose-600 text-xs px-1.5 py-0.5 rounded" title="刪除課室"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                `;
+
+                schoolDays.forEach(d => {
+                    let dateKey = d.dateStr;
+                    if (!roomAssignments[dateKey]) roomAssignments[dateKey] = {};
+                    if (!roomAssignments[dateKey][room]) roomAssignments[dateKey][room] = [];
+
+                    let assignedTutors = roomAssignments[dateKey][room]; // Array of { name, slot }
+
+                    let availableTutors = [];
+                    rawData.forEach(t => {
+                        let shift = t.shifts[dateKey];
+                        if (shift && shift !== "不能出席" && shift.trim() !== "") {
+                            let isFull = shift.includes("全節") || shift.includes("15:00-18:00");
+                            availableTutors.push({ name: t.name, isFull: isFull, defaultSlot: isFull ? '全' : '功' });
+                        }
+                    });
+
+                    tableHTML += `<td class="p-2 border-r border-slate-200 align-top bg-white">`;
+                    if (availableTutors.length === 0) {
+                        tableHTML += `<span class="text-xs text-slate-400 italic block text-center py-2">無當值導師</span>`;
+                    } else {
+                        tableHTML += `<div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">`;
+                        availableTutors.forEach(t => {
+                            let existing = assignedTutors.find(item => item.name === t.name);
+                            let isChecked = !!existing;
+                            let currentSlot = existing ? existing.slot : t.defaultSlot;
+
+                            let selectHTML = '';
+                            if (t.isFull) {
+                                selectHTML = `<select onchange="updateMatrixSlot('${dateKey}', '${room}', '${t.name}', this.value)" ${!isChecked ? 'disabled class="opacity-50 text-[10px] px-1 py-0.5 rounded border border-slate-200 bg-slate-100"' : 'class="text-[10px] px-1 py-0.5 rounded border border-amber-300 bg-white font-semibold text-amber-800 focus:outline-none"'}>
+                                    <option value="全" ${currentSlot === '全' ? 'selected' : ''}>全節</option>
+                                    <option value="功" ${currentSlot === '功' ? 'selected' : ''}>功課節</option>
+                                </select>`;
+                            } else {
+                                selectHTML = `<select disabled class="opacity-75 text-[10px] px-1 py-0.5 rounded border border-slate-200 bg-slate-100 font-semibold text-slate-600">
+                                    <option value="功" selected>功課節</option>
+                                </select>`;
+                            }
+
+                            tableHTML += `
+                                <div class="flex items-center justify-between p-1.5 rounded-lg border ${isChecked ? 'bg-amber-50/80 border-amber-300 shadow-sm' : 'bg-slate-50 border-slate-200'} text-xs transition">
+                                    <label class="flex items-center gap-1.5 truncate font-medium text-slate-700 cursor-pointer flex-grow">
+                                        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleMatrixAssignment('${dateKey}', '${room}', '${t.name}', this.checked)" class="rounded text-amber-600 focus:ring-amber-500">
+                                        <span class="truncate">${t.name}</span>
+                                    </label>
+                                    ${selectHTML}
+                                </div>
+                            `;
+                        });
+                        tableHTML += `</div>`;
+                    }
+                    tableHTML += `</td>`;
+                });
+
+                tableHTML += `</tr>`;
+            });
+
+            tableHTML += `</tbody></table>`;
+            container.innerHTML = tableHTML;
+        }
+
+        function toggleMatrixAssignment(dateKey, roomName, tutorName, isChecked) {
+            if (!roomAssignments[dateKey]) roomAssignments[dateKey] = {};
+
+            for (let r in roomAssignments[dateKey]) {
+                roomAssignments[dateKey][r] = (roomAssignments[dateKey][r] || []).filter(item => item.name !== tutorName);
+            }
+
+            if (isChecked) {
+                if (!roomAssignments[dateKey][roomName]) {
+                    roomAssignments[dateKey][roomName] = [];
+                }
+                let tutorObj = rawData.find(t => t.name === tutorName);
+                let defaultSlot = '功';
+                if (tutorObj && tutorObj.shifts[dateKey]) {
+                    let s = tutorObj.shifts[dateKey];
+                    if (s.includes("全節") || s.includes("15:00-18:00")) defaultSlot = '全';
+                }
+                roomAssignments[dateKey][roomName].push({ name: tutorName, slot: defaultSlot });
+                showToast(`已指派 ${tutorName} 至 ${roomName}`);
+            } else {
+                showToast(`已取消 ${tutorName} 的指派`);
+            }
+
+            renderRoomMatrix();
+        }
+
+        function updateMatrixSlot(dateKey, roomName, tutorName, slotVal) {
+            if (roomAssignments[dateKey] && roomAssignments[dateKey][roomName]) {
+                let assignment = roomAssignments[dateKey][roomName].find(item => item.name === tutorName);
+                if (assignment) {
+                    assignment.slot = slotVal;
+                    showToast(`已更新 ${tutorName} 在 ${roomName} 的時段為 ${slotVal === '全' ? '全節' : '功課節'}`);
+                }
+            }
+        }
+
+        function addRoom() {
+            const input = document.getElementById('newRoomInput');
+            const roomName = input.value.trim();
+            if (!roomName) {
+                showToast("請輸入課室名稱", false);
+                return;
+            }
+            if (roomList.includes(roomName)) {
+                showToast("此課室已存在", false);
+                return;
+            }
+            roomList.push(roomName);
+            input.value = '';
+            showToast(`成功新增課室: ${roomName}`);
+            renderRoomMatrix();
+        }
+
+        function deleteRoom(roomName) {
+            roomList = roomList.filter(r => r !== roomName);
+            for (let dKey in roomAssignments) {
+                if (roomAssignments[dKey][roomName]) {
+                    delete roomAssignments[dKey][roomName];
+                }
+            }
+            showToast(`已刪除課室: ${roomName}`);
+            renderRoomMatrix();
+        }
+
+        function autoAssignMatrixWeek() {
+            const weekIndex = parseInt(document.getElementById('matrixWeekSelect').value || 0);
+            const weekObj = octoberWeeks[weekIndex];
+            let schoolDays = weekObj.days.filter(d => !d.isSpacer && d.dateStr && !d.isHolidayOrSpecial);
+
+            if (schoolDays.length === 0) {
+                showToast("本週沒有上課日可供自動分配", false);
+                return;
+            }
+
+            schoolDays.forEach(d => {
+                let dateKey = d.dateStr;
+                let availableTutors = [];
+                rawData.forEach(t => {
+                    let shift = t.shifts[dateKey];
+                    if (shift && shift !== "不能出席" && shift.trim() !== "") {
+                        let isFull = shift.includes("全節") || shift.includes("15:00-18:00");
+                        availableTutors.push({ name: t.name, defaultSlot: isFull ? '全' : '功' });
+                    }
+                });
+
+                if (availableTutors.length > 0) {
+                    if (!roomAssignments[dateKey]) roomAssignments[dateKey] = {};
+                    roomList.forEach(room => { roomAssignments[dateKey][room] = []; });
+
+                    let shuffled = [...availableTutors].sort(() => 0.5 - Math.random());
+                    shuffled.forEach((t, i) => {
+                        let targetRoom = roomList[i % roomList.length];
+                        roomAssignments[dateKey][targetRoom].push({ name: t.name, slot: t.defaultSlot });
+                    });
+                }
+            });
+
+            showToast("已成功隨機自動分配本週所有上課日的導師！");
+            renderRoomMatrix();
+        }
+
+        function checkUnassignedRooms() {
+            const weekIndex = parseInt(document.getElementById('matrixWeekSelect').value || 0);
+            const weekObj = octoberWeeks[weekIndex];
+            let schoolDays = weekObj.days.filter(d => !d.isSpacer && d.dateStr && !d.isHolidayOrSpecial);
+
+            let unassignedList = [];
+
+            schoolDays.forEach(d => {
+                let dateKey = d.dateStr;
+                let availableTutorsCount = 0;
+                rawData.forEach(t => {
+                    let shift = t.shifts[dateKey];
+                    if (shift && shift !== "不能出席" && shift.trim() !== "") {
+                        availableTutorsCount++;
+                    }
+                });
+
+                if (availableTutorsCount > 0) {
+                    roomList.forEach(room => {
+                        let assignedTutors = (roomAssignments[dateKey] && roomAssignments[dateKey][room]) || [];
+                        if (assignedTutors.length === 0) {
+                            unassignedList.push(`10/${d.dayNum} 的「${room}」`);
+                        }
+                    });
+                }
+            });
+
+            if (unassignedList.length > 0) {
+                let msg = `⚠️ 注意：以下課室尚未指派任何導師：\n• ` + unassignedList.slice(0, 5).join('\n• ');
+                if (unassignedList.length > 5) {
+                    msg += `\n...及其他 ${unassignedList.length - 5} 個未分配項`;
+                }
+                showToast(msg, false);
+            } else {
+                showToast(`✅ 太棒了！本週所有上課日的課室均已分配導師。`);
+            }
+        }
+
+        function exportRoomAssignment() {
+            let report = "在校課後託管導師課室分配矩陣報告\n==========================\n\n";
+            for (let [dateKey, rooms] of Object.entries(roomAssignments)) {
+                let hasAssign = Object.values(rooms).some(arr => arr && arr.length > 0);
+                if (!hasAssign) continue;
+                report += `日期: ${dateKey}\n`;
+                for (let [room, tutors] of Object.entries(rooms)) {
+                    if (tutors && tutors.length > 0) {
+                        let tutorStrs = tutors.map(t => `${t.name}(${t.slot === '全' ? '全節' : '功課節'})`);
+                        report += `  - ${room}: ${tutorStrs.join(', ')}\n`;
+                    }
+                }
+                report += `\n`;
+            }
+
+            let blob = new Blob([report], { type: 'text/plain;charset=utf-8;' });
+            let link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `October_Room_Matrix_Assignments.txt`;
+            link.click();
+            showToast("成功匯出課室分配矩陣報告！");
+        }
+
+        function exportRoomAssignmentExcel() {
+            try {
+                if (typeof XLSX === 'undefined') {
+                    showToast("Excel 庫尚未加載完成，請稍候再試", false);
+                    return;
+                }
+
+                let excelData = [];
+                // Title row
+                excelData.push(["在校課後託管導師報更及課室分配 - 十月份月曆總表"]);
+                excelData.push([]); // Empty row
+
+                // Calendar headers: Mon to Sun
+                let dayNames = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
+                excelData.push(dayNames);
+
+                octoberWeeks.forEach(weekObj => {
+                    let dateRow = [];
+                    let contentRows = {}; // roomName -> 7 days array
+                    roomList.forEach(r => contentRows[r] = ["", "", "", "", "", "", ""]);
+
+                    weekObj.days.forEach((d, dayIdx) => {
+                        if (d.isSpacer || !d.dayNum) {
+                            dateRow.push("");
+                        } else {
+                            let dateLabel = `10/${d.dayNum}`;
+                            if (d.isHolidayOrSpecial) {
+                                dateLabel += ` (假期)`;
+                            }
+                            dateRow.push(dateLabel);
+
+                            // Populate cells as room-teacher-shift
+                            if (!d.isHolidayOrSpecial && d.dateStr && roomAssignments[d.dateStr]) {
+                                roomList.forEach(room => {
+                                    let tutors = roomAssignments[d.dateStr][room] || [];
+                                    if (tutors.length > 0) {
+                                        let tutorStrs = tutors.map(t => `${t.name}(${t.slot === '全' ? '全節' : '功課'})`).join(', ');
+                                        contentRows[room][dayIdx] = `${room}: ${tutorStrs}`;
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+                    // Push week date header row
+                    excelData.push(dateRow);
+
+                    // Push room rows for this week
+                    roomList.forEach(room => {
+                        let row = [];
+                        for (let i = 0; i < 7; i++) {
+                            row.push(contentRows[room][i] || (weekObj.days[i].isSpacer ? "" : "-"));
+                        }
+                        excelData.push(row);
+                    });
+
+                    // Blank separator row
+                    excelData.push([]);
+                });
+
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                
+                let colWidths = [];
+                for (let i = 0; i < 7; i++) {
+                    colWidths.push({wch: 35});
+                }
+                ws['!cols'] = colWidths;
+
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "十月份月曆分配總表");
+
+                XLSX.writeFile(wb, `October_Room_Calendar_Report.xlsx`);
+                showToast("成功匯出月曆格式 Excel 報表！");
+            } catch (err) {
+                console.error("Excel export error:", err);
+                showToast("匯出 Excel 發生錯誤，請稍後再試", false);
+            }
+        }
+
+        // --- STREAMING_CHUNK: Implementing backup and restore functions ---
+        function exportDataBackup() {
+            try {
+                const backupData = {
+                    version: "1.0",
+                    timestamp: new Date().toISOString(),
+                    rawData: rawData,
+                    activeDateKeys: activeDateKeys,
+                    roomList: roomList,
+                    roomAssignments: roomAssignments
+                };
+                
+                const jsonStr = JSON.stringify(backupData, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `AfterSchool_Roster_Room_Backup_${new Date().toISOString().slice(0,10)}.json`;
+                link.click();
+                showToast("成功備份所有導師報更及課室分配數據 (JSON)！");
+            } catch (err) {
+                console.error("Backup error:", err);
+                showToast("備份數據失敗，請稍後再試", false);
+            }
+        }
+
+        function importDataBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (!parsed.roomAssignments || !parsed.rawData) {
+                        showToast("備份檔案格式不正確", false);
+                        return;
+                    }
+
+                    rawData = parsed.rawData;
+                    if (parsed.activeDateKeys) activeDateKeys = parsed.activeDateKeys;
+                    if (parsed.roomList) roomList = parsed.roomList;
+                    roomAssignments = parsed.roomAssignments;
+
+                    buildCalendarStructure();
+                    renderViews();
+                    renderRoomMatrix();
+                    showToast("成功還原導師報更及課室分配數據！");
+                } catch (err) {
+                    console.error("Restore error:", err);
+                    showToast("還原備份失敗，請確認檔案格式正確", false);
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function showToast(message, isSuccess = true) {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toastMessage');
+            const icon = document.getElementById('toastIcon');
+            
+            msg.innerText = message;
+            icon.className = isSuccess ? "fa-solid fa-circle-check text-emerald-400" : "fa-solid fa-circle-exclamation text-rose-400";
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+
+        function parseCSV(text) {
+            let lines = [];
+            let row = [];
+            let inQuotes = false;
+            let field = '';
+            
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                let nextC = text[i + 1];
+                
+                if (c === '"') {
+                    if (inQuotes && nextC === '"') {
+                        field += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (c === ',' && !inQuotes) {
+                    row.push(field.trim());
+                    field = '';
+                } else if ((c === '\r' || c === '\n') && !inQuotes) {
+                    if (c === '\r' && nextC === '\n') { i++; }
+                    row.push(field.trim());
+                    if (row.length > 1 || row[0] !== '') {
+                        lines.push(row);
+                    }
+                    row = [];
+                    field = '';
+                } else {
+                    field += c;
+                }
+            }
+            if (field !== '' || row.length > 0) {
+                row.push(field.trim());
+                lines.push(row);
+            }
+            return lines;
+        }
+
+        function handleCsvImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csvText = e.target.result;
+                    const rows = parseCSV(csvText);
+                    
+                    if (rows.length < 2) {
+                        showToast("CSV檔案格式錯誤或內容過少", false);
+                        return;
+                    }
+
+                    const headers = rows[0];
+                    activeDateKeys = headers.slice(6);
+                    
+                    let newRawData = [];
+                    for (let i = 1; i < rows.length; i++) {
+                        let r = rows[i];
+                        if (r.length < 6) continue;
+                        
+                        let tutorName = r[5] || r[4] || `導師 ${i}`;
+                        let shiftsObj = {};
+                        
+                        for (let j = 6; j < headers.length; j++) {
+                            if (j < r.length && headers[j]) {
+                                shiftsObj[headers[j]] = r[j] || "不能出席";
+                            }
+                        }
+
+                        newRawData.push({
+                            id: i,
+                            name: tutorName,
+                            shifts: shiftsObj
+                        });
+                    }
+
+                    if (newRawData.length > 0) {
+                        rawData = newRawData;
+                        buildCalendarStructure();
+                        renderViews();
+                        document.getElementById('dataSourceBadge').innerText = `已載入: ${file.name}`;
+                        showToast(`成功匯入 ${newRawData.length} 位導師的報更數據！`);
+                    } else {
+                        showToast("未能從CSV解析出有效的導師數據", false);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast("解析 CSV 失敗，請確認檔案格式正確", false);
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        window.onload = function() {
+            buildCalendarStructure();
+            renderViews();
+        };
+    </script>
+</body>
+</html>
