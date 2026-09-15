@@ -1030,10 +1030,44 @@
                         return;
                     }
 
+                    let detectedMonth = currentMonth;
+                    let detectedYear = currentYear;
+                    
+                    let fileName = file.name;
+                    let monthMatch = fileName.match(/(\d+)月/);
+                    if (monthMatch) {
+                        detectedMonth = parseInt(monthMatch[1]);
+                    }
+                    let yearMatch = fileName.match(/(20\d\d)/);
+                    if (yearMatch) {
+                        detectedYear = parseInt(yearMatch[1]);
+                    }
+
+                    // Also check first few rows for date patterns like "3/11" or "11/3"
+                    if (!monthMatch) {
+                        for (let r = 0; r < Math.min(rows.length, 3); r++) {
+                            for (let c = 0; c < rows[r].length; c++) {
+                                let cell = rows[r][c];
+                                let dateM = cell.match(/(\d+)[\/\-月](\d+)/);
+                                if (dateM) {
+                                    let m1 = parseInt(dateM[1]);
+                                    let m2 = parseInt(dateM[2]);
+                                    if (m1 >= 1 && m1 <= 12 && m2 > 12) { detectedMonth = m1; break; }
+                                    if (m2 >= 1 && m2 <= 12 && m1 > 12) { detectedMonth = m2; break; }
+                                    if (m1 >= 1 && m1 <= 12) { detectedMonth = m1; break; }
+                                }
+                            }
+                        }
+                    }
+
+                    currentMonth = detectedMonth;
+                    currentYear = detectedYear;
+                    buildCalendarStructure();
+
                     const headers = rows[0];
                     console.log("CSV Headers detected:", headers);
 
-                    // Find which column index contains the tutor name (usually column 4 or 5, or header containing '姓名' or '導師')
+                    // Find which column index contains the tutor name
                     let nameColIndex = 5;
                     for (let c = 0; c < headers.length; c++) {
                         let h = headers[c];
@@ -1043,21 +1077,18 @@
                         }
                     }
 
-                    // Identify date header indices (columns that look like dates or have numbers)
-                    let dateColMap = []; // stores { colIndex: number, dateKey: string }
-                    
+                    // Identify date header indices
+                    let dateColMap = [];
                     for (let j = 0; j < headers.length; j++) {
                         let h = headers[j];
                         if (!h) continue;
                         
-                        // Check if header contains a date pattern like "3/11", "11/3", or matches activeDateKeys
-                        // Let's extract day number from header e.g. "3/11" or "3日" or "11月3日"
                         let match = h.match(/(\d+)\s*[\/\-月]\s*(\d+)/);
                         if (match) {
                             let m = parseInt(match[1]);
                             let d = parseInt(match[2]);
-                            // If CSV format is DD/MM or MM/DD, match with currentMonth
                             let targetDay = (m === currentMonth) ? d : ((d === currentMonth) ? m : d);
+                            if (isNaN(targetDay) || targetDay < 1 || targetDay > 31) targetDay = d;
                             let targetMonth = currentMonth;
                             
                             let dateObj = new Date(currentYear, targetMonth - 1, targetDay);
@@ -1067,7 +1098,6 @@
                             
                             dateColMap.push({ colIndex: j, dateKey: dateKey, dayNum: targetDay });
                         } else if (j >= 6) {
-                            // Fallback if index >= 6
                             let dateKey = activeDateKeys[j - 6] || h;
                             dateColMap.push({ colIndex: j, dateKey: dateKey, dayNum: j - 5 });
                         }
@@ -1082,8 +1112,6 @@
                         if (!tutorName || tutorName.toLowerCase() === '姓名' || tutorName === '') continue;
 
                         let shiftsObj = {};
-                        
-                        // Map each date column
                         dateColMap.forEach(item => {
                             if (item.colIndex < r.length) {
                                 let val = r[item.colIndex];
@@ -1105,7 +1133,7 @@
                         buildCalendarStructure();
                         renderViews();
                         document.getElementById('dataSourceBadge').innerText = `已載入: ${file.name} (${newRawData.length}位導師)`;
-                        showToast(`成功匯入 ${newRawData.length} 位導師的報更數據！`);
+                        showToast(`成功匯入 ${currentMonth}月 ${newRawData.length} 位導師的報更數據！`);
                     } else {
                         showToast("未能從CSV解析出有效的導師數據，請檢查檔案格式", false);
                     }
