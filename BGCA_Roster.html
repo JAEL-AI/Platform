@@ -30,7 +30,28 @@
                 </div>
                 <div>
                     <h1 class="text-2xl font-bold tracking-tight">在校課後託管導師報更及課室分配</h1>
-                    <p class="text-indigo-200 text-sm">2025年10月 (1/10 - 31/10)</p>
+                    <div class="flex items-center gap-2 mt-1">
+                        <select id="selectedYear" onchange="changeMonthYear()" class="bg-indigo-700 text-white text-xs px-2 py-1 rounded border border-indigo-500 focus:outline-none font-medium">
+                            <option value="2025">2025年</option>
+                            <option value="2026" selected>2026年</option>
+                            <option value="2027">2027年</option>
+                        </select>
+                        <select id="selectedMonth" onchange="changeMonthYear()" class="bg-indigo-700 text-white text-xs px-2 py-1 rounded border border-indigo-500 focus:outline-none font-medium">
+                            <option value="1">1月</option>
+                            <option value="2">2月</option>
+                            <option value="3">3月</option>
+                            <option value="4">4月</option>
+                            <option value="5">5月</option>
+                            <option value="6">6月</option>
+                            <option value="7">7月</option>
+                            <option value="8">8月</option>
+                            <option value="9">9月</option>
+                            <option value="10">10月</option>
+                            <option value="11">11月</option>
+                            <option value="12">12月</option>
+                        </select>
+                        <span id="monthSubtitle" class="text-indigo-200 text-sm"></span>
+                    </div>
                 </div>
             </div>
             <div class="flex items-center gap-3 flex-wrap">
@@ -195,99 +216,77 @@
     </footer>
 
     <script>
-        let rawData = [
-            { id: 1, name: "吳健宇", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "全節 (15:00-18:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "全節 (15:00-18:00)", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "不能出席", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "全節 (15:00-18:00)", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "全節 (15:00-18:00)", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "全節 (15:00-18:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
-            { id: 2, name: "陳培津", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "全節 (15:00-18:00)", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "全節 (15:00-18:00)", "15/10/2025 (三)": "全節 (15:00-18:00)", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "全節 (15:00-18:00)", "22/10/2025 (三)": "全節 (15:00-18:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "不能出席", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "全節 (15:00-18:00)", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
-            { id: 3, name: "郭嘉兒", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "功課節 (15:30-17:00)", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "功課節 (15:30-17:00)", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "全節 (15:00-18:00)", "14/10/2025 (二)": "全節 (15:00-18:00)", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "功課節 (15:30-17:00)", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "全節 (15:00-18:00)", "22/10/2025 (三)": "功課節 (15:30-17:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "全節 (15:00-18:00)", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "功課節 (15:30-17:00)", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
-            { id: 4, name: "林懿澄", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "功課節 (15:30-17:00)", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "功課節 (15:30-17:00)", "15/10/2025 (三)": "功課節 (15:30-17:00)", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "功課節 (15:30-17:00)", "22/10/2025 (三)": "功課節 (15:30-17:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "不能出席", "28/10/2025 (二)": "功課節 (15:30-17:00)", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
-            { id: 5, name: "方嘉瑩", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "全節 (15:00-18:00)", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "功課節 (15:30-17:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "功課節 (15:30-17:00)", "9/10/2025 (四)": "全節 (15:00-18:00)", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "功課節 (15:30-17:00)", "14/10/2025 (二)": "全節 (15:00-18:00)", "15/10/2025 (三)": "功課節 (15:30-17:00)", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "功課節 (15:30-17:00)", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "功課節 (15:30-17:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
-            { id: 6, name: "袁珞桐", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "全節 (15:00-18:00)", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "全節 (15:00-18:00)", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "全節 (15:00-18:00)", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "全節 (15:00-18:00)", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "不能出席", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "不能出席", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "全節 (15:00-18:00)", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
-            { id: 7, name: "Lam Ching Hei", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "全節 (15:00-18:00)", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "全節 (15:00-18:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "全節 (15:00-18:00)", "9/10/2025 (四)": "全節 (15:00-18:00)", "10/10/2025 (五)": "不能出席", "13/10/2025 (一)": "全節 (15:00-18:00)", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "全節 (15:00-18:00)", "16/10/2025 (四)": "全節 (15:00-18:00)", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "全節 (15:00-18:00)", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "全節 (15:00-18:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "全節 (15:00-18:00)", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "全節 (15:00-18:00)", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
-            { id: 8, name: "吳海藍", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "全節 (15:00-18:00)", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "全節 (15:00-18:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "全節 (15:00-18:00)", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "全節 (15:00-18:00)", "14/10/2025 (二)": "功課節 (15:30-17:00)", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "全節 (15:00-18:00)", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "全節 (15:00-18:00)", "21/10/2025 (二)": "功課節 (15:30-17:00)", "22/10/2025 (三)": "不能出席", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "功課節 (15:30-17:00)", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
-            { id: 9, name: "Chan hiu nam", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "全節 (15:00-18:00)", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "全節 (15:00-18:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "全節 (15:00-18:00)", "9/10/2025 (四)": "全節 (15:00-18:00)", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "全節 (15:00-18:00)", "14/10/2025 (二)": "全節 (15:00-18:00)", "15/10/2025 (三)": "全節 (15:00-18:00)", "16/10/2025 (四)": "全節 (15:00-18:00)", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "全節 (15:00-18:00)", "21/10/2025 (二)": "全節 (15:00-18:00)", "22/10/2025 (三)": "全節 (15:00-18:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "全節 (15:00-18:00)", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "全節 (15:00-18:00)", "31/10/2025 (五)": "全節 (15:00-18:00)"} },
-            { id: 10, name: "黃倩心", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "不能出席", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "全節 (15:00-18:00)", "22/10/2025 (三)": "不能出席", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "不能出席", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
-            { id: 11, name: "洪煒彤", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "全節 (15:00-18:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "不能出席", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "全節 (15:00-18:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "不能出席", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
-            { id: 12, name: "譚學斌", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "不能出席", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
-            { id: 13, name: "Lee Yat Ho", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "功課節 (15:30-17:00)", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "功課節 (15:30-17:00)", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "不能出席", "13/10/2025 (一)": "功課節 (15:30-17:00)", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "功課節 (15:30-17:00)", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "功課節 (15:30-17:00)", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "功課節 (15:30-17:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "功課節 (15:30-17:00)", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
-            { id: 14, name: "莊家銘", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "全節 (15:00-18:00)", "3/10/2025 (五)": "全節 (15:00-18:00)", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "全節 (15:00-18:00)", "10/10/2025 (五)": "全節 (15:00-18:00)", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "不能出席", "16/10/2025 (四)": "全節 (15:00-18:00)", "17/10/2025 (五)": "全節 (15:00-18:00)", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "全節 (15:00-18:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "全節 (15:00-18:00)", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} },
-            { id: 15, name: "甘詠恩", shifts: {"1/10/25 (HOLIDAY)": "不能出席", "2/10/2025 (四)": "不能出席", "3/10/2025 (五)": "不能出席", "6/10/2025 (一)": "不能出席", "7/10/2025 (HOLIDAY)": "不能出席", "8/10/2025 (三)": "不能出席", "9/10/2025 (四)": "不能出席", "10/10/2025 (五)": "功課節 (15:30-17:00)", "13/10/2025 (一)": "不能出席", "14/10/2025 (二)": "不能出席", "15/10/2025 (三)": "功課節 (15:30-17:00)", "16/10/2025 (四)": "不能出席", "17/10/2025 (五)": "不能出席", "20/10/2025 (一)": "不能出席", "21/10/2025 (二)": "不能出席", "22/10/2025 (三)": "功課節 (15:30-17:00)", "23/10/2025 (四) (學校旅行日)": "不能出席", "24/10/2025 (五) 旅行日翌日, 學校假期": "不能出席", "27/10/2025 (一)": "不能出席", "28/10/2025 (二)": "不能出席", "29/10/2025 (HOLIDAY)": "不能出席", "30/10/2025 (三`)": "不能出席", "31/10/2025 (五)": "不能出席"} }
-        ];
+        let rawData = [];
 
-        let activeDateKeys = [
-            "1/10/25 (HOLIDAY)", "2/10/2025 (四)", "3/10/2025 (五)", "6/10/2025 (一)", "7/10/2025 (HOLIDAY)", 
-            "8/10/2025 (三)", "9/10/2025 (四)", "10/10/2025 (五)", "13/10/2025 (一)", "14/10/2025 (二)", 
-            "15/10/2025 (三)", "16/10/2025 (四)", "17/10/2025 (五)", "20/10/2025 (一)", "21/10/2025 (二)", 
-            "22/10/2025 (三)", "23/10/2025 (四) (學校旅行日)", "24/10/2025 (五) 旅行日翌日, 學校假期", "27/10/2025 (一)", 
-            "28/10/2025 (二)", "29/10/2025 (HOLIDAY)", "30/10/2025 (三`)", "31/10/2025 (五)"
-        ];
-
-        let octoberWeeks = [];
+        let currentYear = 2026;
+        let currentMonth = 10; // 1-12
+        let activeDateKeys = [];
+        let calendarWeeks = [];
         let roomList = ["室內活動室 (Activity Room)", "導管室 A (Room A)", "導管室 B (Room B)", "電腦室 (Computer Room)"];
-        let roomAssignments = {}; // Format: { "dateKey": { "Room Name": [{ name: "Tutor 1", slot: "全" }, ...] } }
+        let roomAssignments = {}; // Format: { "YYYY-MM-DD": { "Room Name": [{ name: "Tutor 1", slot: "全" }, ...] } }
 
         function buildCalendarStructure() {
-            octoberWeeks = [
-                {
-                    title: "第 1 週 (29/9 - 5/10)",
-                    days: [
-                        { dayNum: null, dateStr: null, isSpacer: true },
-                        { dayNum: null, dateStr: null, isSpacer: true },
-                        { dayNum: 1, dateStr: activeDateKeys.find(k => k.startsWith("1/10")), dayOfWeek: 3, isHolidayOrSpecial: true },
-                        { dayNum: 2, dateStr: activeDateKeys.find(k => k.startsWith("2/10")), dayOfWeek: 4, isHolidayOrSpecial: false },
-                        { dayNum: 3, dateStr: activeDateKeys.find(k => k.startsWith("3/10")), dayOfWeek: 5, isHolidayOrSpecial: false },
-                        { dayNum: 4, dateStr: null, dayOfWeek: 6, isHolidayOrSpecial: true },
-                        { dayNum: 5, dateStr: null, dayOfWeek: 0, isHolidayOrSpecial: true }
-                    ]
-                },
-                {
-                    title: "第 2 週 (6/10 - 12/10)",
-                    days: [
-                        { dayNum: 6, dateStr: activeDateKeys.find(k => k.startsWith("6/10")), dayOfWeek: 1, isHolidayOrSpecial: false },
-                        { dayNum: 7, dateStr: activeDateKeys.find(k => k.startsWith("7/10")), dayOfWeek: 2, isHolidayOrSpecial: true },
-                        { dayNum: 8, dateStr: activeDateKeys.find(k => k.startsWith("8/10")), dayOfWeek: 3, isHolidayOrSpecial: false },
-                        { dayNum: 9, dateStr: activeDateKeys.find(k => k.startsWith("9/10")), dayOfWeek: 4, isHolidayOrSpecial: false },
-                        { dayNum: 10, dateStr: activeDateKeys.find(k => k.startsWith("10/10")), dayOfWeek: 5, isHolidayOrSpecial: false },
-                        { dayNum: 11, dateStr: null, dayOfWeek: 6, isHolidayOrSpecial: true },
-                        { dayNum: 12, dateStr: null, dayOfWeek: 0, isHolidayOrSpecial: true }
-                    ]
-                },
-                {
-                    title: "第 3 週 (13/10 - 19/10)",
-                    days: [
-                        { dayNum: 13, dateStr: activeDateKeys.find(k => k.startsWith("13/10")), dayOfWeek: 1, isHolidayOrSpecial: false },
-                        { dayNum: 14, dateStr: activeDateKeys.find(k => k.startsWith("14/10")), dayOfWeek: 2, isHolidayOrSpecial: false },
-                        { dayNum: 15, dateStr: activeDateKeys.find(k => k.startsWith("15/10")), dayOfWeek: 3, isHolidayOrSpecial: false },
-                        { dayNum: 16, dateStr: activeDateKeys.find(k => k.startsWith("16/10")), dayOfWeek: 4, isHolidayOrSpecial: false },
-                        { dayNum: 17, dateStr: activeDateKeys.find(k => k.startsWith("17/10")), dayOfWeek: 5, isHolidayOrSpecial: false },
-                        { dayNum: 18, dateStr: null, dayOfWeek: 6, isHolidayOrSpecial: true },
-                        { dayNum: 19, dateStr: null, dayOfWeek: 0, isHolidayOrSpecial: true }
-                    ]
-                },
-                {
-                    title: "第 4 週 (20/10 - 26/10)",
-                    days: [
-                        { dayNum: 20, dateStr: activeDateKeys.find(k => k.startsWith("20/10")), dayOfWeek: 1, isHolidayOrSpecial: false },
-                        { dayNum: 21, dateStr: activeDateKeys.find(k => k.startsWith("21/10")), dayOfWeek: 2, isHolidayOrSpecial: false },
-                        { dayNum: 22, dateStr: activeDateKeys.find(k => k.startsWith("22/10")), dayOfWeek: 3, isHolidayOrSpecial: false },
-                        { dayNum: 23, dateStr: activeDateKeys.find(k => k.startsWith("23/10")), dayOfWeek: 4, isHolidayOrSpecial: true },
-                        { dayNum: 24, dateStr: activeDateKeys.find(k => k.startsWith("24/10")), dayOfWeek: 5, isHolidayOrSpecial: true },
-                        { dayNum: 25, dateStr: null, dayOfWeek: 6, isHolidayOrSpecial: true },
-                        { dayNum: 26, dateStr: null, dayOfWeek: 0, isHolidayOrSpecial: true }
-                    ]
-                },
-                {
-                    title: "第 5 週 (27/10 - 2/11)",
-                    days: [
-                        { dayNum: 27, dateStr: activeDateKeys.find(k => k.startsWith("27/10")), dayOfWeek: 1, isHolidayOrSpecial: false },
-                        { dayNum: 28, dateStr: activeDateKeys.find(k => k.startsWith("28/10")), dayOfWeek: 2, isHolidayOrSpecial: false },
-                        { dayNum: 29, dateStr: activeDateKeys.find(k => k.startsWith("29/10")), dayOfWeek: 3, isHolidayOrSpecial: true },
-                        { dayNum: 30, dateStr: activeDateKeys.find(k => k.startsWith("30/10")), dayOfWeek: 4, isHolidayOrSpecial: false },
-                        { dayNum: 31, dateStr: activeDateKeys.find(k => k.startsWith("31/10")), dayOfWeek: 5, isHolidayOrSpecial: false },
-                        { dayNum: null, dateStr: null, isSpacer: true },
-                        { dayNum: null, dateStr: null, isSpacer: true }
-                    ]
+            activeDateKeys = [];
+            calendarWeeks = [];
+
+            const totalDays = new Date(currentYear, currentMonth, 0).getDate();
+            const dayNames = ['(日)', '(一)', '(二)', '(三)', '(四)', '(五)', '(六)'];
+            for (let d = 1; d <= totalDays; d++) {
+                let dateObj = new Date(currentYear, currentMonth - 1, d);
+                let dayOfWeek = dateObj.getDay();
+                let dayNameStr = dayNames[dayOfWeek];
+                let dateKey = `${d}/${currentMonth}/${currentYear} ${dayNameStr}`;
+                activeDateKeys.push(dateKey);
+            }
+
+            let firstDayOfMonth = new Date(currentYear, currentMonth - 1, 1).getDay();
+            let firstDayMonBased = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+
+            let currentWeekDays = [];
+            for (let i = 0; i < firstDayMonBased; i++) {
+                currentWeekDays.push({ dayNum: null, dateStr: null, isSpacer: true });
+            }
+
+            let weekCounter = 1;
+            for (let d = 1; d <= totalDays; d++) {
+                let dateObj = new Date(currentYear, currentMonth - 1, d);
+                let jsDay = dateObj.getDay();
+                let monBasedDay = (jsDay === 0) ? 6 : jsDay - 1;
+
+                let dateStrMatch = activeDateKeys.find(k => k.startsWith(`${d}/${currentMonth}/${currentYear} `));
+                let isHoliday = (jsDay === 0 || jsDay === 6);
+
+                currentWeekDays.push({
+                    dayNum: d,
+                    dateStr: dateStrMatch,
+                    dayOfWeek: jsDay,
+                    isHolidayOrSpecial: isHoliday
+                });
+
+                if (monBasedDay === 6 || d === totalDays) {
+                    while (currentWeekDays.length < 7) {
+                        currentWeekDays.push({ dayNum: null, dateStr: null, isSpacer: true });
+                    }
+                    calendarWeeks.push({
+                        title: `第 ${weekCounter} 週`,
+                        days: [...currentWeekDays]
+                    });
+                    currentWeekDays = [];
+                    weekCounter++;
                 }
-            ];
+            }
+
+            document.getElementById('monthSubtitle').innerText = `${currentYear}年${currentMonth}月 (共 ${totalDays} 天)`;
+            document.getElementById('selectedYear').value = currentYear;
+            document.getElementById('selectedMonth').value = currentMonth;
+        }
+
+        function changeMonthYear() {
+            currentYear = parseInt(document.getElementById('selectedYear').value);
+            currentMonth = parseInt(document.getElementById('selectedMonth').value);
+            buildCalendarStructure();
+            renderViews();
+            showToast(`已切換至 ${currentYear}年 ${currentMonth}月`);
         }
 
         let currentView = 'calendar';
@@ -329,7 +328,20 @@
             const grid = document.getElementById('calendarGrid');
             grid.innerHTML = '';
 
-            octoberWeeks.forEach(week => {
+            if (rawData.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-16 bg-white rounded-2xl border border-dashed border-slate-300 text-center">
+                        <div class="inline-flex bg-indigo-50 p-4 rounded-full text-indigo-600 mb-3 text-2xl">
+                            <i class="fa-solid fa-file-arrow-up"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-700">尚未載入導師報更數據</h3>
+                        <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">請點擊頂部的 <span class="font-semibold text-emerald-600">「匯入 CSV 報更表」</span> 按鈕上載您的報更 CSV 檔案，或還原備份資料。</p>
+                    </div>
+                `;
+                return;
+            }
+
+            calendarWeeks.forEach(week => {
                 week.days.forEach(item => {
                     if (item.isSpacer) {
                         const spacer = document.createElement('div');
@@ -346,6 +358,10 @@
                         rawData.forEach(tutor => {
                             if (searchQuery && !tutor.name.toLowerCase().includes(searchQuery)) return;
                             let shift = tutor.shifts[item.dateStr];
+                            if (!shift) {
+                                let foundKey = Object.keys(tutor.shifts).find(k => k.startsWith(`${item.dayNum}/${currentMonth}/`));
+                                if (foundKey) shift = tutor.shifts[foundKey];
+                            }
                             if (shift && shift !== "不能出席" && shift.trim() !== "") {
                                 if (shiftFilter === 'all' || 
                                    (shiftFilter === 'full' && (shift.includes("全節") || shift.includes("15:00"))) ||
@@ -368,7 +384,7 @@
                     let dayNames = ['日','一','二','三','四','五','六'];
                     let headerHTML = `
                         <div class="flex justify-between items-start mb-2">
-                            <span class="font-bold text-slate-700 text-base">10/${item.dayNum}</span>
+                            <span class="font-bold text-slate-700 text-base">${currentMonth}/${item.dayNum}</span>
                             <span class="text-xs px-2 py-0.5 rounded-full font-medium ${isWeekend ? 'bg-rose-100 text-rose-600' : 'bg-slate-100 text-slate-500'}">
                                 ${dayNames[item.dayOfWeek]}
                             </span>
@@ -377,10 +393,7 @@
 
                     let bodyHTML = '';
                     if (item.isHolidayOrSpecial) {
-                        let reason = "假期 / 停課";
-                        if (item.dateStr && (item.dateStr.includes("旅行日") || item.dateStr.includes("學校"))) reason = "學校假期/活動";
-                        else if (isWeekend) reason = "週末假期";
-                        
+                        let reason = isWeekend ? "週末假期" : "假期/停課";
                         bodyHTML = `
                             <div class="flex-grow flex items-center justify-center text-center py-4">
                                 <span class="text-xs text-slate-400 font-medium bg-slate-200/60 px-2.5 py-1 rounded-lg">${reason}</span>
@@ -443,6 +456,19 @@
             const container = document.getElementById('tutorListContainer');
             container.innerHTML = '';
 
+            if (rawData.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-16 bg-white rounded-2xl border border-dashed border-slate-300 text-center">
+                        <div class="inline-flex bg-indigo-50 p-4 rounded-full text-indigo-600 mb-3 text-2xl">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-700">目前沒有導師數據</h3>
+                        <p class="text-xs text-slate-500 mt-1">請先匯入 CSV 報更檔案以檢視導師更次列表。</p>
+                    </div>
+                `;
+                return;
+            }
+
             rawData.forEach(tutor => {
                 if (searchQuery && !tutor.name.toLowerCase().includes(searchQuery)) return;
 
@@ -492,7 +518,7 @@
                     </div>
                     <div class="pt-3 border-t border-slate-100 flex justify-between items-center text-xs text-slate-400">
                         <span>導師 ID: #${tutor.id}</span>
-                        <span class="font-medium text-slate-600">十月份報更表</span>
+                        <span class="font-medium text-slate-600">${currentMonth}月份報更表</span>
                     </div>
                 `;
                 container.appendChild(card);
@@ -504,7 +530,7 @@
             const title = document.getElementById('modalTitle');
             const body = document.getElementById('modalBody');
 
-            title.innerText = `10月${dayNum}日 託管導師當值名單 (${tutors.length}位)`;
+            title.innerText = `${currentMonth}月${dayNum}日 託管導師當值名單 (${tutors.length}位)`;
 
             if (tutors.length === 0) {
                 body.innerHTML = `<p class="text-center text-slate-400 py-6">此日無導師當值</p>`;
@@ -543,7 +569,7 @@
             const select = document.getElementById('matrixWeekSelect');
             select.innerHTML = '';
 
-            octoberWeeks.forEach((week, idx) => {
+            calendarWeeks.forEach((week, idx) => {
                 let opt = document.createElement('option');
                 opt.value = idx;
                 opt.innerText = week.title;
@@ -561,7 +587,7 @@
 
         function renderRoomMatrix() {
             const weekIndex = parseInt(document.getElementById('matrixWeekSelect').value || 0);
-            const weekObj = octoberWeeks[weekIndex];
+            const weekObj = calendarWeeks[weekIndex];
             const container = document.getElementById('matrixTableContainer');
 
             let schoolDays = weekObj.days.filter(d => !d.isSpacer && d.dateStr && !d.isHolidayOrSpecial);
@@ -580,7 +606,7 @@
 
             let dayNames = ['日','一','二','三','四','五','六'];
             schoolDays.forEach(d => {
-                tableHTML += `<th class="p-3 font-semibold text-center border-r border-slate-200 min-w-[200px]">10/${d.dayNum} (${dayNames[d.dayOfWeek]})</th>`;
+                tableHTML += `<th class="p-3 font-semibold text-center border-r border-slate-200 min-w-[200px]">${currentMonth}/${d.dayNum} (${dayNames[d.dayOfWeek]})</th>`;
             });
             tableHTML += `</tr></thead><tbody class="divide-y divide-slate-200">`;
 
@@ -598,11 +624,15 @@
                     if (!roomAssignments[dateKey]) roomAssignments[dateKey] = {};
                     if (!roomAssignments[dateKey][room]) roomAssignments[dateKey][room] = [];
 
-                    let assignedTutors = roomAssignments[dateKey][room]; // Array of { name, slot }
+                    let assignedTutors = roomAssignments[dateKey][room];
 
                     let availableTutors = [];
                     rawData.forEach(t => {
                         let shift = t.shifts[dateKey];
+                        if (!shift) {
+                            let foundKey = Object.keys(t.shifts).find(k => k.startsWith(`${d.dayNum}/${currentMonth}/`));
+                            if (foundKey) shift = t.shifts[foundKey];
+                        }
                         if (shift && shift !== "不能出席" && shift.trim() !== "") {
                             let isFull = shift.includes("全節") || shift.includes("15:00-18:00");
                             availableTutors.push({ name: t.name, isFull: isFull, defaultSlot: isFull ? '全' : '功' });
@@ -622,12 +652,12 @@
                             let selectHTML = '';
                             if (t.isFull) {
                                 selectHTML = `<select onchange="updateMatrixSlot('${dateKey}', '${room}', '${t.name}', this.value)" ${!isChecked ? 'disabled class="opacity-50 text-[10px] px-1 py-0.5 rounded border border-slate-200 bg-slate-100"' : 'class="text-[10px] px-1 py-0.5 rounded border border-amber-300 bg-white font-semibold text-amber-800 focus:outline-none"'}>
-                                    <option value="全" ${currentSlot === '全' ? 'selected' : ''}>全節</option>
-                                    <option value="功" ${currentSlot === '功' ? 'selected' : ''}>功課節</option>
+                                    <option value="全" ${currentSlot === '全' ? 'selected' : ''}>全</option>
+                                    <option value="功" ${currentSlot === '功' ? 'selected' : ''}>功</option>
                                 </select>`;
                             } else {
                                 selectHTML = `<select disabled class="opacity-75 text-[10px] px-1 py-0.5 rounded border border-slate-200 bg-slate-100 font-semibold text-slate-600">
-                                    <option value="功" selected>功課節</option>
+                                    <option value="功" selected>功</option>
                                 </select>`;
                             }
 
@@ -684,7 +714,7 @@
                 let assignment = roomAssignments[dateKey][roomName].find(item => item.name === tutorName);
                 if (assignment) {
                     assignment.slot = slotVal;
-                    showToast(`已更新 ${tutorName} 在 ${roomName} 的時段為 ${slotVal === '全' ? '全節' : '功課節'}`);
+                    showToast(`已更新 ${tutorName} 在 ${roomName} 的時段為 ${slotVal === '全' ? '全' : '功'}`);
                 }
             }
         }
@@ -719,7 +749,7 @@
 
         function autoAssignMatrixWeek() {
             const weekIndex = parseInt(document.getElementById('matrixWeekSelect').value || 0);
-            const weekObj = octoberWeeks[weekIndex];
+            const weekObj = calendarWeeks[weekIndex];
             let schoolDays = weekObj.days.filter(d => !d.isSpacer && d.dateStr && !d.isHolidayOrSpecial);
 
             if (schoolDays.length === 0) {
@@ -732,6 +762,10 @@
                 let availableTutors = [];
                 rawData.forEach(t => {
                     let shift = t.shifts[dateKey];
+                    if (!shift) {
+                        let foundKey = Object.keys(t.shifts).find(k => k.startsWith(`${d.dayNum}/${currentMonth}/`));
+                        if (foundKey) shift = t.shifts[foundKey];
+                    }
                     if (shift && shift !== "不能出席" && shift.trim() !== "") {
                         let isFull = shift.includes("全節") || shift.includes("15:00-18:00");
                         availableTutors.push({ name: t.name, defaultSlot: isFull ? '全' : '功' });
@@ -756,7 +790,7 @@
 
         function checkUnassignedRooms() {
             const weekIndex = parseInt(document.getElementById('matrixWeekSelect').value || 0);
-            const weekObj = octoberWeeks[weekIndex];
+            const weekObj = calendarWeeks[weekIndex];
             let schoolDays = weekObj.days.filter(d => !d.isSpacer && d.dateStr && !d.isHolidayOrSpecial);
 
             let unassignedList = [];
@@ -766,6 +800,10 @@
                 let availableTutorsCount = 0;
                 rawData.forEach(t => {
                     let shift = t.shifts[dateKey];
+                    if (!shift) {
+                        let foundKey = Object.keys(t.shifts).find(k => k.startsWith(`${d.dayNum}/${currentMonth}/`));
+                        if (foundKey) shift = t.shifts[foundKey];
+                    }
                     if (shift && shift !== "不能出席" && shift.trim() !== "") {
                         availableTutorsCount++;
                     }
@@ -775,7 +813,7 @@
                     roomList.forEach(room => {
                         let assignedTutors = (roomAssignments[dateKey] && roomAssignments[dateKey][room]) || [];
                         if (assignedTutors.length === 0) {
-                            unassignedList.push(`10/${d.dayNum} 的「${room}」`);
+                            unassignedList.push(`${currentMonth}/${d.dayNum} 的「${room}」`);
                         }
                     });
                 }
@@ -792,29 +830,6 @@
             }
         }
 
-        function exportRoomAssignment() {
-            let report = "在校課後託管導師課室分配矩陣報告\n==========================\n\n";
-            for (let [dateKey, rooms] of Object.entries(roomAssignments)) {
-                let hasAssign = Object.values(rooms).some(arr => arr && arr.length > 0);
-                if (!hasAssign) continue;
-                report += `日期: ${dateKey}\n`;
-                for (let [room, tutors] of Object.entries(rooms)) {
-                    if (tutors && tutors.length > 0) {
-                        let tutorStrs = tutors.map(t => `${t.name}(${t.slot === '全' ? '全節' : '功課節'})`);
-                        report += `  - ${room}: ${tutorStrs.join(', ')}\n`;
-                    }
-                }
-                report += `\n`;
-            }
-
-            let blob = new Blob([report], { type: 'text/plain;charset=utf-8;' });
-            let link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `October_Room_Matrix_Assignments.txt`;
-            link.click();
-            showToast("成功匯出課室分配矩陣報告！");
-        }
-
         function exportRoomAssignmentExcel() {
             try {
                 if (typeof XLSX === 'undefined') {
@@ -823,46 +838,41 @@
                 }
 
                 let excelData = [];
-                // Title row
-                excelData.push(["在校課後託管導師報更及課室分配 - 十月份月曆總表"]);
-                excelData.push([]); // Empty row
+                excelData.push([`在校課後託管導師報更及課室分配 - ${currentYear}年${currentMonth}月份月曆總表`]);
+                excelData.push([]);
 
-                // Calendar headers: Mon to Sun
-                let dayNames = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
-                excelData.push(dayNames);
+                let dayHeaders = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
+                excelData.push(dayHeaders);
 
-                octoberWeeks.forEach(weekObj => {
+                calendarWeeks.forEach(weekObj => {
                     let dateRow = [];
-                    let contentRows = {}; // roomName -> 7 days array
+                    let contentRows = {};
                     roomList.forEach(r => contentRows[r] = ["", "", "", "", "", "", ""]);
 
                     weekObj.days.forEach((d, dayIdx) => {
                         if (d.isSpacer || !d.dayNum) {
                             dateRow.push("");
                         } else {
-                            let dateLabel = `10/${d.dayNum}`;
+                            let dateLabel = `${currentMonth}/${d.dayNum}`;
                             if (d.isHolidayOrSpecial) {
                                 dateLabel += ` (假期)`;
                             }
                             dateRow.push(dateLabel);
 
-                            // Populate cells as room-teacher-shift
                             if (!d.isHolidayOrSpecial && d.dateStr && roomAssignments[d.dateStr]) {
                                 roomList.forEach(room => {
                                     let tutors = roomAssignments[d.dateStr][room] || [];
                                     if (tutors.length > 0) {
-                                        let tutorStrs = tutors.map(t => `${t.name}(${t.slot === '全' ? '全節' : '功課'})`).join(', ');
-                                        contentRows[room][dayIdx] = `${room}: ${tutorStrs}`;
+                                        let tutorStrs = tutors.map(t => `${room}-${t.name}-${t.slot}`).join(', ');
+                                        contentRows[room][dayIdx] = tutorStrs;
                                     }
                                 });
                             }
                         }
                     });
 
-                    // Push week date header row
                     excelData.push(dateRow);
 
-                    // Push room rows for this week
                     roomList.forEach(room => {
                         let row = [];
                         for (let i = 0; i < 7; i++) {
@@ -871,12 +881,10 @@
                         excelData.push(row);
                     });
 
-                    // Blank separator row
                     excelData.push([]);
                 });
 
                 const ws = XLSX.utils.aoa_to_sheet(excelData);
-                
                 let colWidths = [];
                 for (let i = 0; i < 7; i++) {
                     colWidths.push({wch: 35});
@@ -884,9 +892,9 @@
                 ws['!cols'] = colWidths;
 
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "十月份月曆分配總表");
+                XLSX.utils.book_append_sheet(wb, ws, `${currentMonth}月月曆分配總表`);
 
-                XLSX.writeFile(wb, `October_Room_Calendar_Report.xlsx`);
+                XLSX.writeFile(wb, `Room_Calendar_Report_${currentYear}_${currentMonth}.xlsx`);
                 showToast("成功匯出月曆格式 Excel 報表！");
             } catch (err) {
                 console.error("Excel export error:", err);
@@ -894,14 +902,16 @@
             }
         }
 
-        // --- STREAMING_CHUNK: Implementing backup and restore functions ---
         function exportDataBackup() {
             try {
                 const backupData = {
                     version: "1.0",
+                    year: currentYear,
+                    month: currentMonth,
                     timestamp: new Date().toISOString(),
                     rawData: rawData,
                     activeDateKeys: activeDateKeys,
+                    calendarWeeks: calendarWeeks,
                     roomList: roomList,
                     roomAssignments: roomAssignments
                 };
@@ -910,7 +920,7 @@
                 const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `AfterSchool_Roster_Room_Backup_${new Date().toISOString().slice(0,10)}.json`;
+                link.download = `AfterSchool_Roster_Backup_${currentYear}_${currentMonth}_${new Date().toISOString().slice(0,10)}.json`;
                 link.click();
                 showToast("成功備份所有導師報更及課室分配數據 (JSON)！");
             } catch (err) {
@@ -933,6 +943,8 @@
                     }
 
                     rawData = parsed.rawData;
+                    if (parsed.year) currentYear = parsed.year;
+                    if (parsed.month) currentMonth = parsed.month;
                     if (parsed.activeDateKeys) activeDateKeys = parsed.activeDateKeys;
                     if (parsed.roomList) roomList = parsed.roomList;
                     roomAssignments = parsed.roomAssignments;
