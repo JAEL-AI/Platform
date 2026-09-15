@@ -90,7 +90,7 @@
                     <option value="full">全節 (15:00-18:00)</option>
                     <option value="homework">功課節 (15:30-17:00)</option>
                 </select>
-                <span id="dataSourceBadge" class="text-xs px-3 py-1 bg-slate-100 text-slate-600 rounded-lg font-medium">使用預設數據</span>
+                <span id="dataSourceBadge" class="text-xs px-3 py-1 bg-slate-100 text-slate-600 rounded-lg font-medium">尚未載入數據</span>
             </div>
             <div class="flex items-center gap-4 text-xs font-medium text-slate-600">
                 <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> 全節 (15:00-18:00)</span>
@@ -152,7 +152,7 @@
                     </div>
                     <div>
                         <h3 class="text-lg font-bold">在校課後託管導師報更及課室分配矩陣管理</h3>
-                        <p class="text-amber-100 text-xs">管理每週導師於不同課室的當值分配（每位導師每日限配一室，並可設定全節或功課節）</p>
+                        <p class="text-amber-100 text-xs">管理每週導師於不同課室的當值分配（全節導師可選"全"或"功"，功課節導師限選"功"）</p>
                     </div>
                 </div>
                 <!-- Week selector & Add room controls -->
@@ -211,7 +211,7 @@
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
-            在校課後託管導師報更及課室分配管理系統 &copy; 2025
+            在校課後託管導師報更及課室分配管理系統 &copy; 2026
         </div>
     </footer>
 
@@ -219,7 +219,7 @@
         let rawData = [];
 
         let currentYear = 2026;
-        let currentMonth = 11; // Default to 11th month based on sample CSV
+        let currentMonth = 11;
         let activeDateKeys = [];
         let calendarWeeks = [];
         let roomList = ["室內活動室 (Activity Room)", "導管室 A (Room A)", "導管室 B (Room B)", "電腦室 (Computer Room)"];
@@ -1043,7 +1043,6 @@
                         detectedYear = parseInt(yearMatch[1]);
                     }
 
-                    // Also check first few rows for date patterns like "3/11" or "11/3"
                     if (!monthMatch) {
                         for (let r = 0; r < Math.min(rows.length, 3); r++) {
                             for (let c = 0; c < rows[r].length; c++) {
@@ -1067,17 +1066,18 @@
                     const headers = rows[0];
                     console.log("CSV Headers detected:", headers);
 
-                    // Find which column index contains the tutor name
-                    let nameColIndex = 5;
+                    let nameColIndex = -1;
                     for (let c = 0; c < headers.length; c++) {
                         let h = headers[c];
-                        if (h && (h.includes('姓名') || h.includes('導師') || h.includes('Name') || h.includes('导师'))) {
+                        if (h && (h.includes('姓名') || h.includes('導師') || h.includes('Name') || h.includes('导师') || h.includes('中文姓名'))) {
                             nameColIndex = c;
                             break;
                         }
                     }
+                    if (nameColIndex === -1) {
+                        nameColIndex = 5; // fallback
+                    }
 
-                    // Identify date header indices
                     let dateColMap = [];
                     for (let j = 0; j < headers.length; j++) {
                         let h = headers[j];
@@ -1097,9 +1097,6 @@
                             let dateKey = `${targetDay}/${targetMonth}/${currentYear} ${dayNames[dayOfWeek]}`;
                             
                             dateColMap.push({ colIndex: j, dateKey: dateKey, dayNum: targetDay });
-                        } else if (j >= 6) {
-                            let dateKey = activeDateKeys[j - 6] || h;
-                            dateColMap.push({ colIndex: j, dateKey: dateKey, dayNum: j - 5 });
                         }
                     }
 
@@ -1108,7 +1105,7 @@
                         let r = rows[i];
                         if (!r || r.length <= nameColIndex) continue;
                         
-                        let tutorName = r[nameColIndex] || r[5] || r[4] || `導師 ${i}`;
+                        let tutorName = r[nameColIndex] || '';
                         if (!tutorName || tutorName.toLowerCase() === '姓名' || tutorName === '') continue;
 
                         let shiftsObj = {};
