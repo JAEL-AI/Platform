@@ -32,9 +32,14 @@
                     <h1 class="text-2xl font-bold tracking-tight">在校課後託管導師報更及課室分配</h1>
                     <div class="flex items-center gap-2 mt-1">
                         <select id="selectedYear" onchange="changeMonthYear()" class="bg-indigo-700 text-white text-xs px-2 py-1 rounded border border-indigo-500 focus:outline-none font-medium">
+                            <option value="2024">2024年</option>
                             <option value="2025">2025年</option>
                             <option value="2026" selected>2026年</option>
                             <option value="2027">2027年</option>
+                            <option value="2028">2028年</option>
+                            <option value="2029">2029年</option>
+                            <option value="2030">2030年</option>
+                            <option value="2031">2031年</option>
                         </select>
                         <select id="selectedMonth" onchange="changeMonthYear()" class="bg-indigo-700 text-white text-xs px-2 py-1 rounded border border-indigo-500 focus:outline-none font-medium">
                             <option value="1">1月</option>
@@ -277,7 +282,14 @@
             }
 
             document.getElementById('monthSubtitle').innerText = `${currentYear}年${currentMonth}月 (共 ${totalDays} 天)`;
-            document.getElementById('selectedYear').value = currentYear;
+            const yearSelect = document.getElementById('selectedYear');
+            if (yearSelect && !yearSelect.querySelector(`option[value="${currentYear}"]`)) {
+                const opt = document.createElement('option');
+                opt.value = currentYear;
+                opt.innerText = `${currentYear}年`;
+                yearSelect.appendChild(opt);
+            }
+            if (yearSelect) yearSelect.value = currentYear;
             document.getElementById('selectedMonth').value = currentMonth;
         }
 

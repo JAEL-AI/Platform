@@ -1,0 +1,8 @@
+{
+  "name": "大阪・白濱・和歌山 2027 | 旅遊 Portal",
+  "description": "大阪・白濱・和歌山 2027 旅遊 Portal 及 AA 埋數計算機",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
