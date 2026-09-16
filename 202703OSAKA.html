@@ -88,6 +88,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <div class="flex items-center space-x-2 sm:space-x-3">
+          <a href="index.html" id="backToHomeBtn" title="返回首頁" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition border border-slate-200 dark:border-slate-700 group shrink-0" aria-label="返回首頁">
+            <i class="fa-solid fa-chevron-left text-sm group-hover:-translate-x-0.5 transition-transform"></i>
+          </a>
           <span class="text-xl sm:text-2xl">🌸</span>
           <div>
             <h1 class="font-bold text-base sm:text-xl text-slate-900 dark:text-white leading-tight">大阪・白濱・和歌山</h1>
@@ -97,8 +100,14 @@
 
         <!-- Desktop Nav Items -->
         <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm font-medium">
+          <a href="index.html" class="px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-1.5 font-semibold">
+            <i class="fa-solid fa-house text-xs"></i> 首頁
+          </a>
           <a href="#overview" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">總覽與航班</a>
           <a href="#itinerary" class="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">每日行程</a>
+          <button onclick="openKuroshioQuickSearch()" class="px-2.5 py-1.5 rounded-lg text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition flex items-center gap-1.5 font-bold text-xs border border-amber-400/50 dark:border-amber-500/30 shadow-xs">
+            <i class="fa-solid fa-bolt text-amber-500"></i> 黑潮號查班次
+          </button>
           <a href="#calculator" class="px-3 py-2 rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/60 transition font-semibold">
             <i class="fa-solid fa-calculator mr-1"></i> AA 埋數計算機
           </a>
@@ -121,8 +130,14 @@
 
     <!-- Mobile Dropdown Menu -->
     <div id="mobileMenu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pt-2 pb-4 space-y-1">
+      <a href="index.html" class="block px-3 py-2 rounded-md text-base font-bold text-brand-600 dark:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2">
+        <i class="fa-solid fa-arrow-left text-sm"></i> 返回首頁 (Main Page)
+      </a>
       <a href="#overview" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 dark:hover:bg-slate-800">總覽與航班</a>
       <a href="#itinerary" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-100 dark:hover:bg-slate-800">每日行程</a>
+      <button onclick="openKuroshioQuickSearch(); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-md text-base font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-slate-800 flex items-center gap-2">
+        <i class="fa-solid fa-bolt text-amber-500"></i> 特急黑潮號班次快速查詢
+      </button>
       <a href="#calculator" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-brand-600 dark:text-brand-400 font-bold hover:bg-brand-50 dark:hover:bg-slate-800">AA 埋數計算機</a>
     </div>
   </header>
@@ -280,18 +295,89 @@
 
           <div class="relative pl-6 sm:pl-8">
             <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-brand-500 border-4 border-white dark:border-slate-900"></div>
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-              <div class="flex flex-col xs:flex-row xs:items-center justify-between gap-2 mb-1">
-                <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-train mr-1"></i> 08:30 - 11:15</span>
-                <a href="kuroshio.html" class="inline-flex items-center gap-1 text-xs px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-bold transition shadow-sm self-start xs:self-auto">
-                  <i class="fa-solid fa-book-open"></i> 黑潮號指南
-                </a>
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
+                <span class="text-xs font-bold text-brand-600 dark:text-brand-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-train text-amber-500"></i> 08:30 - 11:15 • 關西機場 ➔ 白濱交通
+                </span>
+                <div class="flex items-center gap-2">
+                  <button onclick="openKuroshioQuickSearch('st-3b', 'st-8', 'outbound', '09:00', '3')" class="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg font-bold transition shadow-xs">
+                    <i class="fa-solid fa-bolt"></i> 快速查班次
+                  </button>
+                  <a href="kuroshio.html?station=st-3b&dir=outbound&train=3" class="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg font-semibold transition border border-slate-200 dark:border-slate-600">
+                    <i class="fa-solid fa-book-open"></i> 黑潮號專頁
+                  </a>
+                </div>
               </div>
-              <h4 class="font-bold text-slate-900 dark:text-white text-base">🚆 關西機場 ➔ 日根野站 ➔ JR 白濱站</h4>
-              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">
-                1. 從關西機場搭乘 <b>JR 關空快速</b> (約 11 分鐘) 到 <b>日根野站</b>。<br>
-                2. 於日根野站月台同站轉乘 <b>JR 特急 Kuroshio (黑潮號)</b> 直達 <b>JR 白濱站</b> (約 1 小時 45 分鐘)。
-              </p>
+
+              <div>
+                <h4 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
+                  <span>🚆 關西機場 ➔ 日根野站 ➔ JR 白濱站</span>
+                </h4>
+                <p class="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
+                  1. 從關西機場搭乘 <b>JR 關空快速</b> (約 11 分鐘) 到 <b>日根野站</b>。<br>
+                  2. 於日根野站月台同站轉乘 <b>JR 特急 Kuroshio (黑潮號)</b> 直達 <b>JR 白濱站</b> (約 1 小時 42 分鐘)。
+                </p>
+              </div>
+
+              <div class="bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>日根野 ➔ 白濱 推薦班次 (kuroshio.html 時刻連動)</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">南行 (下り)</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <button onclick="openKuroshioQuickSearch('st-3b', 'st-8', 'outbound', '09:00', '3')" class="text-left bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-amber-500/40 hover:border-amber-500 shadow-2xs hover:shadow-xs transition group">
+                    <div class="flex items-center justify-between text-[11px] mb-1">
+                      <span class="font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400">Kuroshio 3</span>
+                      <span class="text-[10px] font-bold px-1.5 py-0.2 bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300 rounded">🐬 海洋之箭</span>
+                    </div>
+                    <div class="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">
+                      09:36 ➔ 11:18
+                    </div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 flex justify-between">
+                      <span>日根野 1 月台</span>
+                      <span class="font-medium text-emerald-600 dark:text-emerald-400">首選推薦</span>
+                    </div>
+                  </button>
+
+                  <button onclick="openKuroshioQuickSearch('st-3b', 'st-8', 'outbound', '09:40', '5')" class="text-left bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-amber-400 shadow-2xs hover:shadow-xs transition group">
+                    <div class="flex items-center justify-between text-[11px] mb-1">
+                      <span class="font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400">Kuroshio 5</span>
+                      <span class="text-[10px] font-bold px-1.5 py-0.2 bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 rounded">🐼 熊貓塗裝</span>
+                    </div>
+                    <div class="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">
+                      09:45 ➔ 11:27
+                    </div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 flex justify-between">
+                      <span>日根野 1 月台</span>
+                      <span>熊貓車身</span>
+                    </div>
+                  </button>
+
+                  <button onclick="openKuroshioQuickSearch('st-3b', 'st-8', 'outbound', '08:15', '1')" class="text-left bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-amber-400 shadow-2xs hover:shadow-xs transition group">
+                    <div class="flex items-center justify-between text-[11px] mb-1">
+                      <span class="font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400">Kuroshio 1</span>
+                      <span class="text-[10px] font-medium px-1.5 py-0.2 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 rounded">🚆 287系</span>
+                    </div>
+                    <div class="text-xs font-mono font-bold text-slate-700 dark:text-slate-300">
+                      08:15 ➔ 09:57
+                    </div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 flex justify-between">
+                      <span>日根野 1 月台</span>
+                      <span>早班備案</span>
+                    </div>
+                  </button>
+                </div>
+
+                <button onclick="openKuroshioQuickSearch('st-3b', 'st-8', 'outbound', '09:00')" class="w-full py-1.5 px-3 rounded-lg border border-dashed border-amber-500/40 bg-white/60 dark:bg-slate-900/60 hover:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-xs font-bold flex items-center justify-center gap-2 transition">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <span>搜尋日根野至白濱所有 16 班車次、停靠站與月台資訊</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -335,15 +421,87 @@
         <div class="relative border-l-2 border-brand-200 dark:border-slate-700 ml-4 sm:ml-6 space-y-6 py-2">
           <div class="relative pl-6 sm:pl-8">
             <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-900"></div>
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-              <div class="flex flex-col xs:flex-row xs:items-center justify-between gap-2 mb-1">
-                <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-clock mr-1"></i> 09:20 - 10:40</span>
-                <a href="kuroshio.html" class="inline-flex items-center gap-1 text-xs px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-bold transition shadow-sm self-start xs:self-auto">
-                  <i class="fa-solid fa-book-open"></i> 黑潮號指南
-                </a>
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
+                <span class="text-xs font-bold text-brand-600 dark:text-brand-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-clock text-indigo-500"></i> 09:20 - 10:40 • 白濱 ➔ 和歌山移動
+                </span>
+                <div class="flex items-center gap-2">
+                  <button onclick="openKuroshioQuickSearch('st-8', 'st-4', 'inbound', '09:20', '8')" class="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg font-bold transition shadow-xs">
+                    <i class="fa-solid fa-bolt"></i> 快速查班次
+                  </button>
+                  <a href="kuroshio.html?station=st-8&dir=inbound&train=8" class="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg font-semibold transition border border-slate-200 dark:border-slate-600">
+                    <i class="fa-solid fa-book-open"></i> 黑潮號專頁
+                  </a>
+                </div>
               </div>
-              <h4 class="font-bold text-slate-900 dark:text-white text-base">🚆 白濱 ➔ JR 和歌山站 (大行李寄放)</h4>
-              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">搭乘 JR 特急 Kuroshio 前往和歌山站。<b>💡必要撇步：</b>抵達後將大件行李寄存於 JR 和歌山站內的投幣置物櫃，輕裝轉乘。</p>
+
+              <div>
+                <h4 class="font-bold text-slate-900 dark:text-white text-base">🚆 白濱 ➔ JR 和歌山站 (大行李寄放)</h4>
+                <p class="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
+                  搭乘 <b>JR 特急 Kuroshio (黑潮號)</b> 北行前往和歌山站 (車程約 1 小時 21 分)。<br>
+                  <b>💡必要撇步：</b>抵達後將大件行李寄存於 JR 和歌山站中央口內的投幣置物櫃，輕裝前往貴志川線採草莓！
+                </p>
+              </div>
+
+              <div class="bg-indigo-500/5 dark:bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-3 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-400">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>白濱 ➔ 和歌山 推薦班次 (kuroshio.html 時刻連動)</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">北行 (上り)</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <button onclick="openKuroshioQuickSearch('st-8', 'st-4', 'inbound', '09:20', '8')" class="text-left bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-amber-500/40 hover:border-amber-500 shadow-2xs hover:shadow-xs transition group">
+                    <div class="flex items-center justify-between text-[11px] mb-1">
+                      <span class="font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400">Kuroshio 8</span>
+                      <span class="text-[10px] font-bold px-1.5 py-0.2 bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300 rounded">🐬 海洋之箭</span>
+                    </div>
+                    <div class="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">
+                      09:20 ➔ 10:41
+                    </div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 flex justify-between">
+                      <span>白濱 1 月台</span>
+                      <span class="font-medium text-emerald-600 dark:text-emerald-400">準點首選 (1h 21m)</span>
+                    </div>
+                  </button>
+
+                  <button onclick="openKuroshioQuickSearch('st-8', 'st-4', 'inbound', '08:15', '6')" class="text-left bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-amber-400 shadow-2xs hover:shadow-xs transition group">
+                    <div class="flex items-center justify-between text-[11px] mb-1">
+                      <span class="font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400">Kuroshio 6</span>
+                      <span class="text-[10px] font-bold px-1.5 py-0.2 bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 rounded">🐼 熊貓塗裝</span>
+                    </div>
+                    <div class="text-xs font-mono font-bold text-slate-700 dark:text-slate-300">
+                      08:15 ➔ 09:36
+                    </div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 flex justify-between">
+                      <span>白濱 1 月台</span>
+                      <span>早出發熊貓號</span>
+                    </div>
+                  </button>
+
+                  <button onclick="openKuroshioQuickSearch('st-8', 'st-4', 'inbound', '10:20', '10')" class="text-left bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-amber-400 shadow-2xs hover:shadow-xs transition group">
+                    <div class="flex items-center justify-between text-[11px] mb-1">
+                      <span class="font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400">Kuroshio 10</span>
+                      <span class="text-[10px] font-medium px-1.5 py-0.2 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 rounded">🚆 287系</span>
+                    </div>
+                    <div class="text-xs font-mono font-bold text-slate-700 dark:text-slate-300">
+                      10:20 ➔ 11:41
+                    </div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 flex justify-between">
+                      <span>白濱 1 月台</span>
+                      <span>慢活用餐備案</span>
+                    </div>
+                  </button>
+                </div>
+
+                <button onclick="openKuroshioQuickSearch('st-8', 'st-4', 'inbound', '09:20')" class="w-full py-1.5 px-3 rounded-lg border border-dashed border-indigo-500/40 bg-white/60 dark:bg-slate-900/60 hover:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 text-xs font-bold flex items-center justify-center gap-2 transition">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <span>搜尋白濱至和歌山所有 15 班北行車次與各站時刻</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -373,15 +531,86 @@
 
           <div class="relative pl-6 sm:pl-8">
             <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-900"></div>
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-              <div class="flex flex-col xs:flex-row xs:items-center justify-between gap-2 mb-1">
-                <span class="text-xs font-bold text-brand-600 dark:text-brand-400"><i class="fa-solid fa-clock mr-1"></i> 15:15 - 16:30</span>
-                <a href="kuroshio.html" class="inline-flex items-center gap-1 text-xs px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-bold transition shadow-sm self-start xs:self-auto">
-                  <i class="fa-solid fa-book-open"></i> 黑潮號指南
-                </a>
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
+                <span class="text-xs font-bold text-brand-600 dark:text-brand-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-clock text-indigo-500"></i> 15:15 - 16:30 • 和歌山 ➔ 大阪市區
+                </span>
+                <div class="flex items-center gap-2">
+                  <button onclick="openKuroshioQuickSearch('st-4', 'st-3', 'inbound', '15:30', '18')" class="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg font-bold transition shadow-xs">
+                    <i class="fa-solid fa-bolt"></i> 快速查班次
+                  </button>
+                  <a href="kuroshio.html?station=st-4&dir=inbound&train=18" class="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg font-semibold transition border border-slate-200 dark:border-slate-600">
+                    <i class="fa-solid fa-book-open"></i> 黑潮號專頁
+                  </a>
+                </div>
               </div>
-              <h4 class="font-bold text-slate-900 dark:text-white text-base">🚆 和歌山 ➔ 大阪市區</h4>
-              <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">返回 JR 和歌山站取回大行李，搭乘 JR 特急 Kuroshio 直達天王寺/大阪站。</p>
+
+              <div>
+                <h4 class="font-bold text-slate-900 dark:text-white text-base">🚆 和歌山 ➔ 大阪市區 (天王寺 / 新大阪)</h4>
+                <p class="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
+                  返回 JR 和歌山站取回大行李，搭乘 <b>JR 特急 Kuroshio (黑潮號)</b> 直達<b>天王寺站</b> (約 43 分鐘) 或 <b>新大阪站</b> (約 63 分鐘)。
+                </p>
+              </div>
+
+              <div class="bg-indigo-500/5 dark:bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-3 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-400">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>和歌山 ➔ 天王寺/新大阪 推薦班次 (kuroshio.html 時刻連動)</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">北行 (上り)</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <button onclick="openKuroshioQuickSearch('st-4', 'st-3', 'inbound', '15:30', '18')" class="text-left bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-amber-500/40 hover:border-amber-500 shadow-2xs hover:shadow-xs transition group">
+                    <div class="flex items-center justify-between text-[11px] mb-1">
+                      <span class="font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400">Kuroshio 18</span>
+                      <span class="text-[10px] font-medium px-1.5 py-0.2 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 rounded">🚆 287系</span>
+                    </div>
+                    <div class="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">
+                      15:41 ➔ 16:24
+                    </div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 flex justify-between">
+                      <span>和歌山 4 月台</span>
+                      <span class="font-medium text-emerald-600 dark:text-emerald-400">行程首選 (43分)</span>
+                    </div>
+                  </button>
+
+                  <button onclick="openKuroshioQuickSearch('st-4', 'st-3', 'inbound', '16:30', '20')" class="text-left bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-amber-400 shadow-2xs hover:shadow-xs transition group">
+                    <div class="flex items-center justify-between text-[11px] mb-1">
+                      <span class="font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400">Kuroshio 20</span>
+                      <span class="text-[10px] font-bold px-1.5 py-0.2 bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 rounded">🐼 熊貓塗裝</span>
+                    </div>
+                    <div class="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">
+                      16:31 ➔ 17:14
+                    </div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 flex justify-between">
+                      <span>和歌山 4 月台</span>
+                      <span>熊貓車身 (43分)</span>
+                    </div>
+                  </button>
+
+                  <button onclick="openKuroshioQuickSearch('st-4', 'st-3', 'inbound', '17:40', '22')" class="text-left bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-amber-400 shadow-2xs hover:shadow-xs transition group">
+                    <div class="flex items-center justify-between text-[11px] mb-1">
+                      <span class="font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400">Kuroshio 22</span>
+                      <span class="text-[10px] font-bold px-1.5 py-0.2 bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300 rounded">🐬 海洋之箭</span>
+                    </div>
+                    <div class="text-xs font-mono font-bold text-slate-700 dark:text-slate-300">
+                      17:41 ➔ 18:24
+                    </div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 flex justify-between">
+                      <span>和歌山 4 月台</span>
+                      <span>傍晚展望席</span>
+                    </div>
+                  </button>
+                </div>
+
+                <button onclick="openKuroshioQuickSearch('st-4', 'st-3', 'inbound', '15:30')" class="w-full py-1.5 px-3 rounded-lg border border-dashed border-indigo-500/40 bg-white/60 dark:bg-slate-900/60 hover:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 text-xs font-bold flex items-center justify-center gap-2 transition">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <span>搜尋和歌山至大阪/新大阪所有 15 班北行車次與各站時刻</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -753,6 +982,166 @@
           關閉
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Kuroshio Train Quick Search Modal (Synchronized with kuroshio.html data) -->
+  <div id="kuroshioQuickSearchModal" class="modal-overlay fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex justify-center items-center p-3 sm:p-4 opacity-0 pointer-events-none transition-opacity duration-200">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center justify-center text-lg shrink-0">
+            <i class="fa-solid fa-train"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                特急 Kuroshio (黑潮號) 班次快速查詢
+              </h3>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 hidden sm:inline-block">
+                即時連動
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              JR 紀勢本線（黑潮號）全日完整時刻表與停靠站查詢
+            </p>
+          </div>
+        </div>
+
+        <button onclick="closeKuroshioQuickSearch()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
+        
+        <!-- Quick Route Presets -->
+        <div class="space-y-1.5">
+          <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            行程預設捷徑 (點擊自動切換)
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <button onclick="applyKuroshioPreset('st-3b', 'st-8', 'outbound', '09:00', '3')" class="preset-btn text-left p-2.5 rounded-xl border border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20 hover:border-amber-500 transition group">
+              <div class="text-[10px] font-bold text-amber-600 dark:text-amber-400">Day 1 行程捷徑</div>
+              <div class="text-xs font-black text-slate-800 dark:text-slate-100">日根野 ➔ 白濱</div>
+              <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">上午推薦 Kuroshio 3 (09:36)</div>
+            </button>
+
+            <button onclick="applyKuroshioPreset('st-8', 'st-4', 'inbound', '09:20', '8')" class="preset-btn text-left p-2.5 rounded-xl border border-indigo-500/30 bg-indigo-50/50 dark:bg-indigo-950/20 hover:border-indigo-500 transition group">
+              <div class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">Day 2 上午捷徑</div>
+              <div class="text-xs font-black text-slate-800 dark:text-slate-100">白濱 ➔ 和歌山</div>
+              <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">推薦 Kuroshio 8 (09:20)</div>
+            </button>
+
+            <button onclick="applyKuroshioPreset('st-4', 'st-3', 'inbound', '15:30', '18')" class="preset-btn text-left p-2.5 rounded-xl border border-cyan-500/30 bg-cyan-50/50 dark:bg-cyan-950/20 hover:border-cyan-500 transition group">
+              <div class="text-[10px] font-bold text-cyan-600 dark:text-cyan-400">Day 2 下午捷徑</div>
+              <div class="text-xs font-black text-slate-800 dark:text-slate-100">和歌山 ➔ 天王寺</div>
+              <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">推薦 Kuroshio 18 (15:41)</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Origin & Destination Selectors -->
+        <div class="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700/80 space-y-3">
+          <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
+            <div class="flex-1 w-full">
+              <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
+                出發站 (Departure)
+              </label>
+              <select id="kuroshioDepStation" onchange="handleKuroshioStationChange()" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-amber-500">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <button onclick="swapKuroshioRoute()" title="交換出發站與抵達站" class="w-9 h-9 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-amber-500 text-slate-600 dark:text-slate-300 flex items-center justify-center transition shadow-2xs hover:scale-105 shrink-0 self-center">
+              <i class="fa-solid fa-arrow-right-arrow-left text-xs"></i>
+            </button>
+
+            <div class="flex-1 w-full">
+              <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
+                抵達站 (Destination)
+              </label>
+              <select id="kuroshioArrStation" onchange="handleKuroshioStationChange()" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-amber-500">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] pt-1">
+            <div id="kuroshioDirectionBadge" class="flex items-center gap-1.5 font-bold text-amber-600 dark:text-amber-400">
+              <i class="fa-solid fa-compass"></i>
+              <span id="kuroshioDirectionText">南行 (下り) 往白濱/新宮方向</span>
+            </div>
+            <span id="kuroshioRouteDistanceText" class="text-slate-500 dark:text-slate-400 font-mono">
+              距離約 134.4 km
+            </span>
+          </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="space-y-2">
+          <div class="relative">
+            <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <input
+              type="text"
+              id="kuroshioTrainSearchInput"
+              oninput="handleKuroshioSearchInput()"
+              placeholder="快速搜尋車次 (例如 3, 8)、車型 (Ocean Arrow, 熊貓) 或出發時間..."
+              class="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-8 pr-8 py-2 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-amber-500 transition"
+            >
+            <button id="clearKuroshioSearchBtn" onclick="clearKuroshioSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs">
+              ✕
+            </button>
+          </div>
+
+          <!-- Model Filter Pills -->
+          <div class="flex flex-wrap gap-1.5">
+            <button onclick="setKuroshioLiveryFilter('')" class="kuroshio-filter-pill text-xs px-2.5 py-1 rounded-lg border font-medium transition bg-amber-500 text-slate-950 border-amber-400 font-bold" data-val="">
+              全部班次
+            </button>
+            <button onclick="setKuroshioLiveryFilter('283')" class="kuroshio-filter-pill text-xs px-2.5 py-1 rounded-lg border font-medium transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-amber-400" data-val="283">
+              🐬 海洋之箭 (283系)
+            </button>
+            <button onclick="setKuroshioLiveryFilter('Panda')" class="kuroshio-filter-pill text-xs px-2.5 py-1 rounded-lg border font-medium transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-amber-400" data-val="Panda">
+              🐼 熊貓列車 (287系)
+            </button>
+            <button onclick="setKuroshioLiveryFilter('Standard')" class="kuroshio-filter-pill text-xs px-2.5 py-1 rounded-lg border font-medium transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-amber-400" data-val="Standard">
+              🚆 287/289系標準
+            </button>
+          </div>
+        </div>
+
+        <!-- Results Header -->
+        <div class="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-400 px-1 pt-1">
+          <span id="kuroshioResultsCount">班次清單</span>
+          <span class="text-[11px] font-normal text-slate-400">點擊車次卡片可展開所有停靠站</span>
+        </div>
+
+        <!-- Train List Container -->
+        <div id="kuroshioResultsList" class="space-y-2.5">
+          <!-- Populated by JavaScript -->
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900/90 shrink-0">
+        <a id="kuroshioPortalDeepLink" href="kuroshio.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline">
+          <i class="fa-solid fa-up-right-from-square"></i>
+          <span>開啟黑潮號完整即時動態頁面 (kuroshio.html)</span>
+        </a>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button onclick="closeKuroshioQuickSearch()" class="flex-1 sm:flex-none px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition">
+            關閉
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1281,7 +1670,514 @@
 
         updatePeopleUI();
         updateItemsUI();
+        initKuroshioQuickSearch();
     });
+
+    // ==========================================
+    // Kuroshio Train Quick Search Engine
+    // (Synchronized with kuroshio.html Data)
+    // ==========================================
+    const KUROSHIO_STATIONS = [
+      { id: 'st-1', name: 'Shin-Osaka', jp: '新大阪', km: 0.0, platformOut: 'Plat 21', platformIn: 'Plat 3' },
+      { id: 'st-2', name: 'Osaka (Umekita)', jp: '大阪（うめきた）', km: 3.8, platformOut: 'Plat 21/22', platformIn: 'Plat 23/24' },
+      { id: 'st-3', name: 'Tennoji', jp: '天王寺', km: 14.8, platformOut: 'Plat 15', platformIn: 'Plat 18' },
+      { id: 'st-3b', name: 'Hineno', jp: '日根野', km: 48.0, platformOut: 'Plat 1', platformIn: 'Plat 4' },
+      { id: 'st-4', name: 'Wakayama', jp: '和歌山', km: 61.3, platformOut: 'Plat 1', platformIn: 'Plat 4/5' },
+      { id: 'st-5', name: 'Kainan', jp: '海南', km: 70.7, platformOut: 'Plat 2', platformIn: 'Plat 3' },
+      { id: 'st-6', name: 'Gobo', jp: '御坊', km: 115.4, platformOut: 'Plat 1', platformIn: 'Plat 2' },
+      { id: 'st-7', name: 'Kii-Tanabe', jp: '紀伊田邊', km: 149.3, platformOut: 'Plat 1', platformIn: 'Plat 2' },
+      { id: 'st-8', name: 'Shirahama', jp: '白濱', km: 167.0, platformOut: 'Plat 1/2', platformIn: 'Plat 1' },
+      { id: 'st-9', name: 'Susami', jp: '周參見', km: 188.5, platformOut: 'Plat 1', platformIn: 'Plat 2' },
+      { id: 'st-10', name: 'Kushimoto', jp: '串本', km: 221.8, platformOut: 'Plat 1', platformIn: 'Plat 2' },
+      { id: 'st-11', name: 'Kii-Katsuura', jp: '紀伊勝浦', km: 260.1, platformOut: 'Plat 1', platformIn: 'Plat 2' },
+      { id: 'st-12', name: 'Shingu', jp: '新宮', km: 276.4, platformOut: 'Plat 1', platformIn: 'Plat 1' }
+    ];
+
+    const KUROSHIO_SERVICES_OUTBOUND = [
+      { num: 1, depH: 7, depM: 33, term: 'Shirahama', cars: '6 cars (287 Standard)', type: '287 Series Standard' },
+      { num: 3, depH: 8, depM: 51, term: 'Shirahama', cars: '6 cars (Ocean Arrow)', type: '283 Series (Ocean Arrow)' },
+      { num: 5, depH: 9, depM: 0, term: 'Shirahama', cars: '6 cars (Panda Livery)', type: '287 Series (Panda Livery)' },
+      { num: 7, depH: 10, depM: 0, term: 'Shirahama', cars: '6 cars (287 Standard)', type: '287 Series Standard' },
+      { num: 9, depH: 11, depM: 0, term: 'Shirahama', cars: '6 cars (289 Standard)', type: '289 Series Standard' },
+      { num: 11, depH: 12, depM: 0, term: 'Shirahama', cars: '6 cars (287 Standard)', type: '287 Series Standard' },
+      { num: 13, depH: 13, depM: 0, term: 'Shirahama', cars: '6 cars (289 Standard)', type: '289 Series Standard' },
+      { num: 15, depH: 14, depM: 0, term: 'Shirahama', cars: '6 cars (287 Standard)', type: '287 Series Standard' },
+      { num: 17, depH: 15, depM: 15, term: 'Shirahama', cars: '6 cars (Ocean Arrow)', type: '283 Series (Ocean Arrow)' },
+      { num: 19, depH: 16, depM: 15, term: 'Shirahama', cars: '6 cars (Panda Livery)', type: '287 Series (Panda Livery)' },
+      { num: 21, depH: 17, depM: 15, term: 'Shirahama', cars: '6 cars (287 Standard)', type: '287 Series Standard' },
+      { num: 23, depH: 18, depM: 15, term: 'Shirahama', cars: '6 cars (289 Standard)', type: '289 Series Standard' },
+      { num: 25, depH: 19, depM: 15, term: 'Shirahama', cars: '6 cars (Panda Livery)', type: '287 Series (Panda Livery)' },
+      { num: 27, depH: 20, depM: 15, term: 'Shirahama', cars: '6 cars (287 Standard)', type: '287 Series Standard' },
+      { num: 29, depH: 21, depM: 15, term: 'Shirahama', cars: '6 cars (289 Standard)', type: '289 Series Standard' },
+      { num: 31, depH: 22, depM: 15, term: 'Kii-Tanabe', cars: '6 cars (287 Standard)', type: '287 Series Standard' }
+    ];
+
+    const KUROSHIO_SERVICES_INBOUND = [
+      { num: 2, depH: 6, depM: 0, orig: 'Kii-Tanabe', term: 'Shin-Osaka', cars: '6 cars (287 Standard)', type: '287 Series Standard' },
+      { num: 4, depH: 7, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (289 Standard)', type: '289 Series Standard' },
+      { num: 6, depH: 8, depM: 15, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (Panda Livery)', type: '287 Series (Panda Livery)' },
+      { num: 8, depH: 9, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (Ocean Arrow)', type: '283 Series (Ocean Arrow)' },
+      { num: 10, depH: 10, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (287 Standard)', type: '287 Series Standard' },
+      { num: 12, depH: 11, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (289 Standard)', type: '289 Series Standard' },
+      { num: 14, depH: 12, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (287 Standard)', type: '287 Series Standard' },
+      { num: 16, depH: 13, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (Ocean Arrow)', type: '283 Series (Ocean Arrow)' },
+      { num: 18, depH: 14, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (287 Standard)', type: '287 Series Standard' },
+      { num: 20, depH: 15, depM: 10, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (Panda Livery)', type: '287 Series (Panda Livery)' },
+      { num: 22, depH: 16, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (Ocean Arrow)', type: '283 Series (Ocean Arrow)' },
+      { num: 24, depH: 17, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (289 Standard)', type: '289 Series Standard' },
+      { num: 26, depH: 18, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (Panda Livery)', type: '287 Series (Panda Livery)' },
+      { num: 28, depH: 19, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (287 Standard)', type: '287 Series Standard' },
+      { num: 30, depH: 20, depM: 20, orig: 'Shirahama', term: 'Shin-Osaka', cars: '6 cars (287 Standard)', type: '287 Series Standard' }
+    ];
+
+    function getKuroshioStationOffset(stationId) {
+      switch (stationId) {
+        case 'st-1': return 0;
+        case 'st-2': return 5;
+        case 'st-3': return 19;
+        case 'st-3b': return 45;
+        case 'st-4': return 62;
+        case 'st-5': return 72;
+        case 'st-6': return 102;
+        case 'st-7': return 130;
+        case 'st-8': return 147;
+        case 'st-9': return 169;
+        case 'st-10': return 198;
+        case 'st-11': return 228;
+        case 'st-12': return 245;
+        default: return 0;
+      }
+    }
+
+    let kuroshioState = {
+      depStationId: 'st-3b',
+      arrStationId: 'st-8',
+      searchQuery: '',
+      liveryFilter: '',
+      highlightTrainNum: null,
+      expandedStops: {}
+    };
+
+    function initKuroshioQuickSearch() {
+      const depSelect = document.getElementById('kuroshioDepStation');
+      const arrSelect = document.getElementById('kuroshioArrStation');
+      if (!depSelect || !arrSelect) return;
+
+      const depOptions = KUROSHIO_STATIONS.map(st => 
+        `<option value="${st.id}">${st.jp} (${st.name}) - ${st.km.toFixed(1)}km</option>`
+      ).join('');
+
+      const arrOptions = KUROSHIO_STATIONS.map(st => 
+        `<option value="${st.id}">${st.jp} (${st.name}) - ${st.km.toFixed(1)}km</option>`
+      ).join('');
+
+      depSelect.innerHTML = depOptions;
+      arrSelect.innerHTML = arrOptions;
+
+      depSelect.value = kuroshioState.depStationId;
+      arrSelect.value = kuroshioState.arrStationId;
+
+      const modal = document.getElementById('kuroshioQuickSearchModal');
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            closeKuroshioQuickSearch();
+          }
+        });
+      }
+
+      // Close modal on ESC key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (modal && !modal.classList.contains('pointer-events-none')) {
+            closeKuroshioQuickSearch();
+          }
+        }
+      });
+    }
+
+    function openKuroshioQuickSearch(fromStId, toStId, direction, targetTime, highlightTrainNum) {
+      if (fromStId) kuroshioState.depStationId = fromStId;
+      if (toStId) kuroshioState.arrStationId = toStId;
+      if (highlightTrainNum) kuroshioState.highlightTrainNum = String(highlightTrainNum);
+      else kuroshioState.highlightTrainNum = null;
+
+      const depSelect = document.getElementById('kuroshioDepStation');
+      const arrSelect = document.getElementById('kuroshioArrStation');
+      if (depSelect) depSelect.value = kuroshioState.depStationId;
+      if (arrSelect) arrSelect.value = kuroshioState.arrStationId;
+
+      const searchInput = document.getElementById('kuroshioTrainSearchInput');
+      if (searchInput) {
+        searchInput.value = '';
+        kuroshioState.searchQuery = '';
+      }
+
+      renderKuroshioQuickSearchResults();
+
+      const modal = document.getElementById('kuroshioQuickSearchModal');
+      if (modal) {
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.classList.add('opacity-100');
+        document.body.style.overflow = 'hidden';
+      }
+
+      if (kuroshioState.highlightTrainNum) {
+        setTimeout(() => {
+          const targetEl = document.getElementById(`kuroshio-card-${kuroshioState.highlightTrainNum}`);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 250);
+      }
+    }
+
+    function closeKuroshioQuickSearch() {
+      const modal = document.getElementById('kuroshioQuickSearchModal');
+      if (modal) {
+        modal.classList.remove('opacity-100');
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        document.body.style.overflow = '';
+      }
+    }
+
+    function applyKuroshioPreset(fromId, toId, dir, time, trainNum) {
+      kuroshioState.depStationId = fromId;
+      kuroshioState.arrStationId = toId;
+      kuroshioState.highlightTrainNum = trainNum ? String(trainNum) : null;
+
+      const depSelect = document.getElementById('kuroshioDepStation');
+      const arrSelect = document.getElementById('kuroshioArrStation');
+      if (depSelect) depSelect.value = fromId;
+      if (arrSelect) arrSelect.value = toId;
+
+      renderKuroshioQuickSearchResults();
+
+      if (kuroshioState.highlightTrainNum) {
+        setTimeout(() => {
+          const targetEl = document.getElementById(`kuroshio-card-${kuroshioState.highlightTrainNum}`);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 150);
+      }
+    }
+
+    function swapKuroshioRoute() {
+      const temp = kuroshioState.depStationId;
+      kuroshioState.depStationId = kuroshioState.arrStationId;
+      kuroshioState.arrStationId = temp;
+
+      const depSelect = document.getElementById('kuroshioDepStation');
+      const arrSelect = document.getElementById('kuroshioArrStation');
+      if (depSelect) depSelect.value = kuroshioState.depStationId;
+      if (arrSelect) arrSelect.value = kuroshioState.arrStationId;
+
+      kuroshioState.highlightTrainNum = null;
+      renderKuroshioQuickSearchResults();
+    }
+
+    function handleKuroshioStationChange() {
+      const depSelect = document.getElementById('kuroshioDepStation');
+      const arrSelect = document.getElementById('kuroshioArrStation');
+      if (!depSelect || !arrSelect) return;
+
+      kuroshioState.depStationId = depSelect.value;
+      kuroshioState.arrStationId = arrSelect.value;
+      kuroshioState.highlightTrainNum = null;
+      renderKuroshioQuickSearchResults();
+    }
+
+    function handleKuroshioSearchInput() {
+      const input = document.getElementById('kuroshioTrainSearchInput');
+      const clearBtn = document.getElementById('clearKuroshioSearchBtn');
+      if (!input) return;
+
+      kuroshioState.searchQuery = input.value.trim().toLowerCase();
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', !kuroshioState.searchQuery);
+      }
+      renderKuroshioQuickSearchResults();
+    }
+
+    function clearKuroshioSearch() {
+      const input = document.getElementById('kuroshioTrainSearchInput');
+      const clearBtn = document.getElementById('clearKuroshioSearchBtn');
+      if (input) input.value = '';
+      if (clearBtn) clearBtn.classList.add('hidden');
+      kuroshioState.searchQuery = '';
+      renderKuroshioQuickSearchResults();
+    }
+
+    function setKuroshioLiveryFilter(val) {
+      kuroshioState.liveryFilter = val;
+      document.querySelectorAll('.kuroshio-filter-pill').forEach(btn => {
+        const isActive = btn.dataset.val === val;
+        btn.className = `kuroshio-filter-pill text-xs px-2.5 py-1 rounded-lg border font-medium transition ${
+          isActive
+            ? 'bg-amber-500 text-slate-950 border-amber-400 font-bold'
+            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-amber-400'
+        }`;
+      });
+      renderKuroshioQuickSearchResults();
+    }
+
+    function toggleKuroshioStopTimes(trainKey) {
+      kuroshioState.expandedStops[trainKey] = !kuroshioState.expandedStops[trainKey];
+      renderKuroshioQuickSearchResults();
+    }
+
+    function formatTimeMins(totalMins) {
+      let mins = Math.round(totalMins) % 1440;
+      if (mins < 0) mins += 1440;
+      const h = Math.floor(mins / 60);
+      const m = mins % 60;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    function renderKuroshioQuickSearchResults() {
+      const depSt = KUROSHIO_STATIONS.find(s => s.id === kuroshioState.depStationId) || KUROSHIO_STATIONS[0];
+      const arrSt = KUROSHIO_STATIONS.find(s => s.id === kuroshioState.arrStationId) || KUROSHIO_STATIONS[1];
+      const resultsContainer = document.getElementById('kuroshioResultsList');
+      const resultsCountEl = document.getElementById('kuroshioResultsCount');
+      const dirTextEl = document.getElementById('kuroshioDirectionText');
+      const distTextEl = document.getElementById('kuroshioRouteDistanceText');
+      const deepLinkEl = document.getElementById('kuroshioPortalDeepLink');
+
+      if (!resultsContainer) return;
+
+      const isOutbound = depSt.km < arrSt.km;
+      const direction = isOutbound ? 'outbound' : 'inbound';
+      const distanceKm = Math.abs(arrSt.km - depSt.km).toFixed(1);
+
+      if (dirTextEl) {
+        dirTextEl.textContent = isOutbound
+          ? '南行 (下り) 往白濱/新宮方向'
+          : '北行 (上り) 往和歌山/天王寺/新大阪方向';
+      }
+      if (distTextEl) {
+        distTextEl.textContent = `路程距離約 ${distanceKm} km`;
+      }
+      if (deepLinkEl) {
+        deepLinkEl.href = `kuroshio.html?station=${depSt.id}&dir=${direction}`;
+      }
+
+      if (depSt.id === arrSt.id) {
+        resultsContainer.innerHTML = `
+          <div class="p-6 text-center text-xs text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+            出發站與抵達站相同，請選擇不同站點以計算班次與車程。
+          </div>
+        `;
+        if (resultsCountEl) resultsCountEl.textContent = '班次清單 (0 班)';
+        return;
+      }
+
+      const services = isOutbound ? KUROSHIO_SERVICES_OUTBOUND : KUROSHIO_SERVICES_INBOUND;
+      const depOffset = getKuroshioStationOffset(depSt.id);
+      const arrOffset = getKuroshioStationOffset(arrSt.id);
+
+      const trainList = [];
+
+      services.forEach(srv => {
+        let depMins = 0;
+        let arrMins = 0;
+
+        if (isOutbound) {
+          const termSt = KUROSHIO_STATIONS.find(s => s.name === srv.term) || KUROSHIO_STATIONS[KUROSHIO_STATIONS.length - 1];
+          if (depSt.km > termSt.km || arrSt.km > termSt.km) return;
+
+          const originMins = srv.depH * 60 + srv.depM;
+          depMins = originMins + depOffset;
+          arrMins = originMins + arrOffset;
+        } else {
+          const origSt = KUROSHIO_STATIONS.find(s => s.name === (srv.orig || 'Shirahama')) || KUROSHIO_STATIONS[KUROSHIO_STATIONS.length - 1];
+          if (depSt.km > origSt.km || arrSt.km > origSt.km) return;
+
+          const origOffset = getKuroshioStationOffset(origSt.id);
+          const origDepMins = srv.depH * 60 + srv.depM;
+          depMins = origDepMins + (origOffset - depOffset);
+          arrMins = origDepMins + (origOffset - arrOffset);
+        }
+
+        const durationMins = arrMins - depMins;
+        if (durationMins <= 0) return;
+
+        // Generate intermediate stop times between dep and arr
+        const stops = [];
+        const minKm = Math.min(depSt.km, arrSt.km);
+        const maxKm = Math.max(depSt.km, arrSt.km);
+        const routeStations = KUROSHIO_STATIONS.filter(s => s.km >= minKm && s.km <= maxKm);
+
+        if (!isOutbound) routeStations.reverse();
+
+        routeStations.forEach(st => {
+          let stMins = 0;
+          if (isOutbound) {
+            stMins = (srv.depH * 60 + srv.depM) + getKuroshioStationOffset(st.id);
+          } else {
+            const origStId = KUROSHIO_STATIONS.find(s => s.name === (srv.orig || 'Shirahama'))?.id || 'st-8';
+            const origOffset = getKuroshioStationOffset(origStId);
+            stMins = (srv.depH * 60 + srv.depM) + (origOffset - getKuroshioStationOffset(st.id));
+          }
+          stops.push({
+            id: st.id,
+            name: st.name,
+            jp: st.jp,
+            time: formatTimeMins(stMins),
+            platform: isOutbound ? st.platformOut : st.platformIn
+          });
+        });
+
+        trainList.push({
+          num: srv.num,
+          id: `train-${direction}-${srv.num}`,
+          title: `Kuroshio ${srv.num} (黑潮 ${srv.num} 號)`,
+          type: srv.type,
+          cars: srv.cars,
+          term: srv.term,
+          depTime: formatTimeMins(depMins),
+          arrTime: formatTimeMins(arrMins),
+          durationMins: durationMins,
+          platformDep: isOutbound ? depSt.platformOut : depSt.platformIn,
+          platformArr: isOutbound ? arrSt.platformOut : arrSt.platformIn,
+          stops: stops
+        });
+      });
+
+      // Filter by query and livery
+      const filtered = trainList.filter(t => {
+        if (kuroshioState.liveryFilter) {
+          if (kuroshioState.liveryFilter === '283' && !t.type.includes('283')) return false;
+          if (kuroshioState.liveryFilter === 'Panda' && !t.type.includes('Panda')) return false;
+          if (kuroshioState.liveryFilter === 'Standard' && (t.type.includes('Panda') || t.type.includes('283'))) return false;
+        }
+        if (kuroshioState.searchQuery) {
+          const q = kuroshioState.searchQuery;
+          const matchNum = String(t.num) === q || t.title.toLowerCase().includes(q);
+          const matchType = t.type.toLowerCase().includes(q);
+          const matchTime = t.depTime.includes(q) || t.arrTime.includes(q);
+          if (!matchNum && !matchType && !matchTime) return false;
+        }
+        return true;
+      });
+
+      if (resultsCountEl) {
+        resultsCountEl.textContent = `找到 ${filtered.length} 班特急列車 (${depSt.jp} ➔ ${arrSt.jp})`;
+      }
+
+      if (filtered.length === 0) {
+        resultsContainer.innerHTML = `
+          <div class="p-8 text-center text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-700">
+            沒有符合「${escapeHtml(kuroshioState.searchQuery || kuroshioState.liveryFilter)}」的黑潮號班次，請清除篩選重試。
+          </div>
+        `;
+        return;
+      }
+
+      resultsContainer.innerHTML = filtered.map(t => {
+        const isHighlighted = kuroshioState.highlightTrainNum && String(t.num) === kuroshioState.highlightTrainNum;
+        const isExpanded = !!kuroshioState.expandedStops[t.id];
+        const hours = Math.floor(t.durationMins / 60);
+        const mins = t.durationMins % 60;
+        const durationText = hours > 0 ? `${hours} 小時 ${mins} 分` : `${mins} 分鐘`;
+
+        let liveryBadge = '';
+        if (t.type.includes('283')) {
+          liveryBadge = '<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-cyan-100 text-cyan-800 dark:bg-cyan-950/80 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-800">🐬 海洋之箭 283系</span>';
+        } else if (t.type.includes('Panda')) {
+          liveryBadge = '<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-300 dark:border-rose-800">🐼 熊貓列車 287系</span>';
+        } else {
+          liveryBadge = '<span class="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">🚆 標準型 (287/289系)</span>';
+        }
+
+        return `
+          <div id="kuroshio-card-${t.num}" class="p-3.5 sm:p-4 rounded-xl border transition ${
+            isHighlighted
+              ? 'bg-amber-500/10 border-amber-500 shadow-md ring-2 ring-amber-500/30'
+              : 'bg-white dark:bg-slate-800/90 border-slate-200 dark:border-slate-700 hover:border-amber-400'
+          }">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-black text-sm sm:text-base text-slate-900 dark:text-white">
+                    ${t.title}
+                  </span>
+                  ${liveryBadge}
+                  ${isHighlighted ? '<span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-500 text-slate-950">行程推薦</span>' : ''}
+                </div>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  終點站：${t.term} • ${t.cars} • 全車指定席
+                </p>
+              </div>
+
+              <!-- Time & Duration -->
+              <div class="flex items-center space-x-3 bg-slate-50 dark:bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 self-start sm:self-auto">
+                <div>
+                  <div class="text-[10px] text-slate-400">${depSt.jp} 發</div>
+                  <div class="font-mono text-base font-black text-amber-600 dark:text-amber-400 leading-none">
+                    ${t.depTime}
+                  </div>
+                </div>
+                <div class="text-xs text-slate-400 font-bold px-1">➔</div>
+                <div>
+                  <div class="text-[10px] text-slate-400">${arrSt.jp} 到</div>
+                  <div class="font-mono text-base font-black text-slate-800 dark:text-slate-100 leading-none">
+                    ${t.arrTime}
+                  </div>
+                </div>
+                <div class="border-l border-slate-200 dark:border-slate-700 pl-2.5 text-right font-mono">
+                  <div class="text-[10px] text-slate-400">車程</div>
+                  <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    ${durationText}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Platform & Stop actions -->
+            <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-3">
+                <span>出發月台：<b class="text-slate-700 dark:text-slate-200">${t.platformDep}</b></span>
+                <span>抵達月台：<b class="text-slate-700 dark:text-slate-200">${t.platformArr}</b></span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button onclick="toggleKuroshioStopTimes('${t.id}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 transition">
+                  ${isExpanded ? '隱藏沿途停靠 ▲' : `沿途 ${t.stops.length} 站時刻 ▼`}
+                </button>
+                <a href="kuroshio.html?station=${depSt.id}&dir=${direction}&train=${t.num}" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-brand-50 text-brand-600 dark:bg-brand-950 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900 border border-brand-200 dark:border-brand-800 transition">
+                  專頁即時動態 ➔
+                </a>
+              </div>
+            </div>
+
+            <!-- Expandable Stop Times -->
+            ${isExpanded ? `
+              <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/80">
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                  沿途車站發車時刻與月台：
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs">
+                  ${t.stops.map(st => `
+                    <div class="p-1.5 rounded-lg ${
+                      st.id === depSt.id || st.id === arrSt.id
+                        ? 'bg-amber-500/15 border border-amber-500/40 text-amber-900 dark:text-amber-200 font-bold'
+                        : 'bg-slate-50 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-slate-800'
+                    } flex items-center justify-between">
+                      <span class="truncate pr-1">${st.jp}</span>
+                      <span class="font-mono text-[11px] font-bold shrink-0">${st.time}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+          </div>
+        `;
+      }).join('');
+    }
   </script>
 </body>
 </html>
